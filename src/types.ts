@@ -11,3 +11,6 @@ export type Settings = {
 export type AppState = {
   settings: Settings;
 };
+
+export type Vertex = [number, number, number];
+export type Edge = [number, number];
