@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { getCubeGeometry } from "./shape";
+import { filterEdges, getCubeGeometry } from "./shape";
 import { Vertex, Edge } from "./types";
 
 describe("test getCubeGeometry", () => {
@@ -30,7 +30,7 @@ describe("test getCubeGeometry", () => {
     expect(edges).toEqual(expectedEdges);
   });
 
-  test("make sure a cube with an offset has the right vertices / edges", () => {
+  test("make sure a cub e with an offset has the right vertices / edges", () => {
     const vertices: Vertex[] = [];
     const edges: Edge[] = [];
     getCubeGeometry(vertices, edges, 1, 1, 2, 3);
@@ -86,5 +86,53 @@ describe("test getCubeGeometry", () => {
   ];
     expect(vertices).toEqual(expectedVertices);
     expect(edges).toEqual(expectedEdges);
+  });
+});
+
+describe("test filterEdges", () => {
+  test("make sure actual duplicate edges are filtered correctly", () => {
+    const vertices: Vertex[] = [
+      [0, 0, 0],
+      [1, 1, 1],
+      [2, 2, 2],
+      [3, 3, 3],
+    ];
+    const edges: Edge[] = [
+      [0, 1],
+      [1, 2], // ducplicate
+      [1, 2], // ducplicate
+      [1, 3],
+    ];
+
+    expect(filterEdges(vertices, edges)).toEqual([
+      [0, 1],
+      [1, 3],
+    ]);
+  });
+
+  test("make sure edges pointing to the same vertices are filtered correctly", () => {
+    // 2 vertices appear twice as it is shared between 2 shapes
+    const vertices: Vertex[] = [
+      // shape 1
+      [0, 0, 0], // 0
+      [1, 1, 1], // 1
+      [2, 2, 2], // 2
+
+      // shape 2
+      [1, 1, 1], // 3
+      [2, 2, 2], // 4
+      [3, 3, 3], // 5
+    ];
+    const edges: Edge[] = [
+      [0, 1],
+      [1, 2], // ducplicate
+      [3, 4], // ducplicate
+      [4, 5],
+    ];
+
+    expect(filterEdges(vertices, edges)).toEqual([
+      [0, 1],
+      [4, 5],
+    ]);
   });
 });

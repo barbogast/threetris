@@ -92,8 +92,7 @@ export const filterEdges = (vertices: Vertex[], edges: Edge[]) => {
   for (const edge of edges) {
     const edgeKey = getKeyForEdge(edge);
     if (!edgesToRemove.includes(edgeKey)) {
-      filteredEdges.push(edge[0]);
-      filteredEdges.push(edge[1]);
+      filteredEdges.push(edge);
     } else {
       console.log("filter", getKeyForEdge(edge));
     }
