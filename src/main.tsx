@@ -5,7 +5,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 import { getPieceGeometry } from "./shape";
 import SettingsPanel from "./components/SettingsPanel";
-import { Vertex } from "./types";
+import { Settings, Vertex } from "./types";
 import useAppStore from "./appStore";
 
 const SETTINGS_WIDTH = 300;
@@ -18,14 +18,16 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
-let currentPiece: {
+type ThreePiece = THREE.LineSegments<
+  THREE.BufferGeometry<THREE.NormalBufferAttributes>,
+  THREE.LineBasicMaterial,
+  THREE.Object3DEventMap
+>;
+
+type CurrentPiece = {
   position: Vertex;
   offsets: Vertex[];
-  threeObject: THREE.LineSegments<
-    THREE.BufferGeometry<THREE.NormalBufferAttributes>,
-    THREE.LineBasicMaterial,
-    THREE.Object3DEventMap
-  >;
+  threeObject: ThreePiece;
 };
 
 const renderGridLine = (fieldDepth: number, fieldSize: number) => {
@@ -66,7 +68,12 @@ const renderGridLine = (fieldDepth: number, fieldSize: number) => {
   scene.add(lines);
 };
 
-const setup = (fieldDepth: number, fieldSize: number) => {
+const setup = (
+  currentPiece: CurrentPiece,
+  updateCurrentPiece: (CurrentPiece: Partial<CurrentPiece>) => void,
+  fieldDepth: number,
+  fieldSize: number
+) => {
   camera.position.set(0, 10, 0); // position the camera on top of the scene
   camera.up.set(0, 0, -1); // point the camera towards the bottom of the scene
   camera.lookAt(0, 1, 0); // target the center of the scene
@@ -95,19 +102,20 @@ const setup = (fieldDepth: number, fieldSize: number) => {
       return;
     }
     if (e.key === "a") {
-      currentPiece.threeObject.rotateOnAxis(
-        new THREE.Vector3(0, 1, 0),
-        Math.PI / 4
-      );
+      // currentPiece.threeObject.rotateOnAxis(
+      //   new THREE.Vector3(0, 1, 0),
+      //   Math.PI / 4
+      // );
+      movePiece(currentPiece, updateCurrentPiece, -1, 0, 0);
     }
     if (e.key === "w") {
-      movePiece(0, -1);
+      movePiece(currentPiece, updateCurrentPiece, 0, 0, -1);
     }
     if (e.key === "s") {
-      movePiece(0, 1);
+      movePiece(currentPiece, updateCurrentPiece, 0, 0, 1);
     }
     if (e.key === "d") {
-      movePiece(1, 0);
+      movePiece(currentPiece, updateCurrentPiece, 1, 0, 0);
     }
   });
 
@@ -116,7 +124,13 @@ const setup = (fieldDepth: number, fieldSize: number) => {
   controls.enableZoom = false;
 };
 
-const movePiece = (x: number, z: number) => {
+const movePiece = (
+  currentPiece: CurrentPiece,
+  updateCurrentPiece: (CurrentPiece: Partial<CurrentPiece>) => void,
+  x: number,
+  y: number,
+  z: number
+) => {
   if (!currentPiece) {
     return;
   }
@@ -126,12 +140,21 @@ const movePiece = (x: number, z: number) => {
   ) {
     currentPiece.threeObject.position.x += x;
   }
+  currentPiece.threeObject.position.y += y;
   if (
     currentPiece.threeObject.position.z > -1 &&
     currentPiece.threeObject.position.z < 1
   ) {
     currentPiece.threeObject.position.z += z;
   }
+
+  updateCurrentPiece({
+    position: [
+      currentPiece.threeObject.position.x,
+      currentPiece.threeObject.position.y,
+      currentPiece.threeObject.position.z,
+    ],
+  });
 };
 
 const addPiece = (size: number) => {
@@ -158,37 +181,87 @@ const addPiece = (size: number) => {
 
   const material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
   const lines = new THREE.LineSegments(geometry, material);
-  currentPiece = { threeObject: lines, offsets: offsets, position: [0, 0, 0] };
+
   scene.add(lines);
+
+  return {
+    threeObject: lines,
+    offsets: offsets,
+    position: [0, 0, 0] as Vertex,
+  };
 };
 
-const tick = () => {
-  // Move the cube
-  if (currentPiece.threeObject.position.y > -0.5) {
-    currentPiece.threeObject.position.y -= 0.01;
-  } else {
-    // addShape(1);
+const mainLoop = (
+  tick: number,
+  currentPiece: CurrentPiece,
+  updateCurrentPiece: (piece: Partial<CurrentPiece>) => void
+) => {
+  if (tick % 24 === 0) {
+    movePiece(currentPiece, updateCurrentPiece, 0, -1, 0);
+    // if (true || currentPiece.threeObject.position.y > -0.5) {
+    //   // currentPiece.threeObject.position.y -= 1;
+    // } else {
+    //   // addShape(1);
+    // }
   }
 
   renderer.render(scene, camera);
   // line.rotateX(0.05);
 
-  requestAnimationFrame(tick);
+  tick += 1;
+  requestAnimationFrame(() => mainLoop(tick, currentPiece, updateCurrentPiece));
+};
+
+const main = (
+  settings: Settings,
+  setCurrentPiece: (piece: CurrentPiece) => void
+) => {
+  let currentPiece: CurrentPiece;
+
+  const updateCurrentPiece = (
+    data: Partial<{
+      threeObject: ThreePiece;
+      position: Vertex;
+      offsets: Vertex[];
+    }>
+  ) => {
+    Object.assign(currentPiece, data);
+    setCurrentPiece(currentPiece);
+  };
+
+  scene.remove.apply(scene, scene.children);
+  currentPiece = addPiece(1);
+  updateCurrentPiece(currentPiece);
+  setup(
+    currentPiece,
+    updateCurrentPiece,
+    settings.fieldDepth,
+    settings.fieldSize
+  );
+  mainLoop(0, currentPiece, updateCurrentPiece);
 };
 
 const App = () => {
+  const [currentPiece, setCurrentPiece] = React.useState<CurrentPiece>();
   const settings = useAppStore().settings;
+
   useEffect(() => {
-    scene.remove.apply(scene, scene.children);
-    setup(settings.fieldDepth, settings.fieldSize);
-    addPiece(1);
-    tick();
+    main(settings, (piece) => {
+      setCurrentPiece({ ...piece });
+    });
   }, [settings.fieldDepth, settings.fieldSize]);
 
   return (
     <div style={{ display: "flex", flexDirection: "row" }}>
       <div id="scene"></div>
       <div id="settings" style={{ width: SETTINGS_WIDTH }}>
+        <pre>
+          X1X{JSON.stringify(currentPiece?.position)}
+          {JSON.stringify(currentPiece?.position[1])}
+        </pre>
+        {currentPiece?.offsets.map((off) => (
+          <pre>{JSON.stringify(off)}</pre>
+        ))}
         <SettingsPanel camera={camera} />
       </div>
     </div>
