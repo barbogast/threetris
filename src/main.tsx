@@ -5,7 +5,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 import { getPieceGeometry } from "./shape";
 import SettingsPanel from "./components/SettingsPanel";
-import { Edge, Settings, Vertex } from "./types";
+import { Settings, Vertex } from "./types";
 import useAppStore from "./appStore";
 
 const SETTINGS_WIDTH = 300;
@@ -30,24 +30,25 @@ const renderGridLine = (settings: Settings) => {
   const vertices: Vertex[] = [];
 
   const s = settings.fieldSize / 2;
+  const d = settings.fieldDepth / 2;
   for (let i = -s + 1; i < s; i++) {
-    vertices.push([-s, -5, i]);
-    vertices.push([-s, 5, i]);
+    vertices.push([-s, -d, i]);
+    vertices.push([-s, d, i]);
   }
 
   for (let i = -s + 1; i < s; i++) {
-    vertices.push([s, -5, i]);
-    vertices.push([s, 5, i]);
+    vertices.push([s, -d, i]);
+    vertices.push([s, d, i]);
   }
 
   for (let i = -s + 1; i < s; i++) {
-    vertices.push([i, -5, -s]);
-    vertices.push([i, 5, -s]);
+    vertices.push([i, -d, -s]);
+    vertices.push([i, d, -s]);
   }
 
   for (let i = -s + 1; i < s; i++) {
-    vertices.push([i, -5, s]);
-    vertices.push([i, 5, s]);
+    vertices.push([i, -d, s]);
+    vertices.push([i, d, s]);
   }
 
   // Add the vertices and edges to the geometry
@@ -55,7 +56,6 @@ const renderGridLine = (settings: Settings) => {
     "position",
     new THREE.BufferAttribute(new Float32Array(vertices.flat()), 3)
   );
-  // geometry.setIndex(e.flat());
 
   const material = new THREE.LineBasicMaterial({ color: "0x00ff00" });
   const lines = new THREE.LineSegments(geometry, material);
@@ -79,7 +79,7 @@ const setup = (settings: Settings) => {
   // Container
   const cubeGeometry = new THREE.BoxGeometry(
     settings.fieldSize,
-    10,
+    settings.fieldDepth,
     settings.fieldSize
   );
   const cubeMaterial = new THREE.LineBasicMaterial({ color: "0x00ff00" });

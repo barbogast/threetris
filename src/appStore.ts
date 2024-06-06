@@ -7,6 +7,7 @@ const useAppStore = create<AppState>()(
     () => ({
       settings: {
         fieldSize: 4,
+        fieldDepth: 10,
         fov: 750,
         positionX: 0.0,
         positionY: 2.0,

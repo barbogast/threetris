@@ -32,6 +32,7 @@ const SettingsPanel = ({ camera }: Props) => {
     <>
       Settings
       <RangeSetting name="fieldSize" min={1} max={10} step={1} type={"int"} />
+      <RangeSetting name="fieldDepth" min={5} max={15} step={1} type={"int"} />
       <RangeSetting name="fov" min={0} max={1000} type={"int"} />
       <RangeSetting
         name="positionX"
@@ -80,6 +81,7 @@ const SettingsPanel = ({ camera }: Props) => {
           useAppStore.setState({
             settings: {
               fieldSize: 4,
+              fieldDepth: 10,
               fov: 750,
               positionX: 0.0,
               positionY: 2.0,
