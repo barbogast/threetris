@@ -24,13 +24,13 @@ let currentBlock: THREE.LineSegments<
   THREE.Object3DEventMap
 >;
 
-const renderGridLine = (settings: Settings) => {
+const renderGridLine = (fieldDepth: number, fieldSize: number) => {
   const geometry = new THREE.BufferGeometry();
 
   const vertices: Vertex[] = [];
 
-  const s = settings.fieldSize / 2;
-  const d = settings.fieldDepth / 2;
+  const s = fieldSize / 2;
+  const d = fieldDepth / 2;
   for (let i = -s + 1; i < s; i++) {
     vertices.push([-s, -d, i]);
     vertices.push([-s, d, i]);
@@ -62,7 +62,7 @@ const renderGridLine = (settings: Settings) => {
   scene.add(lines);
 };
 
-const setup = (settings: Settings) => {
+const setup = (fieldDepth: number, fieldSize: number) => {
   camera.position.set(0, 10, 0); // position the camera on top of the scene
   camera.up.set(0, 0, -1); // point the camera towards the bottom of the scene
   camera.lookAt(0, 1, 0); // target the center of the scene
@@ -77,17 +77,13 @@ const setup = (settings: Settings) => {
   document.getElementById("scene")?.appendChild(renderer.domElement);
 
   // Container
-  const cubeGeometry = new THREE.BoxGeometry(
-    settings.fieldSize,
-    settings.fieldDepth,
-    settings.fieldSize
-  );
+  const cubeGeometry = new THREE.BoxGeometry(fieldSize, fieldDepth, fieldSize);
   const cubeMaterial = new THREE.LineBasicMaterial({ color: "0x00ff00" });
   const edges = new THREE.EdgesGeometry(cubeGeometry);
   const cube = new THREE.LineSegments(edges, cubeMaterial);
   scene.add(cube);
 
-  renderGridLine(settings);
+  renderGridLine(fieldDepth, fieldSize);
 
   addEventListener("keypress", (e) => {
     console.log("event", e.key);
@@ -181,10 +177,10 @@ const App = () => {
   const settings = useAppStore().settings;
   useEffect(() => {
     scene.remove.apply(scene, scene.children);
-    setup(settings);
+    setup(settings.fieldDepth, settings.fieldSize);
     addBlock();
     tick();
-  }, [settings]);
+  }, [settings.fieldDepth, settings.fieldSize]);
 
   return (
     <div style={{ display: "flex", flexDirection: "row" }}>
