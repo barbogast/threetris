@@ -5,6 +5,8 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 import { getPieceGeometry } from "./shape";
 import SettingsPanel from "./components/SettingsPanel";
+import { Edge, Settings, Vertex } from "./types";
+import useAppStore from "./appStore";
 
 const SETTINGS_WIDTH = 300;
 const scene = new THREE.Scene();
@@ -22,8 +24,46 @@ let currentBlock: THREE.LineSegments<
   THREE.Object3DEventMap
 >;
 
-const setup = () => {
-  camera.position.set(0, 2, 0); // position the camera on top of the scene
+const renderGridLine = (settings: Settings) => {
+  const geometry = new THREE.BufferGeometry();
+
+  const vertices: Vertex[] = [];
+
+  const s = settings.fieldSize / 2;
+  for (let i = -s + 1; i < s; i++) {
+    vertices.push([-s, -5, i]);
+    vertices.push([-s, 5, i]);
+  }
+
+  for (let i = -s + 1; i < s; i++) {
+    vertices.push([s, -5, i]);
+    vertices.push([s, 5, i]);
+  }
+
+  for (let i = -s + 1; i < s; i++) {
+    vertices.push([i, -5, -s]);
+    vertices.push([i, 5, -s]);
+  }
+
+  for (let i = -s + 1; i < s; i++) {
+    vertices.push([i, -5, s]);
+    vertices.push([i, 5, s]);
+  }
+
+  // Add the vertices and edges to the geometry
+  geometry.setAttribute(
+    "position",
+    new THREE.BufferAttribute(new Float32Array(vertices.flat()), 3)
+  );
+  // geometry.setIndex(e.flat());
+
+  const material = new THREE.LineBasicMaterial({ color: "0x00ff00" });
+  const lines = new THREE.LineSegments(geometry, material);
+  scene.add(lines);
+};
+
+const setup = (settings: Settings) => {
+  camera.position.set(0, 10, 0); // position the camera on top of the scene
   camera.up.set(0, 0, -1); // point the camera towards the bottom of the scene
   camera.lookAt(0, 1, 0); // target the center of the scene
 
@@ -37,11 +77,17 @@ const setup = () => {
   document.getElementById("scene")?.appendChild(renderer.domElement);
 
   // Container
-  const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+  const cubeGeometry = new THREE.BoxGeometry(
+    settings.fieldSize,
+    10,
+    settings.fieldSize
+  );
   const cubeMaterial = new THREE.LineBasicMaterial({ color: "0x00ff00" });
   const edges = new THREE.EdgesGeometry(cubeGeometry);
   const cube = new THREE.LineSegments(edges, cubeMaterial);
   scene.add(cube);
+
+  renderGridLine(settings);
 
   addEventListener("keypress", (e) => {
     console.log("event", e.key);
@@ -115,7 +161,7 @@ const addShape = (size: number) => {
   scene.add(lines);
 };
 
-addShape(0.1);
+addShape(1);
 
 const tick = () => {
   // Move the cube
@@ -132,11 +178,13 @@ const tick = () => {
 };
 
 const App = () => {
+  const settings = useAppStore().settings;
   useEffect(() => {
-    setup();
+    scene.remove.apply(scene, scene.children);
+    setup(settings);
     addBlock();
     tick();
-  }, []);
+  }, [settings]);
 
   return (
     <div style={{ display: "flex", flexDirection: "row" }}>

@@ -1,4 +1,5 @@
 export type Settings = {
+  fieldSize: number;
   fov: number;
   positionX: number;
   positionY: number;
