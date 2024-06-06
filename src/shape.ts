@@ -45,22 +45,26 @@ export const getCubeGeometry = (
   offsetZ: number
 ) => {
   const s = size;
-  const oX = offsetX * size;
-  const oY = offsetY * size;
-  const oZ = offsetZ * size;
 
   // Define the vertices of the cube
   // prettier-ignore
   const newVertices: Vertex[] = [
-    [0 + oX, 0 + oY, 0 + oZ], // 0
-    [s + oX, 0 + oY, 0 + oZ], // 1
-    [s + oX, s + oY, 0 + oZ], // 2
-    [0 + oX, s + oY, 0 + oZ], // 3
-    [0 + oX, 0 + oY, s + oZ], // 4
-    [s + oX, 0 + oY, s + oZ], // 5
-    [s + oX, s + oY, s + oZ], // 6
-    [0 + oX, s + oY, s + oZ], // 7
+    [0, 0, 0 ], // 0
+    [s, 0, 0 ], // 1
+    [s, s, 0 ], // 2
+    [0, s, 0 ], // 3
+    [0, 0, s ], // 4
+    [s, 0, s ], // 5
+    [s, s, s ], // 6
+    [0, s, s ], // 7
   ];
+
+  // Apply offsets
+  for (const vertex of newVertices) {
+    vertex[0] += offsetX * size;
+    vertex[1] += offsetY * size;
+    vertex[2] += offsetZ * size;
+  }
 
   // Define the edges for the 12 triangles that make up the cube
   const n = vertices.length;
@@ -70,8 +74,8 @@ export const getCubeGeometry = (
     [n+4,n+5], [n+5,n+6], [n+6,n+7], [n+7,n+4], // Bottom face
     [n+0,n+4], [n+1,n+5], [n+2,n+6], [n+3,n+7]  // Sides
   ]
-  edges.push(...newEdges);
 
+  edges.push(...newEdges);
   vertices.push(...newVertices);
 };
 
