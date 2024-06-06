@@ -44,7 +44,7 @@ const SettingsPanel = ({ camera }: Props) => {
       <RangeSetting
         name="positionY"
         min={-1.0}
-        max={10.0}
+        max={20.0}
         step={0.1}
         type={"float"}
       />
