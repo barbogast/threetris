@@ -67,14 +67,14 @@ describe("test getCubeGeometry", () => {
 
     // prettier-ignore
     const expectedVertices = [
-    [-1, -1, -1], // 0
-    [ 1, -1, -1], // 1
-    [ 1,  1, -1], // 2
-    [-1,  1, -1], // 3
-    [-1, -1,  1], // 4
-    [ 1, -1,  1], // 5
+    [0,   0, 0], // 0
+    [ 1, 0, 0], // 1
+    [ 1,  1, 0], // 2
+    [0,  1, 0], // 3
+    [0, 0,  1], // 4
+    [ 1, 0,  1], // 5
     [ 1,  1,  1], // 6
-    [-1,  1,  1], // 7
+    [0,  1,  1], // 7
   ];
     // prettier-ignore
     const expectedEdges = [
@@ -93,14 +93,14 @@ describe("test getCubeGeometry", () => {
     getCubeGeometry(vertices, edges, 1, 1, 2, 3);
 
     const expectedVertices = [
-      [1, 3, 5],
-      [3, 3, 5],
-      [3, 5, 5],
-      [1, 5, 5],
-      [1, 3, 7],
-      [3, 3, 7],
-      [3, 5, 7],
-      [1, 5, 7],
+      [1, 2, 3],
+      [2, 2, 3],
+      [2, 3, 3],
+      [1, 3, 3],
+      [1, 2, 4],
+      [2, 2, 4],
+      [2, 3, 4],
+      [1, 3, 4],
     ];
     const expectedEdges = [
       [0, 1],
@@ -126,14 +126,14 @@ describe("test getCubeGeometry", () => {
     getCubeGeometry(vertices, edges, 0.1, 0, 0, 0);
 
     const expectedVertices = [
-      [-0.1, -0.1, -0.1],
-      [0.1, -0.1, -0.1],
-      [0.1, 0.1, -0.1],
-      [-0.1, 0.1, -0.1],
-      [-0.1, -0.1, 0.1],
-      [0.1, -0.1, 0.1],
+      [0, 0, 0],
+      [0.1, 0, 0],
+      [0.1, 0.1, 0],
+      [0, 0.1, 0],
+      [0, 0, 0.1],
+      [0.1, 0, 0.1],
       [0.1, 0.1, 0.1],
-      [-0.1, 0.1, 0.1],
+      [0, 0.1, 0.1],
     ];
     // prettier-ignore
     const expectedEdges = [
