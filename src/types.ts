@@ -13,4 +13,5 @@ export type AppState = {
 };
 
 export type Vertex = [number, number, number];
+export type PieceOffset = [number, number, number];
 export type Edge = [number, number];

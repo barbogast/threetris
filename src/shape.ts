@@ -2,7 +2,32 @@
 //    1. assembling the vertices and edges which will later be passed to THREE.BufferGeometry()
 //    2. filtering out the edges that are shared by 2 cubes
 
-import { Edge, Vertex } from "./types";
+import { Edge, PieceOffset, Vertex } from "./types";
+import shapeDefinitions from "./shapeDefinitions";
+
+export const parseShapeDefinition = (shapes: string[]) => {
+  const pieceOffsets: PieceOffset[] = [];
+
+  for (const [level, shape] of shapes.entries()) {
+    // Remove leading and trailing newlines. Note that we cannot use trim() here, as it would also trailing spaces
+    // const trimmed = shape.replace(/^[\n]?|[\n]?$/g, "");
+
+    const trimmed = shape
+      .trim()
+      .replace(/---------\n/, "")
+      .replace(/\n---------/, "");
+
+    for (const [lineNumber, line] of trimmed.split("\n").entries()) {
+      for (let i = 0; i < line.length; i++) {
+        if (line[i] === "▢") {
+          pieceOffsets.push([i, lineNumber, level]);
+        }
+      }
+    }
+  }
+
+  return pieceOffsets;
+};
 
 // First we generate vertices and edges for all cubes. Important: The edges-array contains not coordinates
 // but indices into the vertices array. Because ... three.js likes it this way?
@@ -99,4 +124,16 @@ export const filterEdges = (vertices: Vertex[], edges: Edge[]) => {
   }
 
   return filteredEdges;
+};
+
+export const getPieceGeometry = (size: number) => {
+  const pieceOffset = parseShapeDefinition(shapeDefinitions.shape1.shape);
+  const vertices: Vertex[] = [];
+  const allEdges: Edge[] = [];
+  for (const offset of pieceOffset) {
+    getCubeGeometry(vertices, allEdges, size, offset[0], offset[1], offset[2]);
+  }
+
+  const filteredEdges = filterEdges(vertices, allEdges);
+  return { vertices, edges: filteredEdges };
 };

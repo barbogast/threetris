@@ -1,6 +1,63 @@
 import { describe, expect, test } from "vitest";
-import { filterEdges, getCubeGeometry } from "./shape";
+import { filterEdges, getCubeGeometry, parseShapeDefinition } from "./shape";
 import { Vertex, Edge } from "./types";
+
+describe("test parseShapeDefinition()", () => {
+  test("parses simple shape correctly", () => {
+    const shapes = [
+      `
+---------
+▢
+▢▢▢
+---------`,
+    ];
+    expect(parseShapeDefinition(shapes)).toEqual([
+      [0, 0, 0],
+      [0, 1, 0],
+      [1, 1, 0],
+      [2, 1, 0],
+    ]);
+  });
+
+  test("parses shape with starting space correctly", () => {
+    const shapes = [
+      `
+---------
+ ▢▢
+▢▢
+---------`,
+    ];
+    expect(parseShapeDefinition(shapes)).toEqual([
+      [1, 0, 0],
+      [2, 0, 0],
+      [0, 1, 0],
+      [1, 1, 0],
+    ]);
+  });
+
+  test("parses shape multi-level shape correctly", () => {
+    const shapes = [
+      `
+---------
+ ▢▢
+▢▢
+---------`,
+      `
+---------
+ ▢
+ ▢
+---------`,
+    ];
+    expect(parseShapeDefinition(shapes)).toEqual([
+      [1, 0, 0],
+      [2, 0, 0],
+      [0, 1, 0],
+      [1, 1, 0],
+      [1, 0, 1],
+      [1, 1, 1],
+    ]);
+  });
+});
 
 describe("test getCubeGeometry", () => {
   test("make sure a cube has the right vertices / edges", () => {

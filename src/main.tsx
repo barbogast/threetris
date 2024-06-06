@@ -3,9 +3,8 @@ import ReactDOM from "react-dom/client";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-import { getCubeGeometry, filterEdges } from "./shape";
+import { getPieceGeometry } from "./shape";
 import SettingsPanel from "./components/SettingsPanel";
-import { Vertex, Edge } from "./types";
 
 const SETTINGS_WIDTH = 300;
 const scene = new THREE.Scene();
@@ -101,15 +100,7 @@ const addShape = (size: number) => {
   // is not rendered. If an edge is touched by 3 cubes we assume it is a fold and we render
   // it. Edges touched by 4 cubes are skipped however, they are in the middle of a bigger cube.
 
-  const vertices: Vertex[] = [];
-  const allEdges: Edge[] = [];
-  getCubeGeometry(vertices, allEdges, size, 0, 1, 0);
-  getCubeGeometry(vertices, allEdges, size, 0, 0, 0);
-  getCubeGeometry(vertices, allEdges, size, 1, 0, 0);
-  getCubeGeometry(vertices, allEdges, size, -1, 0, 0);
-
-  const filteredEdges = filterEdges(vertices, allEdges);
-  // const filteredEdges = allEdges;
+  const { vertices, edges } = getPieceGeometry(size);
   const geometry = new THREE.BufferGeometry();
 
   // Add the vertices and edges to the geometry
@@ -117,7 +108,7 @@ const addShape = (size: number) => {
     "position",
     new THREE.BufferAttribute(new Float32Array(vertices.flat()), 3)
   );
-  geometry.setIndex(filteredEdges.flat());
+  geometry.setIndex(edges.flat());
 
   const material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
   const lines = new THREE.LineSegments(geometry, material);
