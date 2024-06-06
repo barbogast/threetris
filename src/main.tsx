@@ -18,11 +18,15 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
-let currentPiece: THREE.LineSegments<
-  THREE.BufferGeometry<THREE.NormalBufferAttributes>,
-  THREE.LineBasicMaterial,
-  THREE.Object3DEventMap
->;
+let currentPiece: {
+  position: Vertex;
+  offsets: Vertex[];
+  threeObject: THREE.LineSegments<
+    THREE.BufferGeometry<THREE.NormalBufferAttributes>,
+    THREE.LineBasicMaterial,
+    THREE.Object3DEventMap
+  >;
+};
 
 const renderGridLine = (fieldDepth: number, fieldSize: number) => {
   const geometry = new THREE.BufferGeometry();
@@ -91,7 +95,10 @@ const setup = (fieldDepth: number, fieldSize: number) => {
       return;
     }
     if (e.key === "a") {
-      currentPiece.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 4);
+      currentPiece.threeObject.rotateOnAxis(
+        new THREE.Vector3(0, 1, 0),
+        Math.PI / 4
+      );
     }
     if (e.key === "w") {
       movePiece(0, -1);
@@ -113,11 +120,17 @@ const movePiece = (x: number, z: number) => {
   if (!currentPiece) {
     return;
   }
-  if (currentPiece.position.x > -1 && currentPiece.position.x < 1) {
-    currentPiece.position.x += x;
+  if (
+    currentPiece.threeObject.position.x > -1 &&
+    currentPiece.threeObject.position.x < 1
+  ) {
+    currentPiece.threeObject.position.x += x;
   }
-  if (currentPiece.position.z > -1 && currentPiece.position.z < 1) {
-    currentPiece.position.z += z;
+  if (
+    currentPiece.threeObject.position.z > -1 &&
+    currentPiece.threeObject.position.z < 1
+  ) {
+    currentPiece.threeObject.position.z += z;
   }
 };
 
@@ -132,7 +145,7 @@ const addPiece = (size: number) => {
   // is not rendered. If an edge is touched by 3 cubes we assume it is a fold and we render
   // it. Edges touched by 4 cubes are skipped however, they are in the middle of a bigger cube.
 
-  const { vertices, edges } = getPieceGeometry(size);
+  const { vertices, edges, offsets } = getPieceGeometry(size);
   console.log("vertices", vertices);
   const geometry = new THREE.BufferGeometry();
 
@@ -145,14 +158,14 @@ const addPiece = (size: number) => {
 
   const material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
   const lines = new THREE.LineSegments(geometry, material);
-  currentPiece = lines;
+  currentPiece = { threeObject: lines, offsets: offsets, position: [0, 0, 0] };
   scene.add(lines);
 };
 
 const tick = () => {
   // Move the cube
-  if (currentPiece.position.y > -0.5) {
-    currentPiece.position.y -= 0.01;
+  if (currentPiece.threeObject.position.y > -0.5) {
+    currentPiece.threeObject.position.y -= 0.01;
   } else {
     // addShape(1);
   }

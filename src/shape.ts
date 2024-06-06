@@ -149,5 +149,5 @@ export const getPieceGeometry = (size: number) => {
   }
 
   const filteredEdges = filterEdges(vertices, allEdges);
-  return { vertices, edges: filteredEdges };
+  return { vertices, edges: filteredEdges, offsets: pieceOffset };
 };
