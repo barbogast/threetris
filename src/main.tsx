@@ -5,7 +5,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 import { getPieceGeometry } from "./shape";
 import SettingsPanel from "./components/SettingsPanel";
-import { Settings, Vertex } from "./types";
+import { Vertex } from "./types";
 import useAppStore from "./appStore";
 
 const SETTINGS_WIDTH = 300;
@@ -18,8 +18,8 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
-let currentBlock: THREE.LineSegments<
-  THREE.EdgesGeometry<THREE.BoxGeometry>,
+let currentPiece: THREE.LineSegments<
+  THREE.BufferGeometry<THREE.NormalBufferAttributes>,
   THREE.LineBasicMaterial,
   THREE.Object3DEventMap
 >;
@@ -87,20 +87,20 @@ const setup = (fieldDepth: number, fieldSize: number) => {
 
   addEventListener("keypress", (e) => {
     console.log("event", e.key);
-    if (!currentBlock) {
+    if (!currentPiece) {
       return;
     }
     if (e.key === "a") {
-      moveBlock(-0.1, 0);
+      movePiece(-1, 0);
     }
     if (e.key === "w") {
-      moveBlock(0, -0.1);
+      movePiece(0, -1);
     }
     if (e.key === "s") {
-      moveBlock(0, 0.1);
+      movePiece(0, 1);
     }
     if (e.key === "d") {
-      moveBlock(0.1, 0);
+      movePiece(1, 0);
     }
   });
 
@@ -109,29 +109,19 @@ const setup = (fieldDepth: number, fieldSize: number) => {
   controls.enableZoom = false;
 };
 
-const moveBlock = (x: number, z: number) => {
-  if (!currentBlock) {
+const movePiece = (x: number, z: number) => {
+  if (!currentPiece) {
     return;
   }
-  if (currentBlock.position.x > -1 && currentBlock.position.x < 1) {
-    currentBlock.position.x += x;
+  if (currentPiece.position.x > -1 && currentPiece.position.x < 1) {
+    currentPiece.position.x += x;
   }
-  if (currentBlock.position.z > -1 && currentBlock.position.z < 1) {
-    currentBlock.position.z += z;
+  if (currentPiece.position.z > -1 && currentPiece.position.z < 1) {
+    currentPiece.position.z += z;
   }
 };
 
-const addBlock = () => {
-  const cubeGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
-  const cubeMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
-  const edges = new THREE.EdgesGeometry(cubeGeometry);
-  const cube = new THREE.LineSegments(edges, cubeMaterial);
-  cube.position.set(0, 0.5, 0);
-  scene.add(cube);
-  currentBlock = cube;
-};
-
-const addShape = (size: number) => {
+const addPiece = (size: number) => {
   // Tetris pieces are constructed from cubes aligned next to or on top of each other.
   // In addition to aligning the cubes we need to remove mesh-lines between cubes where
   // cubes touch and form a flat continuous surface. Mesh lines between cubes which form
@@ -143,6 +133,7 @@ const addShape = (size: number) => {
   // it. Edges touched by 4 cubes are skipped however, they are in the middle of a bigger cube.
 
   const { vertices, edges } = getPieceGeometry(size);
+  console.log("vertices", vertices);
   const geometry = new THREE.BufferGeometry();
 
   // Add the vertices and edges to the geometry
@@ -154,17 +145,16 @@ const addShape = (size: number) => {
 
   const material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
   const lines = new THREE.LineSegments(geometry, material);
+  currentPiece = lines;
   scene.add(lines);
 };
 
-addShape(1);
-
 const tick = () => {
   // Move the cube
-  if (currentBlock.position.y > -0.5) {
-    currentBlock.position.y -= 0.01;
+  if (currentPiece.position.y > -0.5) {
+    currentPiece.position.y -= 0.01;
   } else {
-    addBlock();
+    // addShape(1);
   }
 
   renderer.render(scene, camera);
@@ -178,7 +168,7 @@ const App = () => {
   useEffect(() => {
     scene.remove.apply(scene, scene.children);
     setup(settings.fieldDepth, settings.fieldSize);
-    addBlock();
+    addPiece(1);
     tick();
   }, [settings.fieldDepth, settings.fieldSize]);
 
