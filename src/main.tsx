@@ -91,7 +91,7 @@ const setup = (fieldDepth: number, fieldSize: number) => {
       return;
     }
     if (e.key === "a") {
-      movePiece(-1, 0);
+      currentPiece.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 4);
     }
     if (e.key === "w") {
       movePiece(0, -1);

@@ -26,6 +26,16 @@ export const parseShapeDefinition = (shapes: string[]) => {
     }
   }
 
+  // Center pieces around 0,0,0 so that they get rotated around their center
+  const maxX = Math.max(...pieceOffsets.map((offset) => offset[0])) + 1;
+  const maxY = Math.max(...pieceOffsets.map((offset) => offset[1])) + 1;
+  const maxZ = Math.max(...pieceOffsets.map((offset) => offset[2])) + 1;
+  for (const offset of pieceOffsets) {
+    offset[0] -= Math.floor(maxX / 2);
+    offset[1] -= Math.floor(maxY / 2);
+    offset[2] -= Math.floor(maxZ / 2);
+  }
+
   return pieceOffsets;
 };
 
