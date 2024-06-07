@@ -42,13 +42,13 @@ const setup = (
   fieldDepth: number,
   fieldSize: number
 ) => {
-  camera.position.set(0, 10, 0); // position the camera on top of the scene
-  camera.up.set(0, 0, -1); // point the camera towards the bottom of the scene
-  camera.lookAt(0, 1, 0); // target the center of the scene
+  camera.position.set(fieldSize / 2, fieldDepth + 2, fieldSize / 2); // position the camera on top of the scene
+  // camera.up.set(0, 0, -1); // point the camera towards the bottom of the scene
+  camera.lookAt(0, 0, fieldSize / 2); // target the center of the scene
 
   // Adjust the camera's aspect ratio and fov to make the scene appear wider and taller
   // camera.aspect = 1.5;
-  camera.fov = 750;
+  camera.fov = 780;
   camera.updateProjectionMatrix();
 
   // Create a renderer
