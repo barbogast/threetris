@@ -77,30 +77,3 @@ class GameState {
 }
 
 export default GameState;
-
-// export const getCurrentPiece = (state: GameState) => state.currentPiece;
-
-// export const getFallenPieces = (state: GameState) => state.fallenPieces;
-
-// export const setCurrentPiece = (
-//   state: GameState,
-//   currentPiece: CurrentPiece
-// ) => {
-//   state.currentPiece = currentPiece;
-// };
-
-// export const addFallenPiece = (state: GameState) => {
-//   const cubes = getCurrentPiece(state).offsets.map((offset) => [
-//     getCurrentPiece(state).position[0] + offset[0],
-//     getCurrentPiece(state).position[1] + offset[1],
-//     getCurrentPiece(state).position[2] + offset[2],
-//   ]);
-//   state.fallenPieces.push(
-//     ...cubes.map((cube) => [cube[0], cube[2]] as [number, number])
-//   );
-// };
-
-// export const getInitialState = (initialPiece: CurrentPiece) => ({
-//   currentPiece: initialPiece,
-//   fallenPieces: [],
-// });
