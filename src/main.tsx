@@ -120,7 +120,7 @@ const rotatePiece = (
   );
 };
 
-const addPiece = (size: number) => {
+const addPiece = (fieldDepth: number, size: number) => {
   // Tetris pieces are constructed from cubes aligned next to or on top of each other.
   // In addition to aligning the cubes we need to remove mesh-lines between cubes where
   // cubes touch and form a flat continuous surface. Mesh lines between cubes which form
@@ -144,20 +144,22 @@ const addPiece = (size: number) => {
 
   const material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
   const lines = new THREE.LineSegments(geometry, material);
+  lines.position.set(0, fieldDepth, 0);
 
   scene.add(lines);
 
   return {
     threeObject: lines,
     offsets: offsets,
-    position: [0, 0, 0] as Vertex,
+    position: [0, fieldDepth, 0] as Vertex,
   };
 };
 
 const mainLoop = (
   tick: number,
   currentPiece: CurrentPiece,
-  updateCurrentPiece: (piece: Partial<CurrentPiece>) => void
+  updateCurrentPiece: (piece: Partial<CurrentPiece>) => void,
+  fieldDepth: number
 ) => {
   if (tick % 24 === 0) {
     if (currentPiece.threeObject.position.y > 0) {
@@ -168,11 +170,14 @@ const mainLoop = (
     }
   }
 
+  renderFallenPieces();
   renderer.render(scene, camera);
   // line.rotateX(0.05);
 
   tick += 1;
-  requestAnimationFrame(() => mainLoop(tick, currentPiece, updateCurrentPiece));
+  requestAnimationFrame(() =>
+    mainLoop(tick, currentPiece, updateCurrentPiece, fieldDepth)
+  );
 };
 
 const main = (
@@ -193,7 +198,7 @@ const main = (
   };
 
   scene.remove.apply(scene, scene.children);
-  currentPiece = addPiece(1);
+  currentPiece = addPiece(settings.fieldDepth, 1);
   updateCurrentPiece(currentPiece);
   setup(
     currentPiece,
@@ -201,7 +206,7 @@ const main = (
     settings.fieldDepth,
     settings.fieldSize
   );
-  mainLoop(0, currentPiece, updateCurrentPiece);
+  mainLoop(0, currentPiece, updateCurrentPiece, settings.fieldDepth);
 };
 
 const App = () => {
