@@ -7,7 +7,7 @@ import { getPieceGeometry } from "./shape";
 import SettingsPanel from "./components/SettingsPanel";
 import { Settings, Vertex } from "./types";
 import useAppStore from "./appStore";
-import { renderContainer, renderGridLine } from "./shaft";
+import { renderContainer, renderFloorGrid, renderGridLine } from "./shaft";
 
 const SETTINGS_WIDTH = 300;
 const scene = new THREE.Scene();
@@ -51,7 +51,8 @@ const setup = (
   document.getElementById("scene")?.appendChild(renderer.domElement);
 
   renderContainer(scene, fieldSize, fieldDepth);
-  renderGridLine(scene, fieldDepth, fieldSize);
+  renderFloorGrid(scene, fieldSize, fieldDepth);
+  renderGridLine(scene, fieldSize, fieldDepth);
 
   addEventListener("keypress", (e) => {
     console.log("event", e.key);

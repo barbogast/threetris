@@ -15,8 +15,8 @@ export const renderContainer = (
 
 export const renderGridLine = (
   scene: THREE.Scene,
-  fieldDepth: number,
-  fieldSize: number
+  fieldSize: number,
+  fieldDepth: number
 ) => {
   const geometry = new THREE.BufferGeometry();
 
@@ -44,7 +44,35 @@ export const renderGridLine = (
     vertices.push([i, d, s]);
   }
 
-  // Add the vertices and edges to the geometry
+  geometry.setAttribute(
+    "position",
+    new THREE.BufferAttribute(new Float32Array(vertices.flat()), 3)
+  );
+
+  const material = new THREE.LineBasicMaterial({ color: "0x00ff00" });
+  const lines = new THREE.LineSegments(geometry, material);
+  scene.add(lines);
+};
+
+export const renderFloorGrid = (
+  scene: THREE.Scene,
+  fieldSize: number,
+  fieldDepth: number
+) => {
+  const geometry = new THREE.BufferGeometry();
+
+  const vertices: Vertex[] = [];
+
+  const s = fieldSize / 2;
+  const y = -fieldDepth / 2;
+
+  for (let i = -s + 1; i < s; i++) {
+    vertices.push([-s, y, i]);
+    vertices.push([s, y, i]);
+    vertices.push([i, y, -s]);
+    vertices.push([i, y, s]);
+  }
+
   geometry.setAttribute(
     "position",
     new THREE.BufferAttribute(new Float32Array(vertices.flat()), 3)
