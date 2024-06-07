@@ -14,6 +14,8 @@ import {
   renderWallGridShortLines,
 } from "./shaft";
 
+import GameState, { CurrentPiece, StateUpdateCallbacks } from "./gameState";
+
 const SETTINGS_WIDTH = 300;
 const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer();
@@ -30,18 +32,7 @@ type ThreePiece = THREE.LineSegments<
   THREE.Object3DEventMap
 >;
 
-type CurrentPiece = {
-  position: Vertex;
-  offsets: Vertex[];
-  threeObject: ThreePiece;
-};
-
-const setup = (
-  currentPiece: CurrentPiece,
-  updateCurrentPiece: (CurrentPiece: Partial<CurrentPiece>) => void,
-  fieldDepth: number,
-  fieldSize: number
-) => {
+const setup = (state: GameState, fieldDepth: number, fieldSize: number) => {
   camera.position.set(fieldSize / 2, fieldDepth + 2, fieldSize / 2); // position the camera on top of the scene
   // camera.up.set(0, 0, -1); // point the camera towards the bottom of the scene
   camera.lookAt(0, 0, fieldSize / 2); // target the center of the scene
@@ -62,23 +53,21 @@ const setup = (
 
   addEventListener("keypress", (e) => {
     console.log("event", e.key);
-    if (!currentPiece) {
-      return;
-    }
+
     // if (e.key === "a") {
     //   rotatePiece(currentPiece, updateCurrentPiece);
     // }
     if (e.key === "a") {
-      movePiece(currentPiece, updateCurrentPiece, -1, 0, 0);
+      state.moveCurrentPiece([-1, 0, 0]);
     }
     if (e.key === "w") {
-      movePiece(currentPiece, updateCurrentPiece, 0, 0, -1);
+      state.moveCurrentPiece([0, 0, -1]);
     }
     if (e.key === "s") {
-      movePiece(currentPiece, updateCurrentPiece, 0, 0, 1);
+      state.moveCurrentPiece([0, 0, 1]);
     }
     if (e.key === "d") {
-      movePiece(currentPiece, updateCurrentPiece, 1, 0, 0);
+      state.moveCurrentPiece([1, 0, 0]);
     }
   });
 
@@ -102,29 +91,6 @@ const renderFallenPieces = () => {
   }
 };
 
-const movePiece = (
-  currentPiece: CurrentPiece,
-  updateCurrentPiece: (CurrentPiece: Partial<CurrentPiece>) => void,
-  x: number,
-  y: number,
-  z: number
-) => {
-  if (!currentPiece) {
-    return;
-  }
-  currentPiece.threeObject.position.x += x;
-  currentPiece.threeObject.position.y += y;
-  currentPiece.threeObject.position.z += z;
-
-  updateCurrentPiece({
-    position: [
-      currentPiece.threeObject.position.x,
-      currentPiece.threeObject.position.y,
-      currentPiece.threeObject.position.z,
-    ],
-  });
-};
-
 const rotatePiece = (
   currentPiece: CurrentPiece,
   updateCurrentPiece: (CurrentPiece: Partial<CurrentPiece>) => void
@@ -135,7 +101,7 @@ const rotatePiece = (
   );
 };
 
-const addPiece = (fieldDepth: number, size: number) => {
+const addPiece = (state: GameState, fieldDepth: number, size: number) => {
   // Tetris pieces are constructed from cubes aligned next to or on top of each other.
   // In addition to aligning the cubes we need to remove mesh-lines between cubes where
   // cubes touch and form a flat continuous surface. Mesh lines between cubes which form
@@ -163,25 +129,21 @@ const addPiece = (fieldDepth: number, size: number) => {
 
   scene.add(lines);
 
-  return {
+  const newPiece = {
     threeObject: lines,
     offsets: offsets,
     position: [0, fieldDepth, 0] as Vertex,
   };
+  state.setCurrentPiece(newPiece);
+  return newPiece;
 };
 
-const mainLoop = (
-  tick: number,
-  currentPiece: CurrentPiece,
-  updateCurrentPiece: (piece: Partial<CurrentPiece>) => void,
-  fieldDepth: number
-) => {
+const mainLoop = (state: GameState, tick: number, fieldDepth: number) => {
   if (tick % 24 === 0) {
-    if (currentPiece.threeObject.position.y > 0) {
-      currentPiece.threeObject.position.y -= 1;
+    if (state.getCurrentPiecePosition()[1] > 0) {
+      state.moveCurrentPiece([0, -1, 0]);
     } else {
-      const newPiece = addPiece(fieldDepth, 1);
-      updateCurrentPiece(newPiece);
+      addPiece(state, fieldDepth, 1);
     }
   }
 
@@ -190,55 +152,35 @@ const mainLoop = (
   // line.rotateX(0.05);
 
   tick += 1;
-  requestAnimationFrame(() =>
-    mainLoop(tick, currentPiece, updateCurrentPiece, fieldDepth)
-  );
+  requestAnimationFrame(() => mainLoop(state, tick, fieldDepth));
 };
 
-const main = (
-  settings: Settings,
-  setCurrentPiece: (piece: CurrentPiece) => void
-) => {
-  let currentPiece: CurrentPiece;
-
-  const updateCurrentPiece = (
-    data: Partial<{
-      threeObject: ThreePiece;
-      position: Vertex;
-      offsets: Vertex[];
-    }>
-  ) => {
-    Object.assign(currentPiece, data);
-    setCurrentPiece(currentPiece);
-  };
-
+const main = (settings: Settings, callbacks: StateUpdateCallbacks) => {
   scene.remove.apply(scene, scene.children);
-  currentPiece = addPiece(settings.fieldDepth, 1);
-  updateCurrentPiece(currentPiece);
-  setup(
-    currentPiece,
-    updateCurrentPiece,
-    settings.fieldDepth,
-    settings.fieldSize
-  );
-  mainLoop(0, currentPiece, updateCurrentPiece, settings.fieldDepth);
+  const state = new GameState(callbacks);
+  addPiece(state, settings.fieldDepth, 1);
+
+  setup(state, settings.fieldDepth, settings.fieldSize);
+  mainLoop(state, 0, settings.fieldDepth);
 };
 
 const App = () => {
   const [currentPiece, setCurrentPiece] = React.useState<CurrentPiece>();
   const settings = useAppStore().settings;
 
+  const callbacks = {
+    currentPiece: setCurrentPiece,
+  };
+
   useEffect(() => {
-    main(settings, (piece) => {
-      setCurrentPiece({ ...piece });
-    });
+    main(settings, callbacks);
   }, [settings.fieldDepth, settings.fieldSize]);
 
   return (
     <div style={{ display: "flex", flexDirection: "row" }}>
       <div id="scene"></div>
       <div id="settings" style={{ width: SETTINGS_WIDTH }}>
-        <pre>{JSON.stringify(currentPiece?.position)}</pre>
+        <pre>{JSON.stringify(currentPiece?.threeObject.position)}</pre>
         {currentPiece?.offsets.map((off, i) => (
           <pre key={i}>{JSON.stringify(off)}</pre>
         ))}
