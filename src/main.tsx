@@ -56,7 +56,7 @@ const setup = (
   document.getElementById("scene")?.appendChild(renderer.domElement);
 
   renderContainer(scene, fieldSize, fieldDepth);
-  renderFloorGrid(scene, fieldSize, fieldDepth);
+  renderFloorGrid(scene, fieldSize);
   renderWallGridLongLines(scene, fieldSize, fieldDepth);
   renderWallGridShortLines(scene, fieldSize, fieldDepth);
 

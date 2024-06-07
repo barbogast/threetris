@@ -10,6 +10,7 @@ export const renderContainer = (
   const cubeMaterial = new THREE.LineBasicMaterial({ color: "0x00ff00" });
   const edges = new THREE.EdgesGeometry(cubeGeometry);
   const cube = new THREE.LineSegments(edges, cubeMaterial);
+  cube.position.set(fieldSize / 2, fieldDepth / 2, fieldSize / 2);
   scene.add(cube);
 };
 
@@ -22,24 +23,24 @@ export const renderWallGridLongLines = (
 
   const vertices: Vertex[] = [];
 
-  const s = fieldSize / 2;
-  const d = fieldDepth / 2;
+  const s = fieldSize;
+  const d = fieldDepth;
 
-  for (let i = -s + 1; i < s; i++) {
+  for (let i = 1; i < s; i++) {
     // Left wall
-    vertices.push([-s, -d, i]);
-    vertices.push([-s, d, i]);
+    vertices.push([0, 0, i]);
+    vertices.push([0, d, i]);
 
     // Right wall
-    vertices.push([s, -d, i]);
+    vertices.push([s, 0, i]);
     vertices.push([s, d, i]);
 
-    // Top
-    vertices.push([i, -d, -s]);
-    vertices.push([i, d, -s]);
+    // // Top
+    vertices.push([i, 0, 0]);
+    vertices.push([i, d, 0]);
 
-    // Bottom
-    vertices.push([i, -d, s]);
+    // // Bottom
+    vertices.push([i, 0, s]);
     vertices.push([i, d, s]);
   }
 
@@ -62,24 +63,24 @@ export const renderWallGridShortLines = (
 
   const vertices: Vertex[] = [];
 
-  const s = fieldSize / 2;
-  const d = fieldDepth / 2;
+  const s = fieldSize;
+  const d = fieldDepth;
 
-  for (let i = -d + 1; i < d; i++) {
+  for (let i = 1; i < d; i++) {
     // Left wall
-    vertices.push([-s, i, -s]);
-    vertices.push([-s, i, s]);
+    vertices.push([0, i, 0]);
+    vertices.push([0, i, s]);
 
-    // // Right wall
-    vertices.push([s, i, -s]);
+    // Right wall
+    vertices.push([s, i, 0]);
     vertices.push([s, i, s]);
 
-    // // Top
-    vertices.push([-s, i, -s]);
-    vertices.push([s, i, -s]);
+    // Top
+    vertices.push([0, i, 0]);
+    vertices.push([s, i, 0]);
 
-    // // Bottom
-    vertices.push([-s, i, s]);
+    // Bottom
+    vertices.push([0, i, s]);
     vertices.push([s, i, s]);
   }
 
@@ -93,26 +94,20 @@ export const renderWallGridShortLines = (
   scene.add(lines);
 };
 
-export const renderFloorGrid = (
-  scene: THREE.Scene,
-  fieldSize: number,
-  fieldDepth: number
-) => {
+export const renderFloorGrid = (scene: THREE.Scene, fieldSize: number) => {
   const geometry = new THREE.BufferGeometry();
 
   const vertices: Vertex[] = [];
 
-  const s = fieldSize / 2;
-  const y = -fieldDepth / 2;
-
-  for (let i = -s + 1; i < s; i++) {
+  const s = fieldSize;
+  for (let i = 0 + 1; i < s; i++) {
     // Horizontal
-    vertices.push([-s, y, i]);
-    vertices.push([s, y, i]);
+    vertices.push([0, 0, i]);
+    vertices.push([s, 0, i]);
 
     // Vertical
-    vertices.push([i, y, -s]);
-    vertices.push([i, y, s]);
+    vertices.push([i, 0, 0]);
+    vertices.push([i, 0, s]);
   }
 
   geometry.setAttribute(
