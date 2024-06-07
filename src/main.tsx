@@ -7,7 +7,12 @@ import { getPieceGeometry } from "./shape";
 import SettingsPanel from "./components/SettingsPanel";
 import { Settings, Vertex } from "./types";
 import useAppStore from "./appStore";
-import { renderContainer, renderFloorGrid, renderGridLine } from "./shaft";
+import {
+  renderContainer,
+  renderFloorGrid,
+  renderWallGridLongLines,
+  renderWallGridShortLines,
+} from "./shaft";
 
 const SETTINGS_WIDTH = 300;
 const scene = new THREE.Scene();
@@ -52,7 +57,8 @@ const setup = (
 
   renderContainer(scene, fieldSize, fieldDepth);
   renderFloorGrid(scene, fieldSize, fieldDepth);
-  renderGridLine(scene, fieldSize, fieldDepth);
+  renderWallGridLongLines(scene, fieldSize, fieldDepth);
+  renderWallGridShortLines(scene, fieldSize, fieldDepth);
 
   addEventListener("keypress", (e) => {
     console.log("event", e.key);
@@ -60,10 +66,9 @@ const setup = (
       return;
     }
     if (e.key === "a") {
-      // currentPiece.threeObject.rotateOnAxis(
-      //   new THREE.Vector3(0, 1, 0),
-      //   Math.PI / 4
-      // );
+      rotatePiece(currentPiece, updateCurrentPiece);
+    }
+    if (e.key === "a") {
       movePiece(currentPiece, updateCurrentPiece, -1, 0, 0);
     }
     if (e.key === "w") {
@@ -92,19 +97,9 @@ const movePiece = (
   if (!currentPiece) {
     return;
   }
-  if (
-    currentPiece.threeObject.position.x > -1 &&
-    currentPiece.threeObject.position.x < 1
-  ) {
-    currentPiece.threeObject.position.x += x;
-  }
+  currentPiece.threeObject.position.x += x;
   currentPiece.threeObject.position.y += y;
-  if (
-    currentPiece.threeObject.position.z > -1 &&
-    currentPiece.threeObject.position.z < 1
-  ) {
-    currentPiece.threeObject.position.z += z;
-  }
+  currentPiece.threeObject.position.z += z;
 
   updateCurrentPiece({
     position: [
@@ -113,6 +108,16 @@ const movePiece = (
       currentPiece.threeObject.position.z,
     ],
   });
+};
+
+const rotatePiece = (
+  currentPiece: CurrentPiece,
+  updateCurrentPiece: (CurrentPiece: Partial<CurrentPiece>) => void
+) => {
+  currentPiece.threeObject.rotateOnAxis(
+    new THREE.Vector3(0, 1, 0),
+    Math.PI / 4
+  );
 };
 
 const addPiece = (size: number) => {
@@ -155,7 +160,7 @@ const mainLoop = (
   updateCurrentPiece: (piece: Partial<CurrentPiece>) => void
 ) => {
   if (tick % 24 === 0) {
-    movePiece(currentPiece, updateCurrentPiece, 0, -1, 0);
+    // movePiece(currentPiece, updateCurrentPiece, 0, -1, 0);
     // if (true || currentPiece.threeObject.position.y > -0.5) {
     //   // currentPiece.threeObject.position.y -= 1;
     // } else {
