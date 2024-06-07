@@ -42,6 +42,13 @@ class GameState {
     this.#callbacks.currentPiece(currentPiece);
   }
 
+  removeCurrentPiece() {
+    if (this.#state.currentPiece) {
+      this.#state.currentPiece.threeObject.remove();
+      this.#state.currentPiece = undefined;
+    }
+  }
+
   getCurrentPiecePosition() {
     const { threeObject } = this.#getCurrentPiece();
     return [

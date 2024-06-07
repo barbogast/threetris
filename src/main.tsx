@@ -76,17 +76,12 @@ const setup = (state: GameState, fieldDepth: number, fieldSize: number) => {
   controls.enableZoom = false;
 };
 
-const renderFallenPieces = () => {
-  const cubes = [
-    [2, 2],
-    [4, 4],
-  ];
-
-  for (const [x, z] of cubes) {
+const renderFallenPieces = (state: GameState) => {
+  for (const [x, z] of state.getFallenPieces()) {
     const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
     const cubeMaterial = new THREE.MeshNormalMaterial();
     const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-    cube.position.set(x - 0.5, 0 + 0.5, z - 0.5);
+    cube.position.set(x + 0.5, 0 + 0.5, z + 0.5);
     scene.add(cube);
   }
 };
@@ -102,6 +97,8 @@ const rotatePiece = (
 };
 
 const addPiece = (state: GameState, fieldDepth: number, size: number) => {
+  state.removeCurrentPiece();
+
   // Tetris pieces are constructed from cubes aligned next to or on top of each other.
   // In addition to aligning the cubes we need to remove mesh-lines between cubes where
   // cubes touch and form a flat continuous surface. Mesh lines between cubes which form
@@ -143,11 +140,12 @@ const mainLoop = (state: GameState, tick: number, fieldDepth: number) => {
     if (state.getCurrentPiecePosition()[1] > 0) {
       state.moveCurrentPiece([0, -1, 0]);
     } else {
+      state.addFallenPiece();
       addPiece(state, fieldDepth, 1);
     }
   }
 
-  renderFallenPieces();
+  renderFallenPieces(state);
   renderer.render(scene, camera);
   // line.rotateX(0.05);
 
