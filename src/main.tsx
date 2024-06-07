@@ -7,7 +7,7 @@ import { getPieceGeometry } from "./shape";
 import SettingsPanel from "./components/SettingsPanel";
 import { Settings, Vertex } from "./types";
 import useAppStore from "./appStore";
-import { renderGridLine } from "./shaft";
+import { renderContainer, renderGridLine } from "./shaft";
 
 const SETTINGS_WIDTH = 300;
 const scene = new THREE.Scene();
@@ -50,13 +50,7 @@ const setup = (
   renderer.setSize(window.innerWidth - SETTINGS_WIDTH, window.innerHeight);
   document.getElementById("scene")?.appendChild(renderer.domElement);
 
-  // Container
-  const cubeGeometry = new THREE.BoxGeometry(fieldSize, fieldDepth, fieldSize);
-  const cubeMaterial = new THREE.LineBasicMaterial({ color: "0x00ff00" });
-  const edges = new THREE.EdgesGeometry(cubeGeometry);
-  const cube = new THREE.LineSegments(edges, cubeMaterial);
-  scene.add(cube);
-
+  renderContainer(scene, fieldSize, fieldDepth);
   renderGridLine(scene, fieldDepth, fieldSize);
 
   addEventListener("keypress", (e) => {

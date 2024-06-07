@@ -1,6 +1,18 @@
 import * as THREE from "three";
 import { Vertex } from "./types";
 
+export const renderContainer = (
+  scene: THREE.Scene,
+  fieldSize: number,
+  fieldDepth: number
+) => {
+  const cubeGeometry = new THREE.BoxGeometry(fieldSize, fieldDepth, fieldSize);
+  const cubeMaterial = new THREE.LineBasicMaterial({ color: "0x00ff00" });
+  const edges = new THREE.EdgesGeometry(cubeGeometry);
+  const cube = new THREE.LineSegments(edges, cubeMaterial);
+  scene.add(cube);
+};
+
 export const renderGridLine = (
   scene: THREE.Scene,
   fieldDepth: number,
