@@ -218,12 +218,9 @@ const App = () => {
     <div style={{ display: "flex", flexDirection: "row" }}>
       <div id="scene"></div>
       <div id="settings" style={{ width: SETTINGS_WIDTH }}>
-        <pre>
-          X1X{JSON.stringify(currentPiece?.position)}
-          {JSON.stringify(currentPiece?.position[1])}
-        </pre>
-        {currentPiece?.offsets.map((off) => (
-          <pre>{JSON.stringify(off)}</pre>
+        <pre>{JSON.stringify(currentPiece?.position)}</pre>
+        {currentPiece?.offsets.map((off, i) => (
+          <pre key={i}>{JSON.stringify(off)}</pre>
         ))}
         <SettingsPanel camera={camera} />
       </div>
