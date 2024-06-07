@@ -65,9 +65,9 @@ const setup = (
     if (!currentPiece) {
       return;
     }
-    if (e.key === "a") {
-      rotatePiece(currentPiece, updateCurrentPiece);
-    }
+    // if (e.key === "a") {
+    //   rotatePiece(currentPiece, updateCurrentPiece);
+    // }
     if (e.key === "a") {
       movePiece(currentPiece, updateCurrentPiece, -1, 0, 0);
     }
