@@ -160,12 +160,12 @@ const mainLoop = (
   updateCurrentPiece: (piece: Partial<CurrentPiece>) => void
 ) => {
   if (tick % 24 === 0) {
-    // movePiece(currentPiece, updateCurrentPiece, 0, -1, 0);
-    // if (true || currentPiece.threeObject.position.y > -0.5) {
-    //   // currentPiece.threeObject.position.y -= 1;
-    // } else {
-    //   // addShape(1);
-    // }
+    if (currentPiece.threeObject.position.y > 0) {
+      currentPiece.threeObject.position.y -= 1;
+    } else {
+      const newPiece = addPiece(fieldDepth, 1);
+      updateCurrentPiece(newPiece);
+    }
   }
 
   renderer.render(scene, camera);
