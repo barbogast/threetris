@@ -87,6 +87,21 @@ const setup = (
   controls.enableZoom = false;
 };
 
+const renderFallenPieces = () => {
+  const cubes = [
+    [2, 2],
+    [4, 4],
+  ];
+
+  for (const [x, z] of cubes) {
+    const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+    const cubeMaterial = new THREE.MeshNormalMaterial();
+    const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+    cube.position.set(x - 0.5, 0 + 0.5, z - 0.5);
+    scene.add(cube);
+  }
+};
+
 const movePiece = (
   currentPiece: CurrentPiece,
   updateCurrentPiece: (CurrentPiece: Partial<CurrentPiece>) => void,
