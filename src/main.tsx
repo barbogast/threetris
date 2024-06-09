@@ -67,7 +67,7 @@ const setup = (state: GameState, fieldDepth: number, fieldSize: number) => {
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.maxPolarAngle = (0.9 * Math.PI) / 2;
-  controls.enableZoom = false;
+  controls.enableZoom = true;
 };
 
 const rotatePiece = (
