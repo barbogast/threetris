@@ -15,16 +15,12 @@ import {
 } from "./shaft";
 
 import GameState, { CurrentPiece, StateUpdateCallbacks } from "./gameState";
-import {
-  moveCurrentPiece,
-  removeCurrentPiece,
-  renderCurrentPiece,
-  setupGroups,
-} from "./render";
+import GameRenderer from "./render";
 
 const SETTINGS_WIDTH = 300;
 const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer();
+const gameRenderer = new GameRenderer(scene);
 const camera = new THREE.PerspectiveCamera(
   50,
   window.innerWidth / window.innerHeight,
@@ -46,12 +42,12 @@ const setup = (state: GameState, fieldDepth: number, fieldSize: number) => {
   renderer.setSize(window.innerWidth - SETTINGS_WIDTH, window.innerHeight);
   document.getElementById("scene")?.appendChild(renderer.domElement);
 
-  setupGroups(scene);
+  gameRenderer.setup();
 
   renderContainer(scene, fieldSize, fieldDepth);
-  renderFloorGrid(scene, fieldSize);
-  renderWallGridLongLines(scene, fieldSize, fieldDepth);
-  renderWallGridShortLines(scene, fieldSize, fieldDepth);
+  renderFloorGrid(gameRenderer, fieldSize);
+  renderWallGridLongLines(gameRenderer, fieldSize, fieldDepth);
+  renderWallGridShortLines(gameRenderer, fieldSize, fieldDepth);
 
   addEventListener("keypress", (e) => {
     console.log("event", e.key);
@@ -60,16 +56,17 @@ const setup = (state: GameState, fieldDepth: number, fieldSize: number) => {
     //   rotatePiece(currentPiece, updateCurrentPiece);
     // }
     if (e.key === "a") {
-      moveCurrentPiece(scene, [-1, 0, 0]);
+      gameRenderer.moveCurrentPiece([-1, 0, 0]);
     }
     if (e.key === "w") {
-      moveCurrentPiece(scene, [0, 0, -1]);
+      gameRenderer.moveCurrentPiece([0, 0, -1]);
     }
     if (e.key === "s") {
-      moveCurrentPiece(scene, [0, 0, 1]);
+      gameRenderer.moveCurrentPiece([0, 0, 1]);
     }
     if (e.key === "d") {
-      moveCurrentPiece(scene, [1, 0, 0]);
+      gameRenderer.moveCurrentPiece([1, 0, 0]);
+    }
     }
   });
 
@@ -90,7 +87,7 @@ const rotatePiece = (
 
 const addPiece = (state: GameState, fieldDepth: number, size: number) => {
   state.removeCurrentPiece();
-  removeCurrentPiece(scene);
+  gameRenderer.removeCurrentPiece();
 
   // Tetris pieces are constructed from cubes aligned next to or on top of each other.
   // In addition to aligning the cubes we need to remove mesh-lines between cubes where
@@ -103,7 +100,11 @@ const addPiece = (state: GameState, fieldDepth: number, size: number) => {
   // it. Edges touched by 4 cubes are skipped however, they are in the middle of a bigger cube.
 
   const { vertices, edges, offsets } = getPieceGeometry(size);
-  renderCurrentPiece(scene, vertices, edges, [0, fieldDepth, 0] as Vertex);
+  gameRenderer.renderCurrentPiece(vertices, edges, [
+    0,
+    fieldDepth,
+    0,
+  ] as Vertex);
   const newPiece = { offsets: offsets };
 
   state.setCurrentPiece(newPiece);
@@ -118,11 +119,11 @@ const mainLoop = (
   fallingSpeed: number
 ) => {
   if (tick % fallingSpeed === 0) {
-    if (state.willTouchFallenCube(scene) || state.willTouchFloor(scene)) {
-      state.addFallenPiece(scene);
+    if (state.willTouchFallenCube() || state.willTouchFloor()) {
+      state.addFallenPiece();
       addPiece(state, fieldDepth, 1);
     } else {
-      moveCurrentPiece(scene, [0, -1, 0]);
+      gameRenderer.moveCurrentPiece([0, -1, 0]);
     }
   }
 
@@ -137,7 +138,7 @@ const mainLoop = (
 
 const main = (settings: Settings, callbacks: StateUpdateCallbacks) => {
   scene.clear();
-  const state = new GameState(callbacks);
+  const state = new GameState(gameRenderer, callbacks);
   addPiece(state, settings.fieldDepth, 1);
 
   setup(state, settings.fieldDepth, settings.fieldSize);

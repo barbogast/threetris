@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { Vertex } from "./types";
-import { renderShaftLines } from "./render";
+import GameRenderer from "./render";
 
 export const renderContainer = (
   scene: THREE.Scene,
@@ -16,7 +16,7 @@ export const renderContainer = (
 };
 
 export const renderWallGridLongLines = (
-  scene: THREE.Scene,
+  gameRenderer: GameRenderer,
   fieldSize: number,
   fieldDepth: number
 ) => {
@@ -43,11 +43,11 @@ export const renderWallGridLongLines = (
     vertices.push([i, d, s]);
   }
 
-  renderShaftLines(scene, "wall-long-lines", vertices);
+  gameRenderer.renderShaftLines("wall-long-lines", vertices);
 };
 
 export const renderWallGridShortLines = (
-  scene: THREE.Scene,
+  gameRenderer: GameRenderer,
   fieldSize: number,
   fieldDepth: number
 ) => {
@@ -74,10 +74,13 @@ export const renderWallGridShortLines = (
     vertices.push([s, i, s]);
   }
 
-  renderShaftLines(scene, "wall-short-lines", vertices);
+  gameRenderer.renderShaftLines("wall-short-lines", vertices);
 };
 
-export const renderFloorGrid = (scene: THREE.Scene, fieldSize: number) => {
+export const renderFloorGrid = (
+  gameRenderer: GameRenderer,
+  fieldSize: number
+) => {
   const vertices: Vertex[] = [];
 
   const s = fieldSize;
@@ -91,5 +94,5 @@ export const renderFloorGrid = (scene: THREE.Scene, fieldSize: number) => {
     vertices.push([i, 0, s]);
   }
 
-  renderShaftLines(scene, "floor-lines", vertices);
+  gameRenderer.renderShaftLines("floor-lines", vertices);
 };

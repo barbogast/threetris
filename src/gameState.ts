@@ -1,7 +1,5 @@
-import * as THREE from "three";
-
 import { Vertex } from "./types";
-import { getCurrentPiecePosition, renderFallenCubes } from "./render";
+import GameRenderer from "./render";
 
 export type CurrentPiece = {
   offsets: Vertex[];
@@ -27,12 +25,14 @@ class GameState {
     fallenCubes: [number, number, number][];
   };
   #callbacks: StateUpdateCallbacks;
+  #gameRenderer: GameRenderer;
 
-  constructor(callbacks: StateUpdateCallbacks) {
+  constructor(gameRenderer: GameRenderer, callbacks: StateUpdateCallbacks) {
     this.#state = {
       currentPiece: undefined,
       fallenCubes: [],
     };
+    this.#gameRenderer = gameRenderer;
     this.#callbacks = callbacks;
   }
 
@@ -50,8 +50,8 @@ class GameState {
     this.#state.currentPiece = undefined;
   }
 
-  willTouchFallenCube(scene: THREE.Scene) {
-    const position = getCurrentPiecePosition(scene);
+  willTouchFallenCube() {
+    const position = this.#gameRenderer.getCurrentPiecePosition();
     const newPosition: Vertex = [position[0], position[1] - 1, position[2]];
     const cubes = getCubesFromOffsets(
       newPosition,
@@ -67,8 +67,8 @@ class GameState {
     );
   }
 
-  willTouchFloor(scene: THREE.Scene) {
-    const position = getCurrentPiecePosition(scene);
+  willTouchFloor() {
+    const position = this.#gameRenderer.getCurrentPiecePosition();
     const cubes = getCubesFromOffsets(
       position,
       this.#getCurrentPiece().offsets
@@ -86,14 +86,14 @@ class GameState {
     return this.#state.fallenCubes;
   }
 
-  addFallenPiece(scene: THREE.Scene) {
-    const position = getCurrentPiecePosition(scene);
+  addFallenPiece() {
+    const position = this.#gameRenderer.getCurrentPiecePosition();
     const cubes = getCubesFromOffsets(
       position,
       this.#getCurrentPiece().offsets
     );
 
-    renderFallenCubes(scene, cubes);
+    this.#gameRenderer.renderFallenCubes(cubes);
 
     this.#state.fallenCubes.push(...cubes);
     this.#callbacks.fallenCubes(this.#state.fallenCubes);
