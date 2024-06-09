@@ -15,6 +15,7 @@ import {
 } from "./shaft";
 
 import GameState, { CurrentPiece, StateUpdateCallbacks } from "./gameState";
+import { setupGroups } from "./render";
 
 const SETTINGS_WIDTH = 300;
 const scene = new THREE.Scene();
@@ -39,6 +40,8 @@ const setup = (state: GameState, fieldDepth: number, fieldSize: number) => {
   // Create a renderer
   renderer.setSize(window.innerWidth - SETTINGS_WIDTH, window.innerHeight);
   document.getElementById("scene")?.appendChild(renderer.domElement);
+
+  setupGroups(scene);
 
   renderContainer(scene, fieldSize, fieldDepth);
   renderFloorGrid(scene, fieldSize);

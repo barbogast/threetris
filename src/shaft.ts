@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { Vertex } from "./types";
+import { renderShaftLines } from "./render";
 
 export const renderContainer = (
   scene: THREE.Scene,
@@ -19,8 +20,6 @@ export const renderWallGridLongLines = (
   fieldSize: number,
   fieldDepth: number
 ) => {
-  const geometry = new THREE.BufferGeometry();
-
   const vertices: Vertex[] = [];
 
   const s = fieldSize;
@@ -44,14 +43,7 @@ export const renderWallGridLongLines = (
     vertices.push([i, d, s]);
   }
 
-  geometry.setAttribute(
-    "position",
-    new THREE.BufferAttribute(new Float32Array(vertices.flat()), 3)
-  );
-
-  const material = new THREE.LineBasicMaterial({ color: "0x00ff00" });
-  const lines = new THREE.LineSegments(geometry, material);
-  scene.add(lines);
+  renderShaftLines(scene, "wall-long-lines", vertices);
 };
 
 export const renderWallGridShortLines = (
@@ -59,8 +51,6 @@ export const renderWallGridShortLines = (
   fieldSize: number,
   fieldDepth: number
 ) => {
-  const geometry = new THREE.BufferGeometry();
-
   const vertices: Vertex[] = [];
 
   const s = fieldSize;
@@ -84,19 +74,10 @@ export const renderWallGridShortLines = (
     vertices.push([s, i, s]);
   }
 
-  geometry.setAttribute(
-    "position",
-    new THREE.BufferAttribute(new Float32Array(vertices.flat()), 3)
-  );
-
-  const material = new THREE.LineBasicMaterial({ color: "0x00ff00" });
-  const lines = new THREE.LineSegments(geometry, material);
-  scene.add(lines);
+  renderShaftLines(scene, "wall-short-lines", vertices);
 };
 
 export const renderFloorGrid = (scene: THREE.Scene, fieldSize: number) => {
-  const geometry = new THREE.BufferGeometry();
-
   const vertices: Vertex[] = [];
 
   const s = fieldSize;
@@ -110,12 +91,5 @@ export const renderFloorGrid = (scene: THREE.Scene, fieldSize: number) => {
     vertices.push([i, 0, s]);
   }
 
-  geometry.setAttribute(
-    "position",
-    new THREE.BufferAttribute(new Float32Array(vertices.flat()), 3)
-  );
-
-  const material = new THREE.LineBasicMaterial({ color: "0x00ff00" });
-  const lines = new THREE.LineSegments(geometry, material);
-  scene.add(lines);
+  renderShaftLines(scene, "floor-lines", vertices);
 };
