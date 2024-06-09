@@ -136,14 +136,13 @@ const mainLoop = (
 ) => {
   if (tick % 12 === 0) {
     if (state.willTouchFallenPiece() || state.willTouchFloor()) {
-      state.addFallenPiece();
+      state.addFallenPiece(scene);
       addPiece(state, fieldDepth, 1);
     } else {
       state.moveCurrentPiece([0, -1, 0]);
     }
   }
 
-  renderFallenPieces(state);
   renderer.render(scene, camera);
   callbacks.rendererInfo({ geometries: renderer.info.memory.geometries });
 

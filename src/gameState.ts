@@ -106,12 +106,21 @@ class GameState {
     return this.#state.fallenPieces;
   }
 
-  addFallenPiece() {
+  addFallenPiece(scene: THREE.Scene) {
     const position = this.getCurrentPiecePosition();
     const cubes = getCubesFromOffsets(
       position,
       this.#getCurrentPiece().offsets
     );
+
+    for (const [x, y, z] of cubes) {
+      const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+      const cubeMaterial = new THREE.MeshNormalMaterial();
+      const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+      cube.position.set(x + 0.5, y + 0.5, z + 0.5);
+      scene.add(cube);
+    }
+
     this.#state.fallenPieces.push(...cubes);
     this.#callbacks.fallenCubes(this.#state.fallenPieces);
   }
