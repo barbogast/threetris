@@ -15,7 +15,7 @@ import {
 } from "./shaft";
 
 import GameState, { CurrentPiece, StateUpdateCallbacks } from "./gameState";
-import GameRenderer from "./render";
+import GameRenderer from "./gameRenderer";
 
 const SETTINGS_WIDTH = 300;
 const scene = new THREE.Scene();

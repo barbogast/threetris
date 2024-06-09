@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { Vertex } from "./types";
-import GameRenderer from "./render";
+import GameRenderer from "./gameRenderer";
 
 export const renderContainer = (
   scene: THREE.Scene,

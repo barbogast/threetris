@@ -1,5 +1,5 @@
 import { Vertex } from "./types";
-import GameRenderer from "./render";
+import GameRenderer from "./gameRenderer";
 
 export type CurrentPiece = {
   offsets: Vertex[];
