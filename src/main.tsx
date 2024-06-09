@@ -132,9 +132,10 @@ const mainLoop = (
   state: GameState,
   callbacks: StateUpdateCallbacks,
   tick: number,
-  fieldDepth: number
+  fieldDepth: number,
+  fallingSpeed: number
 ) => {
-  if (tick % 12 === 0) {
+  if (tick % fallingSpeed === 0) {
     if (state.willTouchFallenCube() || state.willTouchFloor()) {
       state.addFallenPiece(scene);
       addPiece(state, fieldDepth, 1);
@@ -147,7 +148,9 @@ const mainLoop = (
   callbacks.rendererInfo({ geometries: renderer.info.memory.geometries });
 
   tick += 1;
-  requestAnimationFrame(() => mainLoop(state, callbacks, tick, fieldDepth));
+  requestAnimationFrame(() =>
+    mainLoop(state, callbacks, tick, fieldDepth, fallingSpeed)
+  );
 };
 
 const main = (settings: Settings, callbacks: StateUpdateCallbacks) => {
@@ -156,7 +159,7 @@ const main = (settings: Settings, callbacks: StateUpdateCallbacks) => {
   addPiece(state, settings.fieldDepth, 1);
 
   setup(state, settings.fieldDepth, settings.fieldSize);
-  mainLoop(state, callbacks, 0, settings.fieldDepth);
+  mainLoop(state, callbacks, 0, settings.fieldDepth, settings.fallingSpeed);
 };
 
 const App = () => {
@@ -177,7 +180,7 @@ const App = () => {
 
   useEffect(() => {
     main(settings, callbacks);
-  }, [settings.fieldDepth, settings.fieldSize]);
+  }, [settings.fieldDepth, settings.fieldSize, settings.fallingSpeed]);
 
   return (
     <div style={{ display: "flex", flexDirection: "row" }}>
