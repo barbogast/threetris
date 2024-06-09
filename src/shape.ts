@@ -119,10 +119,6 @@ export const filterEdges = (vertices: Vertex[], edges: Edge[]) => {
     touchedCubeCount[coordinatesStr].edges.push([edge[0], edge[1]]);
   }
 
-  console.log(vertices);
-  console.log(edges);
-  console.log(touchedCubeCount);
-
   const edgesToRemove = Object.values(touchedCubeCount)
     .filter((count) => count.count === 2 || count.count === 4)
     .flatMap((count) => count.edges.map((edge) => getKeyForEdge(edge)));
@@ -133,7 +129,7 @@ export const filterEdges = (vertices: Vertex[], edges: Edge[]) => {
     if (!edgesToRemove.includes(edgeKey)) {
       filteredEdges.push(edge);
     } else {
-      console.log("filter", getKeyForEdge(edge));
+      // console.log("filter", getKeyForEdge(edge));
     }
   }
 

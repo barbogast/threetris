@@ -26,12 +26,6 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
-type ThreePiece = THREE.LineSegments<
-  THREE.BufferGeometry<THREE.NormalBufferAttributes>,
-  THREE.LineBasicMaterial,
-  THREE.Object3DEventMap
->;
-
 const setup = (state: GameState, fieldDepth: number, fieldSize: number) => {
   camera.position.set(fieldSize / 2, fieldDepth + 2, fieldSize / 2); // position the camera on top of the scene
   // camera.up.set(0, 0, -1); // point the camera towards the bottom of the scene
@@ -110,7 +104,6 @@ const addPiece = (state: GameState, fieldDepth: number, size: number) => {
   // it. Edges touched by 4 cubes are skipped however, they are in the middle of a bigger cube.
 
   const { vertices, edges, offsets } = getPieceGeometry(size);
-  console.log("vertices", vertices);
   const geometry = new THREE.BufferGeometry();
 
   // Add the vertices and edges to the geometry
@@ -147,7 +140,6 @@ const mainLoop = (state: GameState, tick: number, fieldDepth: number) => {
 
   renderFallenPieces(state);
   renderer.render(scene, camera);
-  // line.rotateX(0.05);
 
   tick += 1;
   requestAnimationFrame(() => mainLoop(state, tick, fieldDepth));
