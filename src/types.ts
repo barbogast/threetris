@@ -33,4 +33,5 @@ export type Context = {
   state: GameState;
   callbacks: StateUpdateCallbacks;
   renderer: GameRenderer;
+  settings: Settings;
 };

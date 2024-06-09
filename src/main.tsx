@@ -27,8 +27,10 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
-const setup = (context: Context, fieldDepth: number, fieldSize: number) => {
-  const { state, renderer: gameRenderer } = context;
+const setup = (context: Context) => {
+  const { state, renderer: gameRenderer, settings } = context;
+  const { fieldDepth, fieldSize } = settings;
+
   camera.position.set(fieldSize / 2, fieldDepth + 2, fieldSize / 2); // position the camera on top of the scene
   // camera.up.set(0, 0, -1); // point the camera towards the bottom of the scene
   camera.lookAt(0, 0, fieldSize / 2); // target the center of the scene
@@ -87,8 +89,8 @@ const rotatePiece = (
   // );
 };
 
-const addPiece = (context: Context, fieldDepth: number, size: number) => {
-  const { state, renderer: gameRenderer } = context;
+const addPiece = (context: Context, size: number) => {
+  const { state, renderer: gameRenderer, settings } = context;
   state.removeCurrentPiece();
   gameRenderer.removeCurrentPiece();
 
@@ -105,7 +107,7 @@ const addPiece = (context: Context, fieldDepth: number, size: number) => {
   const { vertices, edges, offsets } = getPieceGeometry(size);
   gameRenderer.renderCurrentPiece(vertices, edges, [
     0,
-    fieldDepth,
+    settings.fieldDepth,
     0,
   ] as Vertex);
   const newPiece = { offsets: offsets };
@@ -119,21 +121,22 @@ type GameController = {
   updateSettings: (s: Settings) => void;
 };
 
-const main = (context: Context, settings: Settings): GameController => {
+const main = (context: Context): GameController => {
+  const { state, callbacks, renderer: gameRenderer } = context;
+  let { settings } = context;
   scene.clear();
-  addPiece(context, settings.fieldDepth, 1);
+  addPiece(context, 1);
 
-  setup(context, settings.fieldDepth, settings.fieldSize);
+  setup(context);
 
   let stop = false;
   let pause = false;
 
   const mainLoop = (tick: number) => {
-    const { state, callbacks, renderer: gameRenderer } = context;
     if (!pause && tick % settings.fallingSpeed === 0) {
       if (state.willTouchFallenCube() || state.willTouchFloor()) {
         state.addFallenPiece();
-        addPiece(context, settings.fieldDepth, 1);
+        addPiece(context, 1);
       } else {
         gameRenderer.moveCurrentPiece([0, -1, 0]);
       }
@@ -186,12 +189,13 @@ const App = () => {
     state: new GameState(gameRenderer, callbacks),
     callbacks: callbacks,
     renderer: gameRenderer,
+    settings,
   };
 
   const gameController = useRef<GameController>();
 
   useEffect(() => {
-    const c = main(context, settings);
+    const c = main(context);
     gameController.current = c;
     return c.stop;
   }, [settings.fieldDepth, settings.fieldSize]);
