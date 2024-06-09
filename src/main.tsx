@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import ReactDOM from "react-dom/client";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -67,6 +67,8 @@ const setup = (context: Context, fieldDepth: number, fieldSize: number) => {
     if (e.key === "d") {
       gameRenderer.moveCurrentPiece([1, 0, 0]);
     }
+    if (e.key === "q") {
+      state.rotateCurrentPieceXAxis();
     }
   });
 
@@ -111,38 +113,47 @@ const addPiece = (context: Context, fieldDepth: number, size: number) => {
   state.setCurrentPiece(newPiece);
   return newPiece;
 };
-
-const mainLoop = (
-  context: Context,
-  tick: number,
-  fieldDepth: number,
-  fallingSpeed: number
-) => {
-  const { state, callbacks, renderer: gameRenderer } = context;
-  if (tick % fallingSpeed === 0) {
-    if (state.willTouchFallenCube() || state.willTouchFloor()) {
-      state.addFallenPiece();
-      addPiece(context, fieldDepth, 1);
-    } else {
-      gameRenderer.moveCurrentPiece([0, -1, 0]);
-    }
-  }
-
-  renderer.render(scene, camera);
-  callbacks.rendererInfo({ geometries: renderer.info.memory.geometries });
-
-  tick += 1;
-  requestAnimationFrame(() =>
-    mainLoop(context, tick, fieldDepth, fallingSpeed)
-  );
+type GameController = {
+  stop: () => void;
+  togglePause: () => void;
 };
 
-const main = (context: Context, settings: Settings) => {
+const main = (context: Context, settings: Settings): GameController => {
   scene.clear();
   addPiece(context, settings.fieldDepth, 1);
 
   setup(context, settings.fieldDepth, settings.fieldSize);
-  mainLoop(context, 0, settings.fieldDepth, settings.fallingSpeed);
+
+  let stop = false;
+  let pause = false;
+
+  const mainLoop = (tick: number) => {
+    const { state, callbacks, renderer: gameRenderer } = context;
+    if (!pause && tick % settings.fallingSpeed === 0) {
+      if (state.willTouchFallenCube() || state.willTouchFloor()) {
+        state.addFallenPiece();
+        addPiece(context, settings.fieldDepth, 1);
+      } else {
+        gameRenderer.moveCurrentPiece([0, -1, 0]);
+      }
+    }
+
+    renderer.render(scene, camera);
+    callbacks.rendererInfo({ geometries: renderer.info.memory.geometries });
+
+    if (!stop) requestAnimationFrame(() => mainLoop(tick + 1));
+  };
+
+  mainLoop(0);
+
+  return {
+    stop: () => {
+      stop = true;
+    },
+    togglePause: () => {
+      pause = !pause;
+    },
+  };
 };
 
 const App = () => {
@@ -173,14 +184,21 @@ const App = () => {
     renderer: gameRenderer,
   };
 
+  const gameController = useRef<GameController>();
+
   useEffect(() => {
-    main(context, settings);
+    const c = main(context, settings);
+    gameController.current = c;
+    return c.stop;
   }, [settings.fieldDepth, settings.fieldSize, settings.fallingSpeed]);
 
   return (
     <div style={{ display: "flex", flexDirection: "row" }}>
       <div id="scene"></div>
       <div id="settings" style={{ width: SETTINGS_WIDTH }}>
+        <button onClick={() => gameController.current!.togglePause()}>
+          Pause
+        </button>
         Geometries: {rendererInfo.geometries}
         <br />
         <pre>{JSON.stringify(currentPiecePosition)}</pre>
