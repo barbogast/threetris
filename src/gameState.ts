@@ -4,7 +4,7 @@ import { Vertex } from "./types";
 
 type ThreePiece = THREE.LineSegments<
   THREE.BufferGeometry<THREE.NormalBufferAttributes>,
-  THREE.LineBasicMaterial,
+  THREE.Material | THREE.Material[],
   THREE.Object3DEventMap
 >;
 

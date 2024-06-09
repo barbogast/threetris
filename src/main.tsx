@@ -15,7 +15,7 @@ import {
 } from "./shaft";
 
 import GameState, { CurrentPiece, StateUpdateCallbacks } from "./gameState";
-import { setupGroups } from "./render";
+import { renderCurrentPiece, setupGroups } from "./render";
 
 const SETTINGS_WIDTH = 300;
 const scene = new THREE.Scene();
@@ -97,27 +97,20 @@ const addPiece = (state: GameState, fieldDepth: number, size: number) => {
   // it. Edges touched by 4 cubes are skipped however, they are in the middle of a bigger cube.
 
   const { vertices, edges, offsets } = getPieceGeometry(size);
-  const geometry = new THREE.BufferGeometry();
+  renderCurrentPiece(scene, vertices, edges, [0, fieldDepth, 0] as Vertex);
 
-  // Add the vertices and edges to the geometry
-  geometry.setAttribute(
-    "position",
-    new THREE.BufferAttribute(new Float32Array(vertices.flat()), 3)
-  );
-  geometry.setIndex(edges.flat());
-
-  const material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
-  const lines = new THREE.LineSegments(geometry, material);
-  lines.position.set(0, fieldDepth, 0);
-
-  scene.add(lines);
+  const threeObject = scene.getObjectByName(
+    "current-piece"
+  ) as THREE.LineSegments;
 
   const newPiece = {
-    threeObject: lines,
+    threeObject,
     offsets: offsets,
     position: [0, fieldDepth, 0] as Vertex,
-    threeGeometry: geometry,
+    threeGeometry:
+      threeObject.geometry as THREE.BufferGeometry<THREE.NormalBufferAttributes>,
   };
+
   state.setCurrentPiece(newPiece);
   return newPiece;
 };
