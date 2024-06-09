@@ -5,7 +5,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 import { getPieceGeometry } from "./shape";
 import SettingsPanel from "./components/SettingsPanel";
-import { Settings, Vertex } from "./types";
+import { Context, Settings, Vertex } from "./types";
 import useAppStore from "./appStore";
 import {
   renderContainer,
@@ -14,13 +14,12 @@ import {
   renderWallGridShortLines,
 } from "./shaft";
 
-import GameState, { CurrentPiece, StateUpdateCallbacks } from "./gameState";
+import GameState, { CurrentPiece } from "./gameState";
 import GameRenderer from "./gameRenderer";
 
 const SETTINGS_WIDTH = 300;
 const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer();
-const gameRenderer = new GameRenderer(scene);
 const camera = new THREE.PerspectiveCamera(
   50,
   window.innerWidth / window.innerHeight,
@@ -28,7 +27,8 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
-const setup = (state: GameState, fieldDepth: number, fieldSize: number) => {
+const setup = (context: Context, fieldDepth: number, fieldSize: number) => {
+  const { state, renderer: gameRenderer } = context;
   camera.position.set(fieldSize / 2, fieldDepth + 2, fieldSize / 2); // position the camera on top of the scene
   // camera.up.set(0, 0, -1); // point the camera towards the bottom of the scene
   camera.lookAt(0, 0, fieldSize / 2); // target the center of the scene
@@ -85,7 +85,8 @@ const rotatePiece = (
   // );
 };
 
-const addPiece = (state: GameState, fieldDepth: number, size: number) => {
+const addPiece = (context: Context, fieldDepth: number, size: number) => {
+  const { state, renderer: gameRenderer } = context;
   state.removeCurrentPiece();
   gameRenderer.removeCurrentPiece();
 
@@ -112,16 +113,16 @@ const addPiece = (state: GameState, fieldDepth: number, size: number) => {
 };
 
 const mainLoop = (
-  state: GameState,
-  callbacks: StateUpdateCallbacks,
+  context: Context,
   tick: number,
   fieldDepth: number,
   fallingSpeed: number
 ) => {
+  const { state, callbacks, renderer: gameRenderer } = context;
   if (tick % fallingSpeed === 0) {
     if (state.willTouchFallenCube() || state.willTouchFloor()) {
       state.addFallenPiece();
-      addPiece(state, fieldDepth, 1);
+      addPiece(context, fieldDepth, 1);
     } else {
       gameRenderer.moveCurrentPiece([0, -1, 0]);
     }
@@ -132,17 +133,16 @@ const mainLoop = (
 
   tick += 1;
   requestAnimationFrame(() =>
-    mainLoop(state, callbacks, tick, fieldDepth, fallingSpeed)
+    mainLoop(context, tick, fieldDepth, fallingSpeed)
   );
 };
 
-const main = (settings: Settings, callbacks: StateUpdateCallbacks) => {
+const main = (context: Context, settings: Settings) => {
   scene.clear();
-  const state = new GameState(gameRenderer, callbacks);
-  addPiece(state, settings.fieldDepth, 1);
+  addPiece(context, settings.fieldDepth, 1);
 
-  setup(state, settings.fieldDepth, settings.fieldSize);
-  mainLoop(state, callbacks, 0, settings.fieldDepth, settings.fallingSpeed);
+  setup(context, settings.fieldDepth, settings.fieldSize);
+  mainLoop(context, 0, settings.fieldDepth, settings.fallingSpeed);
 };
 
 const App = () => {
@@ -161,8 +161,15 @@ const App = () => {
     rendererInfo: setRendererInfo,
   };
 
+  const gameRenderer = new GameRenderer(scene);
+  const context: Context = {
+    state: new GameState(gameRenderer, callbacks),
+    callbacks: callbacks,
+    renderer: gameRenderer,
+  };
+
   useEffect(() => {
-    main(settings, callbacks);
+    main(context, settings);
   }, [settings.fieldDepth, settings.fieldSize, settings.fallingSpeed]);
 
   return (
