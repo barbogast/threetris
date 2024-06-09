@@ -1,17 +1,10 @@
 import * as THREE from "three";
 
 import { Vertex } from "./types";
-
-type ThreePiece = THREE.LineSegments<
-  THREE.BufferGeometry<THREE.NormalBufferAttributes>,
-  THREE.Material | THREE.Material[],
-  THREE.Object3DEventMap
->;
+import { getCurrentPiecePosition, renderFallenCubes } from "./render";
 
 export type CurrentPiece = {
   offsets: Vertex[];
-  threeObject: ThreePiece;
-  threeGeometry: THREE.BufferGeometry<THREE.NormalBufferAttributes>;
 };
 
 export type StateUpdateCallbacks = {
@@ -53,26 +46,13 @@ class GameState {
     this.#callbacks.currentPiece(currentPiece);
   }
 
-  removeCurrentPiece(scene: THREE.Scene) {
-    if (this.#state.currentPiece) {
-      scene.remove(this.#state.currentPiece.threeObject);
-      this.#state.currentPiece.threeGeometry.dispose();
-      this.#state.currentPiece = undefined;
-    }
+  removeCurrentPiece() {
+    this.#state.currentPiece = undefined;
   }
 
-  getCurrentPiecePosition() {
-    const { threeObject } = this.#getCurrentPiece();
-    return [
-      threeObject.position.x,
-      threeObject.position.y,
-      threeObject.position.z,
-    ] as Vertex;
-  }
-
-  willTouchFallenCube() {
-    const position = this.getCurrentPiecePosition();
-    const newPosition = [position[0], position[1] - 1, position[2]] as Vertex;
+  willTouchFallenCube(scene: THREE.Scene) {
+    const position = getCurrentPiecePosition(scene);
+    const newPosition: Vertex = [position[0], position[1] - 1, position[2]];
     const cubes = getCubesFromOffsets(
       newPosition,
       this.#getCurrentPiece().offsets
@@ -87,21 +67,13 @@ class GameState {
     );
   }
 
-  willTouchFloor() {
-    const position = this.getCurrentPiecePosition();
+  willTouchFloor(scene: THREE.Scene) {
+    const position = getCurrentPiecePosition(scene);
     const cubes = getCubesFromOffsets(
       position,
       this.#getCurrentPiece().offsets
     );
     return cubes.some((cube) => cube[1] === 0);
-  }
-
-  moveCurrentPiece(offset: Vertex) {
-    const { threeObject } = this.#getCurrentPiece();
-    threeObject.position.x += offset[0];
-    threeObject.position.y += offset[1];
-    threeObject.position.z += offset[2];
-    this.#callbacks.currentPiece(this.#getCurrentPiece());
   }
 
   rotateCurrentPieceXAxis() {
@@ -115,19 +87,13 @@ class GameState {
   }
 
   addFallenPiece(scene: THREE.Scene) {
-    const position = this.getCurrentPiecePosition();
+    const position = getCurrentPiecePosition(scene);
     const cubes = getCubesFromOffsets(
       position,
       this.#getCurrentPiece().offsets
     );
 
-    for (const [x, y, z] of cubes) {
-      const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-      const cubeMaterial = new THREE.MeshNormalMaterial();
-      const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-      cube.position.set(x + 0.5, y + 0.5, z + 0.5);
-      scene.add(cube);
-    }
+    renderFallenCubes(scene, cubes);
 
     this.#state.fallenCubes.push(...cubes);
     this.#callbacks.fallenCubes(this.#state.fallenCubes);

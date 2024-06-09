@@ -15,7 +15,12 @@ import {
 } from "./shaft";
 
 import GameState, { CurrentPiece, StateUpdateCallbacks } from "./gameState";
-import { renderCurrentPiece, setupGroups } from "./render";
+import {
+  moveCurrentPiece,
+  removeCurrentPiece,
+  renderCurrentPiece,
+  setupGroups,
+} from "./render";
 
 const SETTINGS_WIDTH = 300;
 const scene = new THREE.Scene();
@@ -55,16 +60,16 @@ const setup = (state: GameState, fieldDepth: number, fieldSize: number) => {
     //   rotatePiece(currentPiece, updateCurrentPiece);
     // }
     if (e.key === "a") {
-      state.moveCurrentPiece([-1, 0, 0]);
+      moveCurrentPiece(scene, [-1, 0, 0]);
     }
     if (e.key === "w") {
-      state.moveCurrentPiece([0, 0, -1]);
+      moveCurrentPiece(scene, [0, 0, -1]);
     }
     if (e.key === "s") {
-      state.moveCurrentPiece([0, 0, 1]);
+      moveCurrentPiece(scene, [0, 0, 1]);
     }
     if (e.key === "d") {
-      state.moveCurrentPiece([1, 0, 0]);
+      moveCurrentPiece(scene, [1, 0, 0]);
     }
   });
 
@@ -77,14 +82,15 @@ const rotatePiece = (
   currentPiece: CurrentPiece,
   updateCurrentPiece: (CurrentPiece: Partial<CurrentPiece>) => void
 ) => {
-  currentPiece.threeObject.rotateOnAxis(
-    new THREE.Vector3(0, 1, 0),
-    Math.PI / 4
-  );
+  // currentPiece.threeObject.rotateOnAxis(
+  //   new THREE.Vector3(0, 1, 0),
+  //   Math.PI / 4
+  // );
 };
 
 const addPiece = (state: GameState, fieldDepth: number, size: number) => {
-  state.removeCurrentPiece(scene);
+  state.removeCurrentPiece();
+  removeCurrentPiece(scene);
 
   // Tetris pieces are constructed from cubes aligned next to or on top of each other.
   // In addition to aligning the cubes we need to remove mesh-lines between cubes where
@@ -98,18 +104,7 @@ const addPiece = (state: GameState, fieldDepth: number, size: number) => {
 
   const { vertices, edges, offsets } = getPieceGeometry(size);
   renderCurrentPiece(scene, vertices, edges, [0, fieldDepth, 0] as Vertex);
-
-  const threeObject = scene.getObjectByName(
-    "current-piece"
-  ) as THREE.LineSegments;
-
-  const newPiece = {
-    threeObject,
-    offsets: offsets,
-    position: [0, fieldDepth, 0] as Vertex,
-    threeGeometry:
-      threeObject.geometry as THREE.BufferGeometry<THREE.NormalBufferAttributes>,
-  };
+  const newPiece = { offsets: offsets };
 
   state.setCurrentPiece(newPiece);
   return newPiece;
@@ -123,11 +118,11 @@ const mainLoop = (
   fallingSpeed: number
 ) => {
   if (tick % fallingSpeed === 0) {
-    if (state.willTouchFallenCube() || state.willTouchFloor()) {
+    if (state.willTouchFallenCube(scene) || state.willTouchFloor(scene)) {
       state.addFallenPiece(scene);
       addPiece(state, fieldDepth, 1);
     } else {
-      state.moveCurrentPiece([0, -1, 0]);
+      moveCurrentPiece(scene, [0, -1, 0]);
     }
   }
 
@@ -175,7 +170,7 @@ const App = () => {
       <div id="settings" style={{ width: SETTINGS_WIDTH }}>
         Geometries: {rendererInfo.geometries}
         <br />
-        <pre>{JSON.stringify(currentPiece?.threeObject.position)}</pre>
+        {/* <pre>{JSON.stringify(currentPiece?.threeObject.position)}</pre> */}
         {currentPiece?.offsets.map((off, i) => (
           <pre key={i}>{JSON.stringify(off)}</pre>
         ))}
