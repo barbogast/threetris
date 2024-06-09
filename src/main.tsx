@@ -145,7 +145,7 @@ const mainLoop = (
 };
 
 const main = (settings: Settings, callbacks: StateUpdateCallbacks) => {
-  scene.remove.apply(scene, scene.children);
+  scene.clear();
   const state = new GameState(callbacks);
   addPiece(state, settings.fieldDepth, 1);
 
