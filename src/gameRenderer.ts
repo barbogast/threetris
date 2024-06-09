@@ -1,13 +1,17 @@
 import * as THREE from "three";
 import { Edge, Vertex } from "./types";
+import { StateUpdateCallbacks } from "./types";
 
 const SHAFT_LINES_ID = "shaft-lines";
 const CURRENT_PIECE_ID = "current-piece";
 
 class GameRenderer {
   #scene: THREE.Scene;
-  constructor(scene: THREE.Scene) {
+  #callbacks: StateUpdateCallbacks;
+
+  constructor(scene: THREE.Scene, callbacks: StateUpdateCallbacks) {
     this.#scene = scene;
+    this.#callbacks = callbacks;
   }
 
   setup() {
@@ -46,6 +50,8 @@ class GameRenderer {
     lines.name = CURRENT_PIECE_ID;
 
     this.#scene.add(lines);
+
+    this.#callbacks.currentPiecePosition(this.getCurrentPiecePosition());
   }
 
   getCurrentPiece() {
@@ -65,6 +71,7 @@ class GameRenderer {
   removeCurrentPiece() {
     const piece = this.getCurrentPieceMaybe();
     if (piece) this.#scene.remove(piece);
+    this.#callbacks.currentPiecePosition(undefined);
   }
 
   moveCurrentPiece(offset: Vertex) {
@@ -72,7 +79,7 @@ class GameRenderer {
     piece.position.x += offset[0];
     piece.position.y += offset[1];
     piece.position.z += offset[2];
-    // this.#callbacks.currentPiece(this.#getCurrentPiece());
+    this.#callbacks.currentPiecePosition(this.getCurrentPiecePosition());
   }
 
   renderFallenCubes(cubes: Vertex[]) {

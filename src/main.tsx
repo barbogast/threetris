@@ -146,7 +146,11 @@ const main = (context: Context, settings: Settings) => {
 };
 
 const App = () => {
-  const [currentPiece, setCurrentPiece] = React.useState<CurrentPiece>();
+  const [currentPieceOffsets, setCurrentPieceOffsets] = React.useState<
+    Vertex[]
+  >([]);
+  const [currentPiecePosition, setCurrentPiecePosition] =
+    React.useState<Vertex>();
   const [fallenCubes, setFallenCubes] = React.useState<
     [number, number, number][]
   >([]);
@@ -156,12 +160,13 @@ const App = () => {
   const settings = useAppStore().settings;
 
   const callbacks = {
-    currentPiece: setCurrentPiece,
+    currentPiecePosition: setCurrentPiecePosition,
+    currentPieceOffsets: setCurrentPieceOffsets,
     fallenCubes: setFallenCubes,
     rendererInfo: setRendererInfo,
   };
 
-  const gameRenderer = new GameRenderer(scene);
+  const gameRenderer = new GameRenderer(scene, callbacks);
   const context: Context = {
     state: new GameState(gameRenderer, callbacks),
     callbacks: callbacks,
@@ -178,8 +183,8 @@ const App = () => {
       <div id="settings" style={{ width: SETTINGS_WIDTH }}>
         Geometries: {rendererInfo.geometries}
         <br />
-        {/* <pre>{JSON.stringify(currentPiece?.threeObject.position)}</pre> */}
-        {currentPiece?.offsets.map((off, i) => (
+        <pre>{JSON.stringify(currentPiecePosition)}</pre>
+        {currentPieceOffsets.map((off, i) => (
           <pre key={i}>{JSON.stringify(off)}</pre>
         ))}
         <br />

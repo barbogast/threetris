@@ -1,5 +1,5 @@
 import GameRenderer from "./gameRenderer";
-import GameState, { StateUpdateCallbacks } from "./gameState";
+import GameState from "./gameState";
 
 export type Settings = {
   fieldSize: number;
@@ -21,6 +21,13 @@ export type AppState = {
 export type Vertex = [number, number, number];
 export type PieceOffset = [number, number, number];
 export type Edge = [number, number];
+
+export type StateUpdateCallbacks = {
+  currentPiecePosition: (position: Vertex | undefined) => void;
+  currentPieceOffsets: (offsets: Vertex[]) => void;
+  fallenCubes: (fallenCubes: [number, number, number][]) => void;
+  rendererInfo: (info: { geometries: number }) => void;
+};
 
 export type Context = {
   state: GameState;
