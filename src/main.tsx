@@ -71,7 +71,7 @@ const setup = (state: GameState, fieldDepth: number, fieldSize: number) => {
 };
 
 const renderFallenPieces = (state: GameState) => {
-  for (const [x, y, z] of state.getFallenPieces()) {
+  for (const [x, y, z] of state.getFallenCubes()) {
     const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
     const cubeMaterial = new THREE.MeshNormalMaterial();
     const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
@@ -135,7 +135,7 @@ const mainLoop = (
   fieldDepth: number
 ) => {
   if (tick % 12 === 0) {
-    if (state.willTouchFallenPiece() || state.willTouchFloor()) {
+    if (state.willTouchFallenCube() || state.willTouchFloor()) {
       state.addFallenPiece(scene);
       addPiece(state, fieldDepth, 1);
     } else {

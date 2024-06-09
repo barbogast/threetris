@@ -30,14 +30,14 @@ const getCubesFromOffsets = (position: Vertex, offsets: Vertex[]): Vertex[] => {
 class GameState {
   #state: {
     currentPiece: CurrentPiece | undefined;
-    fallenPieces: [number, number, number][];
+    fallenCubes: [number, number, number][];
   };
   #callbacks: StateUpdateCallbacks;
 
   constructor(callbacks: StateUpdateCallbacks) {
     this.#state = {
       currentPiece: undefined,
-      fallenPieces: [],
+      fallenCubes: [],
     };
     this.#callbacks = callbacks;
   }
@@ -68,7 +68,7 @@ class GameState {
     ] as Vertex;
   }
 
-  willTouchFallenPiece() {
+  willTouchFallenCube() {
     const position = this.getCurrentPiecePosition();
     const newPosition = [position[0], position[1] - 1, position[2]] as Vertex;
     const cubes = getCubesFromOffsets(
@@ -76,7 +76,7 @@ class GameState {
       this.#getCurrentPiece().offsets
     );
     return cubes.some((cube) =>
-      this.#state.fallenPieces.some(
+      this.#state.fallenCubes.some(
         (fallenCube) =>
           fallenCube[0] === cube[0] &&
           fallenCube[1] === cube[1] &&
@@ -102,8 +102,14 @@ class GameState {
     this.#callbacks.currentPiece(this.#getCurrentPiece());
   }
 
-  getFallenPieces() {
-    return this.#state.fallenPieces;
+  rotateCurrentPieceXAxis() {
+    this.#state.currentPiece?.offsets.map((cube) =>
+      cube.map((offset) => (offset = -offset))
+    );
+  }
+
+  getFallenCubes() {
+    return this.#state.fallenCubes;
   }
 
   addFallenPiece(scene: THREE.Scene) {
@@ -121,8 +127,8 @@ class GameState {
       scene.add(cube);
     }
 
-    this.#state.fallenPieces.push(...cubes);
-    this.#callbacks.fallenCubes(this.#state.fallenPieces);
+    this.#state.fallenCubes.push(...cubes);
+    this.#callbacks.fallenCubes(this.#state.fallenCubes);
   }
 }
 
