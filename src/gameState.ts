@@ -17,10 +17,18 @@ export type StateUpdateCallbacks = {
   currentPiece: (currentPiece: CurrentPiece) => void;
 };
 
+const getCubesFromOffsets = (position: Vertex, offsets: Vertex[]): Vertex[] => {
+  return offsets.map((offset) => [
+    position[0] + offset[0],
+    position[1] + offset[1],
+    position[2] + offset[2],
+  ]);
+};
+
 class GameState {
   #state: {
     currentPiece: CurrentPiece | undefined;
-    fallenPieces: [number, number][];
+    fallenPieces: [number, number, number][];
   };
   #callbacks: StateUpdateCallbacks;
 
@@ -58,6 +66,32 @@ class GameState {
     ] as Vertex;
   }
 
+  willTouchFallenPiece() {
+    const position = this.getCurrentPiecePosition();
+    const newPosition = [position[0], position[1] - 1, position[2]] as Vertex;
+    const cubes = getCubesFromOffsets(
+      newPosition,
+      this.#getCurrentPiece().offsets
+    );
+    return cubes.some((cube) =>
+      this.#state.fallenPieces.some(
+        (fallenCube) =>
+          fallenCube[0] === cube[0] &&
+          fallenCube[1] === cube[1] &&
+          fallenCube[2] === cube[2]
+      )
+    );
+  }
+
+  willTouchFloor() {
+    const position = this.getCurrentPiecePosition();
+    const cubes = getCubesFromOffsets(
+      position,
+      this.#getCurrentPiece().offsets
+    );
+    return cubes.some((cube) => cube[1] === 0);
+  }
+
   moveCurrentPiece(offset: Vertex) {
     const { threeObject } = this.#getCurrentPiece();
     threeObject.position.x += offset[0];
@@ -72,14 +106,11 @@ class GameState {
 
   addFallenPiece() {
     const position = this.getCurrentPiecePosition();
-    const cubes = this.#getCurrentPiece().offsets.map((offset) => [
-      position[0] + offset[0],
-      position[1] + offset[1],
-      position[2] + offset[2],
-    ]);
-    this.#state.fallenPieces.push(
-      ...cubes.map((cube) => [cube[0], cube[2]] as [number, number])
+    const cubes = getCubesFromOffsets(
+      position,
+      this.#getCurrentPiece().offsets
     );
+    this.#state.fallenPieces.push(...cubes);
   }
 }
 

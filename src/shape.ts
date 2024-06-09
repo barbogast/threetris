@@ -137,7 +137,7 @@ export const filterEdges = (vertices: Vertex[], edges: Edge[]) => {
 };
 
 export const getPieceGeometry = (size: number) => {
-  const pieceOffset = parseShapeDefinition(shapeDefinitions.shape1.shape);
+  const pieceOffset = parseShapeDefinition(shapeDefinitions.shape2.shape);
   const vertices: Vertex[] = [];
   const allEdges: Edge[] = [];
   for (const offset of pieceOffset) {
