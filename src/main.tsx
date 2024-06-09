@@ -70,16 +70,6 @@ const setup = (state: GameState, fieldDepth: number, fieldSize: number) => {
   controls.enableZoom = false;
 };
 
-const renderFallenPieces = (state: GameState) => {
-  for (const [x, y, z] of state.getFallenCubes()) {
-    const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-    const cubeMaterial = new THREE.MeshNormalMaterial();
-    const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-    cube.position.set(x + 0.5, y + 0.5, z + 0.5);
-    scene.add(cube);
-  }
-};
-
 const rotatePiece = (
   currentPiece: CurrentPiece,
   updateCurrentPiece: (CurrentPiece: Partial<CurrentPiece>) => void
