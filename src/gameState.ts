@@ -15,6 +15,8 @@ export type CurrentPiece = {
 
 export type StateUpdateCallbacks = {
   currentPiece: (currentPiece: CurrentPiece) => void;
+  fallenCubes: (fallenCubes: [number, number, number][]) => void;
+  rendererInfo: (info: { geometries: number }) => void;
 };
 
 const getCubesFromOffsets = (position: Vertex, offsets: Vertex[]): Vertex[] => {
@@ -111,6 +113,7 @@ class GameState {
       this.#getCurrentPiece().offsets
     );
     this.#state.fallenPieces.push(...cubes);
+    this.#callbacks.fallenCubes(this.#state.fallenPieces);
   }
 }
 

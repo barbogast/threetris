@@ -128,7 +128,12 @@ const addPiece = (state: GameState, fieldDepth: number, size: number) => {
   return newPiece;
 };
 
-const mainLoop = (state: GameState, tick: number, fieldDepth: number) => {
+const mainLoop = (
+  state: GameState,
+  callbacks: StateUpdateCallbacks,
+  tick: number,
+  fieldDepth: number
+) => {
   if (tick % 12 === 0) {
     if (state.willTouchFallenPiece() || state.willTouchFloor()) {
       state.addFallenPiece();
@@ -140,9 +145,10 @@ const mainLoop = (state: GameState, tick: number, fieldDepth: number) => {
 
   renderFallenPieces(state);
   renderer.render(scene, camera);
+  callbacks.rendererInfo({ geometries: renderer.info.memory.geometries });
 
   tick += 1;
-  requestAnimationFrame(() => mainLoop(state, tick, fieldDepth));
+  requestAnimationFrame(() => mainLoop(state, callbacks, tick, fieldDepth));
 };
 
 const main = (settings: Settings, callbacks: StateUpdateCallbacks) => {
@@ -151,15 +157,23 @@ const main = (settings: Settings, callbacks: StateUpdateCallbacks) => {
   addPiece(state, settings.fieldDepth, 1);
 
   setup(state, settings.fieldDepth, settings.fieldSize);
-  mainLoop(state, 0, settings.fieldDepth);
+  mainLoop(state, callbacks, 0, settings.fieldDepth);
 };
 
 const App = () => {
   const [currentPiece, setCurrentPiece] = React.useState<CurrentPiece>();
+  const [fallenCubes, setFallenCubes] = React.useState<
+    [number, number, number][]
+  >([]);
+  const [rendererInfo, setRendererInfo] = React.useState<{
+    geometries: number;
+  }>({ geometries: 0 });
   const settings = useAppStore().settings;
 
   const callbacks = {
     currentPiece: setCurrentPiece,
+    fallenCubes: setFallenCubes,
+    rendererInfo: setRendererInfo,
   };
 
   useEffect(() => {
@@ -170,10 +184,14 @@ const App = () => {
     <div style={{ display: "flex", flexDirection: "row" }}>
       <div id="scene"></div>
       <div id="settings" style={{ width: SETTINGS_WIDTH }}>
+        Geometries: {rendererInfo.geometries}
+        <br />
         <pre>{JSON.stringify(currentPiece?.threeObject.position)}</pre>
         {currentPiece?.offsets.map((off, i) => (
           <pre key={i}>{JSON.stringify(off)}</pre>
         ))}
+        <br />
+        Fallen cubes: {fallenCubes.length}
         <SettingsPanel camera={camera} />
       </div>
     </div>
