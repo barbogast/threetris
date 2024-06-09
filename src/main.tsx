@@ -81,7 +81,7 @@ const rotatePiece = (
 };
 
 const addPiece = (state: GameState, fieldDepth: number, size: number) => {
-  state.removeCurrentPiece();
+  state.removeCurrentPiece(scene);
 
   // Tetris pieces are constructed from cubes aligned next to or on top of each other.
   // In addition to aligning the cubes we need to remove mesh-lines between cubes where
@@ -113,6 +113,7 @@ const addPiece = (state: GameState, fieldDepth: number, size: number) => {
     threeObject: lines,
     offsets: offsets,
     position: [0, fieldDepth, 0] as Vertex,
+    threeGeometry: geometry,
   };
   state.setCurrentPiece(newPiece);
   return newPiece;

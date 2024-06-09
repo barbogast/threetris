@@ -11,6 +11,7 @@ type ThreePiece = THREE.LineSegments<
 export type CurrentPiece = {
   offsets: Vertex[];
   threeObject: ThreePiece;
+  threeGeometry: THREE.BufferGeometry<THREE.NormalBufferAttributes>;
 };
 
 export type StateUpdateCallbacks = {
@@ -52,9 +53,10 @@ class GameState {
     this.#callbacks.currentPiece(currentPiece);
   }
 
-  removeCurrentPiece() {
+  removeCurrentPiece(scene: THREE.Scene) {
     if (this.#state.currentPiece) {
-      this.#state.currentPiece.threeObject.remove();
+      scene.remove(this.#state.currentPiece.threeObject);
+      this.#state.currentPiece.threeGeometry.dispose();
       this.#state.currentPiece = undefined;
     }
   }
