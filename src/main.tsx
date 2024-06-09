@@ -116,6 +116,7 @@ const addPiece = (context: Context, fieldDepth: number, size: number) => {
 type GameController = {
   stop: () => void;
   togglePause: () => void;
+  updateSettings: (s: Settings) => void;
 };
 
 const main = (context: Context, settings: Settings): GameController => {
@@ -152,6 +153,9 @@ const main = (context: Context, settings: Settings): GameController => {
     },
     togglePause: () => {
       pause = !pause;
+    },
+    updateSettings: (s: Settings) => {
+      settings = s;
     },
   };
 };
@@ -190,7 +194,12 @@ const App = () => {
     const c = main(context, settings);
     gameController.current = c;
     return c.stop;
-  }, [settings.fieldDepth, settings.fieldSize, settings.fallingSpeed]);
+  }, [settings.fieldDepth, settings.fieldSize]);
+
+  // Some settings can be updated while the game is running.
+  useEffect(() => {
+    gameController.current!.updateSettings(settings);
+  }, [settings.fallingSpeed]);
 
   return (
     <div style={{ display: "flex", flexDirection: "row" }}>
