@@ -48,6 +48,7 @@ class GameRenderer {
     const lines = new THREE.LineSegments(geometry, material);
     lines.position.set(...position);
     lines.name = CURRENT_PIECE_ID;
+    lines.renderOrder = 1;
 
     this.#scene.add(lines);
 
