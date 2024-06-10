@@ -63,16 +63,16 @@ const onKeyPress = (context: Context, key: string) => {
 
   let [posX, posY, posZ] = gameRenderer.getCurrentPiecePosition();
 
-  if (key === "a") {
+  if (key === "ArrowLeft") {
     posX -= 1;
   }
-  if (key === "w") {
+  if (key === "ArrowUp") {
     posZ -= 1;
   }
-  if (key === "s") {
+  if (key === "ArrowDown") {
     posZ += 1;
   }
-  if (key === "d") {
+  if (key === "ArrowRight") {
     posX += 1;
   }
   if (key === "q") {
@@ -139,8 +139,11 @@ const main = (context: Context): GameController => {
 
   setup(context);
 
-  const keyPress = (e: KeyboardEvent) => onKeyPress(context, e.key);
-  addEventListener("keypress", keyPress);
+  const keyPress = (e: KeyboardEvent) => {
+    e.preventDefault();
+    onKeyPress(context, e.key);
+  };
+  addEventListener("keydown", keyPress);
 
   let stop = false;
   let pause = false;
@@ -172,7 +175,7 @@ const main = (context: Context): GameController => {
   return {
     stop: () => {
       stop = true;
-      removeEventListener("keypress", keyPress);
+      removeEventListener("keydown", keyPress);
     },
     togglePause: () => {
       pause = !pause;
