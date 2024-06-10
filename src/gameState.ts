@@ -13,6 +13,15 @@ const getCubesFromOffsets = (position: Vertex, offsets: Vertex[]): Vertex[] => {
   ]);
 };
 
+export const rotateXAxis = (offsets: Vertex[], clockwise: number): Vertex[] =>
+  offsets.map(([oX, oY, oZ]) => [oX, -oZ * clockwise, oY * clockwise]);
+
+export const rotateYAxis = (offsets: Vertex[], clockwise: number): Vertex[] =>
+  offsets.map(([oX, oY, oZ]) => [-oZ * clockwise, oY, oX * clockwise]);
+
+export const rotateZAxis = (offsets: Vertex[], clockwise: number): Vertex[] =>
+  offsets.map(([oX, oY, oZ]) => [-oY * clockwise, oX * clockwise, oZ]);
+
 class GameState {
   #state: {
     currentPiece: CurrentPiece | undefined;

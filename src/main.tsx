@@ -14,7 +14,7 @@ import {
   renderWallGridShortLines,
 } from "./shaft";
 
-import GameState, { CurrentPiece } from "./gameState";
+import GameState, { rotateXAxis, rotateYAxis, rotateZAxis } from "./gameState";
 import GameRenderer from "./gameRenderer";
 import shapeDefinitions from "./shapeDefinitions";
 
@@ -62,6 +62,7 @@ const onKeyPress = (context: Context, key: string) => {
   const { state, renderer: gameRenderer } = context;
 
   let [posX, posY, posZ] = gameRenderer.getCurrentPiecePosition();
+  let offsets = state.getCurrentPiece().offsets;
 
   if (key === "ArrowLeft") {
     posX -= 1;
@@ -77,30 +78,31 @@ const onKeyPress = (context: Context, key: string) => {
   }
 
   if (key === "q") {
-    state.rotateCurrentPieceYAxis(-1);
+    offsets = rotateYAxis(offsets, -1);
   }
   if (key === "a") {
-    state.rotateCurrentPieceYAxis(1);
+    offsets = rotateYAxis(offsets, 1);
   }
 
   if (key === "w") {
-    state.rotateCurrentPieceXAxis(-1);
+    offsets = rotateXAxis(offsets, -1);
   }
   if (key === "s") {
-    state.rotateCurrentPieceXAxis(1);
+    offsets = rotateXAxis(offsets, 1);
   }
 
   if (key === "e") {
-    state.rotateCurrentPieceZAxis(-1);
+    offsets = rotateZAxis(offsets, -1);
   }
   if (key === "d") {
-    state.rotateCurrentPieceZAxis(1);
+    offsets = rotateZAxis(offsets, 1);
   }
 
   if (
     !state.willTouchFallenCube([posX, posY, posZ]) &&
     !state.willBeOutsideOfShaft([posX, posY, posZ])
   ) {
+    state.setCurrentPiece({ offsets });
     gameRenderer.setCurrentPiecePosition([posX, posY, posZ]);
   }
 };
