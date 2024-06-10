@@ -54,23 +54,26 @@ const setup = (context: Context) => {
   addEventListener("keypress", (e) => {
     console.log("event", e.key);
 
-    // if (e.key === "a") {
-    //   rotatePiece(currentPiece, updateCurrentPiece);
-    // }
+    let [posX, posY, posZ] = gameRenderer.getCurrentPiecePosition();
+
     if (e.key === "a") {
-      gameRenderer.moveCurrentPiece([-1, 0, 0]);
+      posX -= 1;
     }
     if (e.key === "w") {
-      gameRenderer.moveCurrentPiece([0, 0, -1]);
+      posZ -= 1;
     }
     if (e.key === "s") {
-      gameRenderer.moveCurrentPiece([0, 0, 1]);
+      posZ += 1;
     }
     if (e.key === "d") {
-      gameRenderer.moveCurrentPiece([1, 0, 0]);
+      posX += 1;
     }
     if (e.key === "q") {
       state.rotateCurrentPieceXAxis();
+    }
+
+    if (!state.willTouchFallenCube([posX, posY, posZ])) {
+      gameRenderer.setCurrentPiecePosition([posX, posY, posZ]);
     }
   });
 
@@ -131,11 +134,13 @@ const main = (context: Context): GameController => {
 
   const mainLoop = (tick: number) => {
     if (!pause && tick % settings.fallingSpeed === 0) {
-      if (state.willTouchFallenCube() || state.willTouchFloor()) {
+      const [posX, posY, posZ] = gameRenderer.getCurrentPiecePosition();
+      const newPosition: Vertex = [posX, posY - 1, posZ];
+      if (state.willTouchFallenCube(newPosition) || state.willTouchFloor()) {
         state.addFallenPiece();
         addPiece(context, 1);
       } else {
-        gameRenderer.moveCurrentPiece([0, -1, 0]);
+        gameRenderer.setCurrentPiecePosition(newPosition);
       }
     }
 

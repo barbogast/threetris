@@ -74,11 +74,9 @@ class GameRenderer {
     this.#callbacks.currentPiecePosition(undefined);
   }
 
-  moveCurrentPiece(offset: Vertex) {
+  setCurrentPiecePosition(position: Vertex) {
     const piece = this.getCurrentPiece();
-    piece.position.x += offset[0];
-    piece.position.y += offset[1];
-    piece.position.z += offset[2];
+    piece.position.set(...position);
     this.#callbacks.currentPiecePosition(this.getCurrentPiecePosition());
   }
 
