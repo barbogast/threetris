@@ -3,7 +3,6 @@
 //    2. filtering out the edges that are shared by 2 cubes
 
 import { Edge, PieceOffset, Vertex } from "./types";
-import shapeDefinitions from "./shapeDefinitions";
 
 export const parseShapeDefinition = (shapes: string[]) => {
   const pieceOffsets: PieceOffset[] = [];

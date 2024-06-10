@@ -29,7 +29,7 @@ const camera = new THREE.PerspectiveCamera(
 );
 
 const setup = (context: Context) => {
-  const { state, renderer: gameRenderer, settings } = context;
+  const { renderer: gameRenderer, settings } = context;
   const { shaftSizeX, shaftSizeY, shaftSizeZ } = settings;
 
   camera.position.set(shaftSizeX / 2, shaftSizeY + 2, shaftSizeZ / 2); // position the camera on top of the scene
@@ -105,17 +105,7 @@ const onKeyPress = (context: Context, key: string) => {
   }
 };
 
-const rotatePiece = (
-  currentPiece: CurrentPiece,
-  updateCurrentPiece: (CurrentPiece: Partial<CurrentPiece>) => void
-) => {
-  // currentPiece.threeObject.rotateOnAxis(
-  //   new THREE.Vector3(0, 1, 0),
-  //   Math.PI / 4
-  // );
-};
-
-const addPiece = (context: Context, size: number) => {
+const addPiece = (context: Context) => {
   const { state, renderer: gameRenderer, settings } = context;
   state.removeCurrentPiece();
   gameRenderer.removeCurrentPiece();
@@ -153,7 +143,7 @@ const main = (context: Context): GameController => {
   const { state, callbacks, renderer: gameRenderer } = context;
   let { settings } = context;
   scene.clear();
-  addPiece(context, 1);
+  addPiece(context);
 
   setup(context);
 
@@ -172,7 +162,7 @@ const main = (context: Context): GameController => {
       const newPosition: Vertex = [posX, posY - 1, posZ];
       if (state.willTouchFallenCube(newPosition) || state.willTouchFloor()) {
         state.addFallenPiece();
-        addPiece(context, 1);
+        addPiece(context);
       } else {
         gameRenderer.setCurrentPiecePosition(newPosition);
       }
