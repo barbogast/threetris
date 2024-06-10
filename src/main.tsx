@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-import { getPieceGeometry } from "./shape";
+import { parseShapeDefinition } from "./shape";
 import SettingsPanel from "./components/SettingsPanel";
 import { Context, Settings, Vertex } from "./types";
 import useAppStore from "./appStore";
@@ -16,6 +16,7 @@ import {
 
 import GameState, { CurrentPiece } from "./gameState";
 import GameRenderer from "./gameRenderer";
+import shapeDefinitions from "./shapeDefinitions";
 
 const SETTINGS_WIDTH = 300;
 const scene = new THREE.Scene();
@@ -110,15 +111,16 @@ const addPiece = (context: Context, size: number) => {
   // is not rendered. If an edge is touched by 3 cubes we assume it is a fold and we render
   // it. Edges touched by 4 cubes are skipped however, they are in the middle of a bigger cube.
 
-  const { vertices, edges, offsets } = getPieceGeometry(size);
+  const pieceOffset = parseShapeDefinition(shapeDefinitions.shape2.shape);
+
   const position: Vertex = [
     Math.floor(settings.shaftSizeX / 2),
     settings.shaftSizeY,
     Math.floor(settings.shaftSizeZ / 2),
   ];
-  gameRenderer.renderCurrentPiece(vertices, edges, position);
+  gameRenderer.renderCurrentPiece(pieceOffset, position);
 
-  const newPiece = { offsets: offsets };
+  const newPiece = { offsets: pieceOffset };
   state.setCurrentPiece(newPiece);
 };
 

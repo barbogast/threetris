@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { Edge, Vertex } from "./types";
 import { StateUpdateCallbacks } from "./types";
+import { filterEdges, getCubeGeometry } from "./shape";
 
 const SHAFT_LINES_ID = "shaft-lines";
 const CURRENT_PIECE_ID = "current-piece";
@@ -34,7 +35,15 @@ class GameRenderer {
     this.#scene.getObjectByName(SHAFT_LINES_ID)!.add(lines);
   }
 
-  renderCurrentPiece(vertices: Vertex[], edges: Edge[], position: Vertex) {
+  renderCurrentPiece(offsets: Vertex[], position: Vertex) {
+    const vertices: Vertex[] = [];
+    const allEdges: Edge[] = [];
+    for (const offset of offsets) {
+      getCubeGeometry(vertices, allEdges, 1, offset[0], offset[1], offset[2]);
+    }
+
+    const filteredEdges = filterEdges(vertices, allEdges);
+
     const geometry = new THREE.BufferGeometry();
 
     // Add the vertices and edges to the geometry
@@ -42,7 +51,7 @@ class GameRenderer {
       "position",
       new THREE.BufferAttribute(new Float32Array(vertices.flat()), 3)
     );
-    geometry.setIndex(edges.flat());
+    geometry.setIndex(filteredEdges.flat());
 
     const material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
     const lines = new THREE.LineSegments(geometry, material);

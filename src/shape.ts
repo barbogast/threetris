@@ -135,15 +135,3 @@ export const filterEdges = (vertices: Vertex[], edges: Edge[]) => {
 
   return filteredEdges;
 };
-
-export const getPieceGeometry = (size: number) => {
-  const pieceOffset = parseShapeDefinition(shapeDefinitions.shape2.shape);
-  const vertices: Vertex[] = [];
-  const allEdges: Edge[] = [];
-  for (const offset of pieceOffset) {
-    getCubeGeometry(vertices, allEdges, size, offset[0], offset[1], offset[2]);
-  }
-
-  const filteredEdges = filterEdges(vertices, allEdges);
-  return { vertices, edges: filteredEdges, offsets: pieceOffset };
-};
