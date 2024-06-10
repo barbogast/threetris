@@ -100,7 +100,7 @@ const onKeyPress = (context: Context, key: string) => {
 
   if (
     !state.willTouchFallenCube([posX, posY, posZ], offsets) &&
-    !state.willBeOutsideOfShaft([posX, posY, posZ])
+    !state.willBeOutsideOfShaft([posX, posY, posZ], offsets)
   ) {
     state.setCurrentPiece({ offsets });
     gameRenderer.setCurrentPiecePosition([posX, posY, posZ]);
