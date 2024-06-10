@@ -64,11 +64,8 @@ class GameState {
     this.#state.currentPiece = undefined;
   }
 
-  willTouchFallenCube(newPosition: Vertex) {
-    const cubes = getCubesFromOffsets(
-      newPosition,
-      this.#getCurrentPiece().offsets
-    );
+  willTouchFallenCube(newPosition: Vertex, newOffsets: Vertex[]) {
+    const cubes = getCubesFromOffsets(newPosition, newOffsets);
     return cubes.some((cube) =>
       this.#state.fallenCubes.some(
         (fallenCube) =>

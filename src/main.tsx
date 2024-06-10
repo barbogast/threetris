@@ -99,7 +99,7 @@ const onKeyPress = (context: Context, key: string) => {
   }
 
   if (
-    !state.willTouchFallenCube([posX, posY, posZ]) &&
+    !state.willTouchFallenCube([posX, posY, posZ], offsets) &&
     !state.willBeOutsideOfShaft([posX, posY, posZ])
   ) {
     state.setCurrentPiece({ offsets });
@@ -161,8 +161,12 @@ const main = (context: Context): GameController => {
   const mainLoop = (tick: number) => {
     if (!pause && tick % settings.fallingSpeed === 0) {
       const [posX, posY, posZ] = gameRenderer.getCurrentPiecePosition();
+      const offsets = state.getCurrentPiece().offsets;
       const newPosition: Vertex = [posX, posY - 1, posZ];
-      if (state.willTouchFallenCube(newPosition) || state.willTouchFloor()) {
+      if (
+        state.willTouchFallenCube(newPosition, offsets) ||
+        state.willTouchFloor()
+      ) {
         state.addFallenPiece();
         addPiece(context);
       } else {
