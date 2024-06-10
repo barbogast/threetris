@@ -81,7 +81,7 @@ export const renderFloorGrid = (
   gameRenderer: GameRenderer,
   settings: Settings
 ) => {
-  const { shaftSizeX: x, shaftSizeY: y, shaftSizeZ: z } = settings;
+  const { shaftSizeX: x, shaftSizeZ: z } = settings;
   const vertices: Vertex[] = [];
 
   for (let i = 0 + 1; i < z; i++) {

@@ -110,11 +110,11 @@ const addPiece = (context: Context, size: number) => {
   const { vertices, edges, offsets } = getPieceGeometry(size);
   const position: Vertex = [0, settings.shaftSizeY, 0];
   gameRenderer.renderCurrentPiece(vertices, edges, position);
-  const newPiece = { offsets: offsets };
 
+  const newPiece = { offsets: offsets };
   state.setCurrentPiece(newPiece);
-  return newPiece;
 };
+
 type GameController = {
   stop: () => void;
   togglePause: () => void;
