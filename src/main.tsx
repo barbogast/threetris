@@ -108,7 +108,11 @@ const addPiece = (context: Context, size: number) => {
   // it. Edges touched by 4 cubes are skipped however, they are in the middle of a bigger cube.
 
   const { vertices, edges, offsets } = getPieceGeometry(size);
-  const position: Vertex = [0, settings.shaftSizeY, 0];
+  const position: Vertex = [
+    Math.floor(settings.shaftSizeX / 2),
+    settings.shaftSizeY,
+    Math.floor(settings.shaftSizeZ / 2),
+  ];
   gameRenderer.renderCurrentPiece(vertices, edges, position);
 
   const newPiece = { offsets: offsets };
