@@ -72,7 +72,10 @@ const setup = (context: Context) => {
       state.rotateCurrentPieceXAxis();
     }
 
-    if (!state.willTouchFallenCube([posX, posY, posZ])) {
+    if (
+      !state.willTouchFallenCube([posX, posY, posZ]) &&
+      !state.willBeOutsideOfShaft([posX, posY, posZ])
+    ) {
       gameRenderer.setCurrentPiecePosition([posX, posY, posZ]);
     }
   });
@@ -192,7 +195,7 @@ const App = () => {
 
   const gameRenderer = new GameRenderer(scene, callbacks);
   const context: Context = {
-    state: new GameState(gameRenderer, callbacks),
+    state: new GameState(settings, gameRenderer, callbacks),
     callbacks: callbacks,
     renderer: gameRenderer,
     settings,

@@ -1,4 +1,4 @@
-import { StateUpdateCallbacks, Vertex } from "./types";
+import { Settings, StateUpdateCallbacks, Vertex } from "./types";
 import GameRenderer from "./gameRenderer";
 
 export type CurrentPiece = {
@@ -20,12 +20,18 @@ class GameState {
   };
   #callbacks: StateUpdateCallbacks;
   #gameRenderer: GameRenderer;
+  #settings: Settings;
 
-  constructor(gameRenderer: GameRenderer, callbacks: StateUpdateCallbacks) {
+  constructor(
+    settings: Settings,
+    gameRenderer: GameRenderer,
+    callbacks: StateUpdateCallbacks
+  ) {
     this.#state = {
       currentPiece: undefined,
       fallenCubes: [],
     };
+    this.#settings = settings;
     this.#gameRenderer = gameRenderer;
     this.#callbacks = callbacks;
   }
@@ -56,6 +62,23 @@ class GameState {
           fallenCube[1] === cube[1] &&
           fallenCube[2] === cube[2]
       )
+    );
+  }
+
+  willBeOutsideOfShaft(newPosition: Vertex) {
+    const { shaftSizeX, shaftSizeY, shaftSizeZ } = this.#settings;
+    const cubes = getCubesFromOffsets(
+      newPosition,
+      this.#getCurrentPiece().offsets
+    );
+    return cubes.some(
+      (cube) =>
+        cube[0] < 0 ||
+        cube[0] >= shaftSizeX ||
+        cube[1] < 0 ||
+        cube[1] >= shaftSizeY ||
+        cube[2] < 0 ||
+        cube[2] >= shaftSizeZ
     );
   }
 
