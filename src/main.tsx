@@ -52,38 +52,39 @@ const setup = (context: Context) => {
   renderWallGridLongLines(gameRenderer, settings);
   renderWallGridShortLines(gameRenderer, settings);
 
-  addEventListener("keypress", (e) => {
-    console.log("event", e.key);
-
-    let [posX, posY, posZ] = gameRenderer.getCurrentPiecePosition();
-
-    if (e.key === "a") {
-      posX -= 1;
-    }
-    if (e.key === "w") {
-      posZ -= 1;
-    }
-    if (e.key === "s") {
-      posZ += 1;
-    }
-    if (e.key === "d") {
-      posX += 1;
-    }
-    if (e.key === "q") {
-      state.rotateCurrentPieceXAxis();
-    }
-
-    if (
-      !state.willTouchFallenCube([posX, posY, posZ]) &&
-      !state.willBeOutsideOfShaft([posX, posY, posZ])
-    ) {
-      gameRenderer.setCurrentPiecePosition([posX, posY, posZ]);
-    }
-  });
-
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.maxPolarAngle = (0.9 * Math.PI) / 2;
   controls.enableZoom = true;
+};
+
+const onKeyPress = (context: Context, key: string) => {
+  console.log("keyPress", key);
+  const { state, renderer: gameRenderer } = context;
+
+  let [posX, posY, posZ] = gameRenderer.getCurrentPiecePosition();
+
+  if (key === "a") {
+    posX -= 1;
+  }
+  if (key === "w") {
+    posZ -= 1;
+  }
+  if (key === "s") {
+    posZ += 1;
+  }
+  if (key === "d") {
+    posX += 1;
+  }
+  if (key === "q") {
+    state.rotateCurrentPieceXAxis();
+  }
+
+  if (
+    !state.willTouchFallenCube([posX, posY, posZ]) &&
+    !state.willBeOutsideOfShaft([posX, posY, posZ])
+  ) {
+    gameRenderer.setCurrentPiecePosition([posX, posY, posZ]);
+  }
 };
 
 const rotatePiece = (
@@ -138,6 +139,9 @@ const main = (context: Context): GameController => {
 
   setup(context);
 
+  const keyPress = (e: KeyboardEvent) => onKeyPress(context, e.key);
+  addEventListener("keypress", keyPress);
+
   let stop = false;
   let pause = false;
 
@@ -153,6 +157,10 @@ const main = (context: Context): GameController => {
       }
     }
 
+    const position = gameRenderer.getCurrentPiecePosition();
+    gameRenderer.removeCurrentPiece();
+    gameRenderer.renderCurrentPiece(state.getCurrentPiece().offsets, position);
+
     renderer.render(scene, camera);
     callbacks.rendererInfo({ geometries: renderer.info.memory.geometries });
 
@@ -164,6 +172,7 @@ const main = (context: Context): GameController => {
   return {
     stop: () => {
       stop = true;
+      removeEventListener("keypress", keyPress);
     },
     togglePause: () => {
       pause = !pause;
