@@ -31,8 +31,9 @@ const SettingsPanel = ({ camera }: Props) => {
   return (
     <>
       Settings
-      <RangeSetting name="fieldSize" min={1} max={10} step={1} type={"int"} />
-      <RangeSetting name="fieldDepth" min={5} max={15} step={1} type={"int"} />
+      <RangeSetting name="shaftSizeX" min={1} max={10} step={1} type={"int"} />
+      <RangeSetting name="shaftSizeY" min={5} max={15} step={1} type={"int"} />
+      <RangeSetting name="shaftSizeZ" min={1} max={10} step={1} type={"int"} />
       <RangeSetting
         name="fallingSpeed"
         min={1}
@@ -87,8 +88,9 @@ const SettingsPanel = ({ camera }: Props) => {
         onClick={() => {
           useAppStore.setState({
             settings: {
-              fieldSize: 4,
-              fieldDepth: 10,
+              shaftSizeX: 4,
+              shaftSizeY: 10,
+              shaftSizeZ: 4,
               fallingSpeed: 15,
               fov: 750,
               positionX: 0.0,

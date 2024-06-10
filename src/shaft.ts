@@ -1,46 +1,49 @@
 import * as THREE from "three";
-import { Vertex } from "./types";
+import { Settings, Vertex } from "./types";
 import GameRenderer from "./gameRenderer";
 
-export const renderContainer = (
-  scene: THREE.Scene,
-  fieldSize: number,
-  fieldDepth: number
-) => {
-  const cubeGeometry = new THREE.BoxGeometry(fieldSize, fieldDepth, fieldSize);
+export const renderContainer = (scene: THREE.Scene, settings: Settings) => {
+  const cubeGeometry = new THREE.BoxGeometry(
+    settings.shaftSizeX,
+    settings.shaftSizeY,
+    settings.shaftSizeZ
+  );
   const cubeMaterial = new THREE.LineBasicMaterial({ color: "0x00ff00" });
   const edges = new THREE.EdgesGeometry(cubeGeometry);
   const cube = new THREE.LineSegments(edges, cubeMaterial);
-  cube.position.set(fieldSize / 2, fieldDepth / 2, fieldSize / 2);
+  cube.position.set(
+    settings.shaftSizeX / 2,
+    settings.shaftSizeY / 2,
+    settings.shaftSizeZ / 2
+  );
   scene.add(cube);
 };
 
 export const renderWallGridLongLines = (
   gameRenderer: GameRenderer,
-  fieldSize: number,
-  fieldDepth: number
+  settings: Settings
 ) => {
+  const { shaftSizeX: x, shaftSizeY: y, shaftSizeZ: z } = settings;
   const vertices: Vertex[] = [];
 
-  const s = fieldSize;
-  const d = fieldDepth;
-
-  for (let i = 1; i < s; i++) {
+  for (let i = 1; i < z; i++) {
     // Left wall
     vertices.push([0, 0, i]);
-    vertices.push([0, d, i]);
+    vertices.push([0, y, i]);
 
     // Right wall
-    vertices.push([s, 0, i]);
-    vertices.push([s, d, i]);
+    vertices.push([x, 0, i]);
+    vertices.push([x, y, i]);
+  }
 
-    // // Top
+  for (let i = 1; i < x; i++) {
+    // // // Top
     vertices.push([i, 0, 0]);
-    vertices.push([i, d, 0]);
+    vertices.push([i, y, 0]);
 
-    // // Bottom
-    vertices.push([i, 0, s]);
-    vertices.push([i, d, s]);
+    // // // Bottom
+    vertices.push([i, 0, z]);
+    vertices.push([i, y, z]);
   }
 
   gameRenderer.renderShaftLines("wall-long-lines", vertices);
@@ -48,30 +51,27 @@ export const renderWallGridLongLines = (
 
 export const renderWallGridShortLines = (
   gameRenderer: GameRenderer,
-  fieldSize: number,
-  fieldDepth: number
+  settings: Settings
 ) => {
+  const { shaftSizeX: x, shaftSizeY: y, shaftSizeZ: z } = settings;
   const vertices: Vertex[] = [];
 
-  const s = fieldSize;
-  const d = fieldDepth;
-
-  for (let i = 1; i < d; i++) {
+  for (let i = 1; i < y; i++) {
     // Left wall
     vertices.push([0, i, 0]);
-    vertices.push([0, i, s]);
+    vertices.push([0, i, z]);
 
     // Right wall
-    vertices.push([s, i, 0]);
-    vertices.push([s, i, s]);
+    vertices.push([x, i, 0]);
+    vertices.push([x, i, z]);
 
-    // Top
+    // // Top
     vertices.push([0, i, 0]);
-    vertices.push([s, i, 0]);
+    vertices.push([x, i, 0]);
 
-    // Bottom
-    vertices.push([0, i, s]);
-    vertices.push([s, i, s]);
+    // // Bottom
+    vertices.push([0, i, z]);
+    vertices.push([x, i, z]);
   }
 
   gameRenderer.renderShaftLines("wall-short-lines", vertices);
@@ -79,19 +79,21 @@ export const renderWallGridShortLines = (
 
 export const renderFloorGrid = (
   gameRenderer: GameRenderer,
-  fieldSize: number
+  settings: Settings
 ) => {
+  const { shaftSizeX: x, shaftSizeY: y, shaftSizeZ: z } = settings;
   const vertices: Vertex[] = [];
 
-  const s = fieldSize;
-  for (let i = 0 + 1; i < s; i++) {
+  for (let i = 0 + 1; i < z; i++) {
     // Horizontal
     vertices.push([0, 0, i]);
-    vertices.push([s, 0, i]);
+    vertices.push([x, 0, i]);
+  }
 
+  for (let i = 0 + 1; i < x; i++) {
     // Vertical
     vertices.push([i, 0, 0]);
-    vertices.push([i, 0, s]);
+    vertices.push([i, 0, z]);
   }
 
   gameRenderer.renderShaftLines("floor-lines", vertices);

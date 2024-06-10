@@ -29,11 +29,11 @@ const camera = new THREE.PerspectiveCamera(
 
 const setup = (context: Context) => {
   const { state, renderer: gameRenderer, settings } = context;
-  const { fieldDepth, fieldSize } = settings;
+  const { shaftSizeX, shaftSizeY, shaftSizeZ } = settings;
 
-  camera.position.set(fieldSize / 2, fieldDepth + 2, fieldSize / 2); // position the camera on top of the scene
+  camera.position.set(shaftSizeX / 2, shaftSizeY + 2, shaftSizeZ / 2); // position the camera on top of the scene
   // camera.up.set(0, 0, -1); // point the camera towards the bottom of the scene
-  camera.lookAt(0, 0, fieldSize / 2); // target the center of the scene
+  camera.lookAt(0, 0, shaftSizeX / 2); // target the center of the scene
 
   // Adjust the camera's aspect ratio and fov to make the scene appear wider and taller
   // camera.aspect = 1.5;
@@ -46,10 +46,10 @@ const setup = (context: Context) => {
 
   gameRenderer.setup();
 
-  renderContainer(scene, fieldSize, fieldDepth);
-  renderFloorGrid(gameRenderer, fieldSize);
-  renderWallGridLongLines(gameRenderer, fieldSize, fieldDepth);
-  renderWallGridShortLines(gameRenderer, fieldSize, fieldDepth);
+  renderContainer(scene, settings);
+  renderFloorGrid(gameRenderer, settings);
+  renderWallGridLongLines(gameRenderer, settings);
+  renderWallGridShortLines(gameRenderer, settings);
 
   addEventListener("keypress", (e) => {
     console.log("event", e.key);
@@ -105,7 +105,7 @@ const addPiece = (context: Context, size: number) => {
   // it. Edges touched by 4 cubes are skipped however, they are in the middle of a bigger cube.
 
   const { vertices, edges, offsets } = getPieceGeometry(size);
-  const position: Vertex = [0, settings.fieldDepth, 0];
+  const position: Vertex = [0, settings.shaftSizeY, 0];
   gameRenderer.renderCurrentPiece(vertices, edges, position);
   const newPiece = { offsets: offsets };
 
@@ -195,7 +195,7 @@ const App = () => {
     const c = main(context);
     gameController.current = c;
     return c.stop;
-  }, [settings.fieldDepth, settings.fieldSize]);
+  }, [settings.shaftSizeX, settings.shaftSizeY, settings.shaftSizeZ]);
 
   // Some settings can be updated while the game is running.
   useEffect(() => {

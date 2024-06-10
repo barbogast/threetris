@@ -2,8 +2,9 @@ import GameRenderer from "./gameRenderer";
 import GameState from "./gameState";
 
 export type Settings = {
-  fieldSize: number;
-  fieldDepth: number;
+  shaftSizeX: number;
+  shaftSizeY: number;
+  shaftSizeZ: number;
   fallingSpeed: number;
   fov: number;
   positionX: number;

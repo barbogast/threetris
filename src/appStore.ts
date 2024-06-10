@@ -6,8 +6,9 @@ const useAppStore = create<AppState>()(
   persist(
     () => ({
       settings: {
-        fieldSize: 4,
-        fieldDepth: 10,
+        shaftSizeX: 4,
+        shaftSizeY: 10,
+        shaftSizeZ: 4,
         fallingSpeed: 15,
         fov: 750,
         positionX: 0.0,
