@@ -75,8 +75,26 @@ const onKeyPress = (context: Context, key: string) => {
   if (key === "ArrowRight") {
     posX += 1;
   }
+
   if (key === "q") {
-    state.rotateCurrentPieceXAxis();
+    state.rotateCurrentPieceYAxis(-1);
+  }
+  if (key === "a") {
+    state.rotateCurrentPieceYAxis(1);
+  }
+
+  if (key === "w") {
+    state.rotateCurrentPieceXAxis(-1);
+  }
+  if (key === "s") {
+    state.rotateCurrentPieceXAxis(1);
+  }
+
+  if (key === "e") {
+    state.rotateCurrentPieceZAxis(-1);
+  }
+  if (key === "d") {
+    state.rotateCurrentPieceZAxis(1);
   }
 
   if (

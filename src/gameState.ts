@@ -41,6 +41,11 @@ class GameState {
     return this.#state.currentPiece;
   }
 
+  getCurrentPiece() {
+    if (!this.#state.currentPiece) throw new Error("No current piece");
+    return this.#state.currentPiece;
+  }
+
   setCurrentPiece(currentPiece: CurrentPiece) {
     this.#state.currentPiece = currentPiece;
     this.#callbacks.currentPieceOffsets(currentPiece.offsets);
@@ -91,10 +96,34 @@ class GameState {
     return cubes.some((cube) => cube[1] === 0);
   }
 
-  rotateCurrentPieceXAxis() {
-    this.#state.currentPiece?.offsets.map((cube) =>
-      cube.map((offset) => (offset = -offset))
-    );
+  rotateCurrentPieceXAxis(clockwise: number) {
+    const piece = this.#getCurrentPiece();
+    piece.offsets = piece.offsets.map(([oX, oY, oZ]) => [
+      oX,
+      -oZ * clockwise,
+      oY * clockwise,
+    ]);
+    this.#callbacks.currentPieceOffsets(piece.offsets);
+  }
+
+  rotateCurrentPieceYAxis(clockwise: number) {
+    const piece = this.#getCurrentPiece();
+    piece.offsets = piece.offsets.map(([oX, oY, oZ]) => [
+      -oZ * clockwise,
+      oY,
+      oX * clockwise,
+    ]);
+    this.#callbacks.currentPieceOffsets(piece.offsets);
+  }
+
+  rotateCurrentPieceZAxis(clockwise: number) {
+    const piece = this.#getCurrentPiece();
+    piece.offsets = piece.offsets.map(([oX, oY, oZ]) => [
+      -oY * clockwise,
+      oX * clockwise,
+      oZ,
+    ]);
+    this.#callbacks.currentPieceOffsets(piece.offsets);
   }
 
   getFallenCubes() {
