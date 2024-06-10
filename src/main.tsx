@@ -105,11 +105,8 @@ const addPiece = (context: Context, size: number) => {
   // it. Edges touched by 4 cubes are skipped however, they are in the middle of a bigger cube.
 
   const { vertices, edges, offsets } = getPieceGeometry(size);
-  gameRenderer.renderCurrentPiece(vertices, edges, [
-    0,
-    settings.fieldDepth,
-    0,
-  ] as Vertex);
+  const position: Vertex = [0, settings.fieldDepth, 0];
+  gameRenderer.renderCurrentPiece(vertices, edges, position);
   const newPiece = { offsets: offsets };
 
   state.setCurrentPiece(newPiece);
@@ -212,14 +209,17 @@ const App = () => {
         <button onClick={() => gameController.current!.togglePause()}>
           Pause
         </button>
+        <br />
         Geometries: {rendererInfo.geometries}
         <br />
-        <pre>{JSON.stringify(currentPiecePosition)}</pre>
+        currentPiecePosition<pre>{JSON.stringify(currentPiecePosition)}</pre>
+        currentPieceOffsets
         {currentPieceOffsets.map((off, i) => (
           <pre key={i}>{JSON.stringify(off)}</pre>
         ))}
-        <br />
         Fallen cubes: {fallenCubes.length}
+        <br />
+        <br />
         <SettingsPanel camera={camera} />
       </div>
     </div>
