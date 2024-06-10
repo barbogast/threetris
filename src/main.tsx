@@ -14,7 +14,13 @@ import {
   renderWallGridShortLines,
 } from "./shaft";
 
-import GameState, { rotateXAxis, rotateYAxis, rotateZAxis } from "./gameState";
+import GameState, {
+  findFullLevels,
+  removeLevel,
+  rotateXAxis,
+  rotateYAxis,
+  rotateZAxis,
+} from "./gameState";
 import GameRenderer from "./gameRenderer";
 import shapeDefinitions from "./shapeDefinitions";
 
@@ -122,7 +128,7 @@ const addPiece = (context: Context) => {
   // is not rendered. If an edge is touched by 3 cubes we assume it is a fold and we render
   // it. Edges touched by 4 cubes are skipped however, they are in the middle of a bigger cube.
 
-  const pieceOffset = parseShapeDefinition(shapeDefinitions.shape2.shape);
+  const pieceOffset = parseShapeDefinition(shapeDefinitions.shape1.shape);
 
   const position: Vertex = [
     Math.floor(settings.shaftSizeX / 2),
@@ -169,6 +175,15 @@ const main = (context: Context): GameController => {
       ) {
         state.addFallenPiece();
         addPiece(context);
+
+        let fallenCubes = state.getFallenCubes();
+        const fullLevels = findFullLevels(settings, fallenCubes);
+        for (const level of fullLevels) {
+          fallenCubes = removeLevel(fallenCubes, level);
+          gameRenderer.removeFallenCubes();
+          gameRenderer.renderFallenCubes(fallenCubes);
+        }
+        state.setFallenCubes(fallenCubes);
       } else {
         gameRenderer.setCurrentPiecePosition(newPosition);
       }

@@ -5,6 +5,7 @@ import { filterEdges, getCubeGeometry } from "./shape";
 
 const SHAFT_LINES_ID = "shaft-lines";
 const CURRENT_PIECE_ID = "current-piece";
+const FALLEN_CUBES_ID = "fallen-cubes";
 
 class GameRenderer {
   #scene: THREE.Scene;
@@ -16,9 +17,13 @@ class GameRenderer {
   }
 
   setup() {
-    const group = new THREE.Group();
-    group.name = SHAFT_LINES_ID;
-    this.#scene.add(group);
+    const group1 = new THREE.Group();
+    group1.name = SHAFT_LINES_ID;
+    this.#scene.add(group1);
+
+    const group2 = new THREE.Group();
+    group2.name = FALLEN_CUBES_ID;
+    this.#scene.add(group2);
   }
 
   renderShaftLines(name: string, vertices: Vertex[]) {
@@ -96,8 +101,13 @@ class GameRenderer {
       const cubeMaterial = new THREE.MeshNormalMaterial();
       const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
       cube.position.set(x + 0.5, y + 0.5, z + 0.5);
-      this.#scene.add(cube);
+      this.#scene.getObjectByName(FALLEN_CUBES_ID)!.add(cube);
     }
+  }
+
+  removeFallenCubes() {
+    const fallenCubes = this.#scene.getObjectByName(FALLEN_CUBES_ID);
+    if (fallenCubes) fallenCubes.clear();
   }
 }
 
