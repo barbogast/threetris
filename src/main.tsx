@@ -5,7 +5,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 import { parseShapeDefinition } from "./shape";
 import SettingsPanel from "./components/SettingsPanel";
-import { Context, Settings, Vertex } from "./types";
+import { Context, Settings, StateUpdateCallbacks, Vertex } from "./types";
 import useAppStore from "./appStore";
 import {
   renderContainer,
@@ -25,7 +25,6 @@ import GameRenderer from "./gameRenderer";
 import shapeDefinitions from "./shapeDefinitions";
 
 const SETTINGS_WIDTH = 300;
-const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer();
 const camera = new THREE.PerspectiveCamera(
   50,
@@ -147,10 +146,23 @@ type GameController = {
   updateSettings: (s: Settings) => void;
 };
 
-const main = (context: Context): GameController => {
-  const { state, callbacks, renderer: gameRenderer } = context;
-  let { settings } = context;
+const main = (
+  settings: Settings,
+  callbacks: StateUpdateCallbacks
+): GameController => {
+  const scene = new THREE.Scene();
+
+  const gameRenderer = new GameRenderer(scene, callbacks);
+  const state = new GameState(settings, gameRenderer, callbacks);
+  const context: Context = {
+    state,
+    callbacks,
+    renderer: gameRenderer,
+    settings,
+  };
+
   scene.clear();
+
   addPiece(context);
 
   setup(context);
@@ -236,20 +248,12 @@ const App = () => {
     rendererInfo: setRendererInfo,
   };
 
-  const gameRenderer = new GameRenderer(scene, callbacks);
-  const context: Context = {
-    state: new GameState(settings, gameRenderer, callbacks),
-    callbacks: callbacks,
-    renderer: gameRenderer,
-    settings,
-  };
-
   const gameController = useRef<GameController>();
 
   useEffect(() => {
-    const c = main(context);
-    gameController.current = c;
-    return c.stop;
+    const controller = main(settings, callbacks);
+    gameController.current = controller;
+    return controller.stop;
   }, [settings.shaftSizeX, settings.shaftSizeY, settings.shaftSizeZ]);
 
   // Some settings can be updated while the game is running.
