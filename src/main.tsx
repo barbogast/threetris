@@ -53,7 +53,7 @@ const setup = (context: Context) => {
 
   gameRenderer.setup();
 
-  renderContainer(scene, settings);
+  renderContainer(gameRenderer, settings);
   renderFloorGrid(gameRenderer, settings);
   renderWallGridLongLines(gameRenderer, settings);
   renderWallGridShortLines(gameRenderer, settings);

@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Edge, Vertex } from "./types";
+import { Edge, Settings, Vertex } from "./types";
 import { StateUpdateCallbacks } from "./types";
 import { filterEdges, getCubeGeometry } from "./shape";
 
@@ -24,6 +24,16 @@ class GameRenderer {
     const group2 = new THREE.Group();
     group2.name = FALLEN_CUBES_ID;
     this.#scene.add(group2);
+  }
+
+  renderShaftCube(dimension: Vertex, position: Vertex) {
+    const cubeGeometry = new THREE.BoxGeometry(...dimension);
+    const cubeMaterial = new THREE.LineBasicMaterial({ color: "0x00ff00" });
+    const edges = new THREE.EdgesGeometry(cubeGeometry);
+    const cube = new THREE.LineSegments(edges, cubeMaterial);
+    cube.position.set(...position);
+    cube.name = "container";
+    this.#scene.add(cube);
   }
 
   renderShaftLines(name: string, vertices: Vertex[]) {

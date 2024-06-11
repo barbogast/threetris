@@ -1,22 +1,21 @@
-import * as THREE from "three";
 import { Settings, Vertex } from "./types";
 import GameRenderer from "./gameRenderer";
 
-export const renderContainer = (scene: THREE.Scene, settings: Settings) => {
-  const cubeGeometry = new THREE.BoxGeometry(
+export const renderContainer = (
+  gameRenderer: GameRenderer,
+  settings: Settings
+) => {
+  const dimensions: Vertex = [
     settings.shaftSizeX,
     settings.shaftSizeY,
-    settings.shaftSizeZ
-  );
-  const cubeMaterial = new THREE.LineBasicMaterial({ color: "0x00ff00" });
-  const edges = new THREE.EdgesGeometry(cubeGeometry);
-  const cube = new THREE.LineSegments(edges, cubeMaterial);
-  cube.position.set(
+    settings.shaftSizeZ,
+  ];
+  const position: Vertex = [
     settings.shaftSizeX / 2,
     settings.shaftSizeY / 2,
-    settings.shaftSizeZ / 2
-  );
-  scene.add(cube);
+    settings.shaftSizeZ / 2,
+  ];
+  gameRenderer.renderShaftCube(dimensions, position);
 };
 
 export const renderWallGridLongLines = (
