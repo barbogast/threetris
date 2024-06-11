@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { useEffect } from "react";
 import RangeSetting from "./RangeSetting";
 import useAppStore from "../appStore";
+import { defaultSettings } from "../config";
 
 type Props = {
   camera: THREE.PerspectiveCamera;
@@ -87,19 +88,7 @@ const SettingsPanel = ({ camera }: Props) => {
       <button
         onClick={() => {
           useAppStore.setState({
-            settings: {
-              shaftSizeX: 4,
-              shaftSizeY: 10,
-              shaftSizeZ: 4,
-              fallingSpeed: 15,
-              fov: 750,
-              positionX: 0.0,
-              positionY: 2.0,
-              positionZ: 0.0,
-              lookAtX: 0,
-              lookAtY: 1,
-              lookAtZ: 0,
-            },
+            settings: defaultSettings,
           });
         }}
       >
