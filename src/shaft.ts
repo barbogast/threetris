@@ -37,11 +37,11 @@ export const renderWallGridLongLines = (
   }
 
   for (let i = 1; i < x; i++) {
-    // // // Top
+    // Top wall
     vertices.push([i, 0, 0]);
     vertices.push([i, y, 0]);
 
-    // // // Bottom
+    // Bottom wall
     vertices.push([i, 0, z]);
     vertices.push([i, y, z]);
   }
@@ -65,11 +65,11 @@ export const renderWallGridShortLines = (
     vertices.push([x, i, 0]);
     vertices.push([x, i, z]);
 
-    // // Top
+    // Top wall
     vertices.push([0, i, 0]);
     vertices.push([x, i, 0]);
 
-    // // Bottom
+    // Bottom wall
     vertices.push([0, i, z]);
     vertices.push([x, i, z]);
   }
