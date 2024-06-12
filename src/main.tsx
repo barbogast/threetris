@@ -61,24 +61,24 @@ const onKeyPress = (context: Context, key: string) => {
   }
 
   if (key === "q") {
-    offsets = rotateYAxis(offsets, -1);
+    offsets = rotateXAxis(offsets, 1);
   }
   if (key === "a") {
-    offsets = rotateYAxis(offsets, 1);
+    offsets = rotateXAxis(offsets, -1);
   }
 
   if (key === "w") {
-    offsets = rotateXAxis(offsets, -1);
+    offsets = rotateZAxis(offsets, -1);
   }
   if (key === "s") {
-    offsets = rotateXAxis(offsets, 1);
+    offsets = rotateZAxis(offsets, 1);
   }
 
   if (key === "e") {
-    offsets = rotateZAxis(offsets, -1);
+    offsets = rotateYAxis(offsets, -1);
   }
   if (key === "d") {
-    offsets = rotateZAxis(offsets, 1);
+    offsets = rotateYAxis(offsets, 1);
   }
 
   if (
