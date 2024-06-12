@@ -4,29 +4,33 @@ import { useEffect } from "react";
 import RangeSetting from "./RangeSetting";
 import useAppStore from "../appStore";
 import { defaultSettings } from "../config";
+import { GameController } from "../types";
 
 type Props = {
-  camera: THREE.PerspectiveCamera;
+  gameController: GameController;
 };
 
-const SettingsPanel = ({ camera }: Props) => {
+const SettingsPanel = ({ gameController }: Props) => {
   const settings = useAppStore().settings;
 
   useEffect(() => {
-    camera.fov = settings.fov;
-    camera.updateProjectionMatrix();
+    gameController.updateCamera.fov(settings.fov);
   }, [settings.fov]);
 
   useEffect(() => {
-    camera.position.set(
+    gameController.updateCamera.position([
       settings.positionX,
       settings.positionY,
-      settings.positionZ
-    );
+      settings.positionZ,
+    ]);
   }, [settings.positionX, settings.positionY, settings.positionZ]);
 
   useEffect(() => {
-    camera.lookAt(settings.lookAtX, settings.lookAtY, settings.lookAtZ);
+    gameController.updateCamera.lookAt([
+      settings.lookAtX,
+      settings.lookAtY,
+      settings.lookAtZ,
+    ]);
   }, [settings.lookAtX, settings.lookAtY, settings.lookAtZ]);
 
   return (

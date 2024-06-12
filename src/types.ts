@@ -36,3 +36,14 @@ export type Context = {
   renderer: GameRenderer;
   settings: Settings;
 };
+
+export type GameController = {
+  stop: () => void;
+  togglePause: () => void;
+  updateSettings: (s: Settings) => void;
+  updateCamera: {
+    fov: (fov: number) => void;
+    position: (position: Vertex) => void;
+    lookAt: (position: Vertex) => void;
+  };
+};

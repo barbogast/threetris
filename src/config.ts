@@ -13,3 +13,5 @@ export const defaultSettings: Settings = {
   lookAtY: 1,
   lookAtZ: 0,
 };
+
+export const SETTINGS_WIDTH = 300;

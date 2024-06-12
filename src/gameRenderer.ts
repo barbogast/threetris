@@ -1,7 +1,9 @@
 import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { Edge, Settings, Vertex } from "./types";
 import { StateUpdateCallbacks } from "./types";
 import { filterEdges, getCubeGeometry } from "./shape";
+import { SETTINGS_WIDTH } from "./config";
 
 const SHAFT_LINES_ID = "shaft-lines";
 const CURRENT_PIECE_ID = "current-piece";
@@ -9,14 +11,19 @@ const FALLEN_CUBES_ID = "fallen-cubes";
 
 class GameRenderer {
   #scene: THREE.Scene;
-  #callbacks: StateUpdateCallbacks;
+  #callbacks?: StateUpdateCallbacks;
+  #renderer: THREE.WebGLRenderer;
+  #camera?: THREE.PerspectiveCamera;
 
-  constructor(scene: THREE.Scene, callbacks: StateUpdateCallbacks) {
-    this.#scene = scene;
-    this.#callbacks = callbacks;
+  constructor() {
+    this.#scene = new THREE.Scene();
+    this.#renderer = new THREE.WebGLRenderer();
   }
 
-  setup() {
+  setup(settings: Settings, callbacks: StateUpdateCallbacks) {
+    this.#callbacks = callbacks;
+    const { shaftSizeX, shaftSizeY, shaftSizeZ } = settings;
+
     const group1 = new THREE.Group();
     group1.name = SHAFT_LINES_ID;
     this.#scene.add(group1);
@@ -24,6 +31,54 @@ class GameRenderer {
     const group2 = new THREE.Group();
     group2.name = FALLEN_CUBES_ID;
     this.#scene.add(group2);
+
+    this.#camera = new THREE.PerspectiveCamera(
+      50,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+
+    this.#camera.position.set(shaftSizeX / 2, shaftSizeY + 2, shaftSizeZ / 2); // position the camera on top of the scene
+    // camera.up.set(0, 0, -1); // point the camera towards the bottom of the scene
+    this.#camera.lookAt(0, 0, shaftSizeX / 2); // target the center of the scene
+
+    // Adjust the camera's aspect ratio and fov to make the scene appear wider and taller
+    // camera.aspect = 1.5;
+    this.#camera.fov = 780;
+    this.#camera.updateProjectionMatrix();
+
+    // Create a renderer
+    this.#renderer.setSize(
+      window.innerWidth - SETTINGS_WIDTH,
+      window.innerHeight
+    );
+
+    document.getElementById("scene")?.appendChild(this.#renderer.domElement);
+
+    const controls = new OrbitControls(this.#camera, this.#renderer.domElement);
+    controls.maxPolarAngle = (0.9 * Math.PI) / 2;
+    controls.enableZoom = true;
+  }
+
+  renderScene() {
+    this.#renderer.render(this.#scene, this.#camera!);
+    this.#callbacks!.rendererInfo({
+      geometries: this.#renderer.info.memory.geometries,
+    });
+  }
+
+  updateCameraFov(fov: number) {
+    this.#camera!.fov = fov;
+    this.#camera!.updateProjectionMatrix();
+  }
+
+  updateCameraPosition(position: Vertex) {
+    this.#camera!.position.set(...position);
+  }
+
+  updateCameraLookAt(lookAt: Vertex) {
+    this.#camera!.lookAt(...lookAt);
   }
 
   renderShaftCube(dimension: Vertex, position: Vertex) {
@@ -76,7 +131,7 @@ class GameRenderer {
 
     this.#scene.add(lines);
 
-    this.#callbacks.currentPiecePosition(this.getCurrentPiecePosition());
+    this.#callbacks!.currentPiecePosition(this.getCurrentPiecePosition());
   }
 
   getCurrentPiece() {
@@ -96,13 +151,13 @@ class GameRenderer {
   removeCurrentPiece() {
     const piece = this.getCurrentPieceMaybe();
     if (piece) this.#scene.remove(piece);
-    this.#callbacks.currentPiecePosition(undefined);
+    this.#callbacks!.currentPiecePosition(undefined);
   }
 
   setCurrentPiecePosition(position: Vertex) {
     const piece = this.getCurrentPiece();
     piece.position.set(...position);
-    this.#callbacks.currentPiecePosition(this.getCurrentPiecePosition());
+    this.#callbacks!.currentPiecePosition(this.getCurrentPiecePosition());
   }
 
   renderFallenCubes(cubes: Vertex[]) {

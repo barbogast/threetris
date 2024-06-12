@@ -1,11 +1,15 @@
 import React, { useEffect, useRef } from "react";
 import ReactDOM from "react-dom/client";
-import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 import { parseShapeDefinition } from "./shape";
 import SettingsPanel from "./components/SettingsPanel";
-import { Context, Settings, StateUpdateCallbacks, Vertex } from "./types";
+import {
+  Context,
+  GameController,
+  Settings,
+  StateUpdateCallbacks,
+  Vertex,
+} from "./types";
 import useAppStore from "./appStore";
 import {
   renderContainer,
@@ -23,43 +27,17 @@ import GameState, {
 } from "./gameState";
 import GameRenderer from "./gameRenderer";
 import shapeDefinitions from "./shapeDefinitions";
-
-const SETTINGS_WIDTH = 300;
-const renderer = new THREE.WebGLRenderer();
-const camera = new THREE.PerspectiveCamera(
-  50,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
+import { SETTINGS_WIDTH } from "./config";
 
 const setup = (context: Context) => {
-  const { renderer: gameRenderer, settings } = context;
-  const { shaftSizeX, shaftSizeY, shaftSizeZ } = settings;
+  const { renderer: gameRenderer, settings, callbacks } = context;
 
-  camera.position.set(shaftSizeX / 2, shaftSizeY + 2, shaftSizeZ / 2); // position the camera on top of the scene
-  // camera.up.set(0, 0, -1); // point the camera towards the bottom of the scene
-  camera.lookAt(0, 0, shaftSizeX / 2); // target the center of the scene
-
-  // Adjust the camera's aspect ratio and fov to make the scene appear wider and taller
-  // camera.aspect = 1.5;
-  camera.fov = 780;
-  camera.updateProjectionMatrix();
-
-  // Create a renderer
-  renderer.setSize(window.innerWidth - SETTINGS_WIDTH, window.innerHeight);
-  document.getElementById("scene")?.appendChild(renderer.domElement);
-
-  gameRenderer.setup();
+  gameRenderer.setup(settings, callbacks);
 
   renderContainer(gameRenderer, settings);
   renderFloorGrid(gameRenderer, settings);
   renderWallGridLongLines(gameRenderer, settings);
   renderWallGridShortLines(gameRenderer, settings);
-
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.maxPolarAngle = (0.9 * Math.PI) / 2;
-  controls.enableZoom = true;
 };
 
 const onKeyPress = (context: Context, key: string) => {
@@ -140,19 +118,12 @@ const addPiece = (context: Context) => {
   state.setCurrentPiece(newPiece);
 };
 
-type GameController = {
-  stop: () => void;
-  togglePause: () => void;
-  updateSettings: (s: Settings) => void;
-};
+const gameRenderer = new GameRenderer();
 
 const main = (
   settings: Settings,
   callbacks: StateUpdateCallbacks
 ): GameController => {
-  const scene = new THREE.Scene();
-
-  const gameRenderer = new GameRenderer(scene, callbacks);
   const state = new GameState(settings, gameRenderer, callbacks);
   const context: Context = {
     state,
@@ -161,11 +132,9 @@ const main = (
     settings,
   };
 
-  scene.clear();
+  setup(context);
 
   addPiece(context);
-
-  setup(context);
 
   const keyPress = (e: KeyboardEvent) => {
     e.preventDefault();
@@ -205,9 +174,7 @@ const main = (
     gameRenderer.removeCurrentPiece();
     gameRenderer.renderCurrentPiece(state.getCurrentPiece().offsets, position);
 
-    renderer.render(scene, camera);
-    callbacks.rendererInfo({ geometries: renderer.info.memory.geometries });
-
+    gameRenderer.renderScene();
     if (!stop) requestAnimationFrame(() => mainLoop(tick + 1));
   };
 
@@ -223,6 +190,11 @@ const main = (
     },
     updateSettings: (s: Settings) => {
       settings = s;
+    },
+    updateCamera: {
+      fov: (...args) => gameRenderer.updateCameraFov(...args),
+      position: (...args) => gameRenderer.updateCameraPosition(...args),
+      lookAt: (...args) => gameRenderer.updateCameraLookAt(...args),
     },
   };
 };
@@ -279,7 +251,9 @@ const App = () => {
         Fallen cubes: {fallenCubes.length}
         <br />
         <br />
-        <SettingsPanel camera={camera} />
+        {gameController.current && (
+          <SettingsPanel gameController={gameController.current} />
+        )}
       </div>
     </div>
   );
