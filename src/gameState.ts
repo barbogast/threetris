@@ -128,7 +128,6 @@ class GameState {
         cube[0] < 0 ||
         cube[0] >= shaftSizeX ||
         cube[1] < 0 ||
-        cube[1] >= shaftSizeY ||
         cube[2] < 0 ||
         cube[2] >= shaftSizeZ
     );
