@@ -5,6 +5,12 @@ import { StateUpdateCallbacks } from "./types";
 import { filterEdges, getCubeGeometry } from "./shape";
 import { SETTINGS_WIDTH } from "./config";
 
+type CurrentPiece = THREE.LineSegments<
+  THREE.BufferGeometry<THREE.NormalBufferAttributes>,
+  THREE.LineBasicMaterial,
+  THREE.Object3DEventMap
+>;
+
 const SHAFT_LINES_ID = "shaft-lines";
 const CURRENT_PIECE_ID = "current-piece";
 const FALLEN_CUBES_ID = "fallen-cubes";
@@ -139,11 +145,13 @@ class GameRenderer {
   getCurrentPiece() {
     const currentPiece = this.#scene.getObjectByName(CURRENT_PIECE_ID);
     if (!currentPiece) throw new Error("No current piece");
-    return currentPiece;
+    return currentPiece as CurrentPiece;
   }
 
   getCurrentPieceMaybe() {
-    return this.#scene.getObjectByName(CURRENT_PIECE_ID);
+    return this.#scene.getObjectByName(CURRENT_PIECE_ID) as
+      | CurrentPiece
+      | undefined;
   }
 
   getCurrentPiecePosition(): Vertex {
@@ -152,7 +160,10 @@ class GameRenderer {
 
   removeCurrentPiece() {
     const piece = this.getCurrentPieceMaybe();
-    if (piece) this.#scene.remove(piece);
+    if (piece) {
+      if (piece.geometry) piece.geometry.dispose();
+      this.#scene.remove(piece);
+    }
     this.#callbacks!.currentPiecePosition(undefined);
   }
 
