@@ -10,6 +10,9 @@ type Props = {
 };
 const RangSetting = ({ name, min, max, step, type }: Props) => {
   const value = useAppStore((state) => state.settings[name]);
+  if (typeof value !== "number")
+    throw new Error(`value ${value} is not a string but ${typeof value}`);
+
   const parse = (s: string) => (type === "int" ? parseInt(s) : parseFloat(s));
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     useAppStore.setState((state) => ({

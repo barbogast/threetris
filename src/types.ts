@@ -1,19 +1,27 @@
 import GameRenderer from "./gameRenderer";
 import GameState from "./gameState";
 
-export type Settings = {
+export type GameSettings = {
   shaftSizeX: number;
   shaftSizeY: number;
   shaftSizeZ: number;
   fallingSpeed: number;
+};
+
+export type CameraSettings = {
+  aspect: number;
   fov: number;
+  zoom: number;
   positionX: number;
   positionY: number;
   positionZ: number;
   lookAtX: number;
   lookAtY: number;
   lookAtZ: number;
+  enableOrbitalControl: boolean;
 };
+
+export type Settings = GameSettings & CameraSettings;
 
 export type AppState = {
   settings: Settings;

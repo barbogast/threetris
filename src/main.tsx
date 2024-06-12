@@ -105,7 +105,7 @@ const addPiece = (context: Context) => {
   // is not rendered. If an edge is touched by 3 cubes we assume it is a fold and we render
   // it. Edges touched by 4 cubes are skipped however, they are in the middle of a bigger cube.
 
-  const pieceOffset = parseShapeDefinition(shapeDefinitions.shape1.shape);
+  const pieceOffset = parseShapeDefinition(shapeDefinitions.shape2.shape);
 
   const position: Vertex = [
     Math.floor(settings.shaftSizeX / 2),
@@ -226,7 +226,14 @@ const App = () => {
     const controller = main(settings, callbacks);
     gameController.current = controller;
     return controller.stop;
-  }, [settings.shaftSizeX, settings.shaftSizeY, settings.shaftSizeZ]);
+  }, [
+    settings.shaftSizeX,
+    settings.shaftSizeY,
+    settings.shaftSizeZ,
+    settings.aspect,
+    settings.zoom,
+    settings.enableOrbitalControl,
+  ]);
 
   // Some settings can be updated while the game is running.
   useEffect(() => {

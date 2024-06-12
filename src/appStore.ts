@@ -1,17 +1,26 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { AppState } from "./types";
-import { defaultSettings } from "./config";
+import { getAllDefaults } from "./config";
 
 const useAppStore = create<AppState>()(
   persist(
     () => ({
-      settings: defaultSettings,
+      settings: getAllDefaults(),
     }),
     {
       name: "bear-storage",
     }
   )
 );
+
+export const updateSettings = (settings: Partial<AppState["settings"]>) => {
+  useAppStore.setState((state) => ({
+    settings: {
+      ...state.settings,
+      ...settings,
+    },
+  }));
+};
 
 export default useAppStore;

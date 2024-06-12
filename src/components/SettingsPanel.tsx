@@ -1,9 +1,7 @@
-import * as THREE from "three";
-
 import { useEffect } from "react";
 import RangeSetting from "./RangeSetting";
-import useAppStore from "../appStore";
-import { defaultSettings } from "../config";
+import useAppStore, { updateSettings } from "../appStore";
+import { getCameraDefaults, getGameDefaults } from "../config";
 import { GameController } from "../types";
 
 type Props = {
@@ -35,7 +33,7 @@ const SettingsPanel = ({ gameController }: Props) => {
 
   return (
     <>
-      Settings
+      <strong>Game Settings</strong>
       <RangeSetting name="shaftSizeX" min={1} max={10} step={1} type={"int"} />
       <RangeSetting name="shaftSizeY" min={5} max={15} step={1} type={"int"} />
       <RangeSetting name="shaftSizeZ" min={1} max={10} step={1} type={"int"} />
@@ -46,7 +44,13 @@ const SettingsPanel = ({ gameController }: Props) => {
         step={1}
         type={"int"}
       />
-      <RangeSetting name="fov" min={0} max={1000} type={"int"} />
+      <button onClick={() => updateSettings(getGameDefaults())}>Reset</button>
+      <br />
+      <br />
+      <strong>Camera Settings</strong>
+      <RangeSetting name="aspect" min={0} max={5} step={0.1} type={"float"} />
+      <RangeSetting name="fov" min={0} max={180} type={"int"} />
+      <RangeSetting name="zoom" min={0} max={10.0} step={0.1} type={"float"} />
       <RangeSetting
         name="positionX"
         min={-10.0}
@@ -57,14 +61,14 @@ const SettingsPanel = ({ gameController }: Props) => {
       <RangeSetting
         name="positionY"
         min={-1.0}
-        max={20.0}
+        max={30.0}
         step={0.1}
         type={"float"}
       />
       <RangeSetting
         name="positionZ"
         min={-2.0}
-        max={2.0}
+        max={10.0}
         step={0.1}
         type={"float"}
       />
@@ -84,18 +88,23 @@ const SettingsPanel = ({ gameController }: Props) => {
       />
       <RangeSetting
         name="lookAtZ"
-        min={-5.0}
-        max={5.0}
+        min={-10.0}
+        max={10.0}
         step={0.1}
         type={"float"}
       />
-      <button
-        onClick={() => {
-          useAppStore.setState({
-            settings: defaultSettings,
-          });
-        }}
-      >
+      <input
+        type="checkbox"
+        checked={settings.enableOrbitalControl}
+        onChange={() =>
+          updateSettings({
+            enableOrbitalControl: !settings.enableOrbitalControl,
+          })
+        }
+      />{" "}
+      Orbital control
+      <br />
+      <button onClick={() => updateSettings(getCameraDefaults(settings))}>
         Reset
       </button>
     </>

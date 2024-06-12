@@ -30,7 +30,6 @@ class GameRenderer {
     this.#scene.clear();
 
     this.#callbacks = callbacks;
-    const { shaftSizeX, shaftSizeY, shaftSizeZ } = settings;
 
     const group1 = new THREE.Group();
     group1.name = SHAFT_LINES_ID;
@@ -40,23 +39,21 @@ class GameRenderer {
     group2.name = FALLEN_CUBES_ID;
     this.#scene.add(group2);
 
-    this.#camera = new THREE.PerspectiveCamera(
-      50,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
+    this.#camera = new THREE.PerspectiveCamera(settings.fov, settings.aspect);
+    this.#camera.zoom = settings.zoom;
+
+    // position the camera on top of the scene
+    this.#camera.position.set(
+      settings.positionX,
+      settings.positionY,
+      settings.positionZ
     );
 
-    this.#camera.position.set(shaftSizeX / 2, shaftSizeY + 2, shaftSizeZ / 2); // position the camera on top of the scene
-    // camera.up.set(0, 0, -1); // point the camera towards the bottom of the scene
-    this.#camera.lookAt(0, 0, shaftSizeX / 2); // target the center of the scene
+    // target the center at the bottom of the scene
+    this.#camera.lookAt(settings.lookAtX, settings.lookAtY, settings.lookAtZ);
 
-    // Adjust the camera's aspect ratio and fov to make the scene appear wider and taller
-    // camera.aspect = 1.5;
-    this.#camera.fov = 780;
     this.#camera.updateProjectionMatrix();
 
-    // Create a renderer
     this.#renderer.setSize(
       window.innerWidth - SETTINGS_WIDTH,
       window.innerHeight
@@ -64,9 +61,19 @@ class GameRenderer {
 
     document.getElementById("scene")?.appendChild(this.#renderer.domElement);
 
-    const controls = new OrbitControls(this.#camera, this.#renderer.domElement);
-    controls.maxPolarAngle = (0.9 * Math.PI) / 2;
-    controls.enableZoom = true;
+    if (settings.enableOrbitalControl) {
+      const controls = new OrbitControls(
+        this.#camera,
+        this.#renderer.domElement
+      );
+      controls.maxPolarAngle = (0.9 * Math.PI) / 2;
+      controls.enableZoom = true;
+      controls.target = new THREE.Vector3(
+        settings.shaftSizeX / 2,
+        1,
+        settings.shaftSizeZ / 2
+      );
+    }
   }
 
   renderScene() {
