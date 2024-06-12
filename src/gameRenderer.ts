@@ -21,6 +21,8 @@ class GameRenderer {
   }
 
   setup(settings: Settings, callbacks: StateUpdateCallbacks) {
+    this.#scene.clear();
+
     this.#callbacks = callbacks;
     const { shaftSizeX, shaftSizeY, shaftSizeZ } = settings;
 
