@@ -44,7 +44,7 @@ const onKeyPress = (context: Context, key: string) => {
   console.log("keyPress", key);
   const { state, renderer: gameRenderer } = context;
 
-  let [posX, posY, posZ] = gameRenderer.getCurrentPiecePosition();
+  let [posX, posY, posZ] = state.getCurrentPiece().position;
   let offsets = state.getCurrentPiece().offsets;
 
   if (key === "ArrowLeft") {
@@ -81,12 +81,13 @@ const onKeyPress = (context: Context, key: string) => {
     offsets = rotateYAxis(offsets, 1);
   }
 
+  const newPosition: Vertex = [posX, posY, posZ];
   if (
-    !state.willTouchFallenCube([posX, posY, posZ], offsets) &&
-    !state.willBeOutsideOfShaft([posX, posY, posZ], offsets)
+    !state.willTouchFallenCube(newPosition, offsets) &&
+    !state.willBeOutsideOfShaft(newPosition, offsets)
   ) {
-    state.setCurrentPiece({ offsets });
-    gameRenderer.setCurrentPiecePosition([posX, posY, posZ]);
+    state.setCurrentPiece({ position: newPosition, offsets });
+    gameRenderer.setCurrentPiecePosition(newPosition);
   }
 };
 
@@ -114,7 +115,7 @@ const addPiece = (context: Context) => {
   ];
   gameRenderer.renderCurrentPiece(pieceOffset, position);
 
-  const newPiece = { offsets: pieceOffset };
+  const newPiece = { offsets: pieceOffset, position };
   state.setCurrentPiece(newPiece);
 };
 
@@ -146,9 +147,11 @@ const main = (
   let pause = false;
 
   const mainLoop = (tick: number) => {
+    const {
+      offsets,
+      position: [posX, posY, posZ],
+    } = state.getCurrentPiece();
     if (!pause && tick % settings.fallingSpeed === 0) {
-      const [posX, posY, posZ] = gameRenderer.getCurrentPiecePosition();
-      const offsets = state.getCurrentPiece().offsets;
       const newPosition: Vertex = [posX, posY - 1, posZ];
       if (
         state.willTouchFallenCube(newPosition, offsets) ||
@@ -167,12 +170,12 @@ const main = (
         state.setFallenCubes(fallenCubes);
       } else {
         gameRenderer.setCurrentPiecePosition(newPosition);
+        state.setCurrentPiece({ position: newPosition, offsets });
       }
     }
 
-    const position = gameRenderer.getCurrentPiecePosition();
     gameRenderer.removeCurrentPiece();
-    gameRenderer.renderCurrentPiece(state.getCurrentPiece().offsets, position);
+    gameRenderer.renderCurrentPiece(offsets, [posX, posY, posZ]);
 
     gameRenderer.renderScene();
     if (!stop) requestAnimationFrame(() => mainLoop(tick + 1));

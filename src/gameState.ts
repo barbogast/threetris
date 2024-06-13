@@ -2,6 +2,7 @@ import { Settings, StateUpdateCallbacks, Vertex } from "./types";
 import GameRenderer from "./gameRenderer";
 
 export type CurrentPiece = {
+  position: Vertex;
   offsets: Vertex[];
 };
 
@@ -97,6 +98,7 @@ class GameState {
   setCurrentPiece(currentPiece: CurrentPiece) {
     this.#state.currentPiece = currentPiece;
     this.#callbacks.currentPieceOffsets(currentPiece.offsets);
+    this.#callbacks.currentPiecePosition(currentPiece.position);
   }
 
   setFallenCubes(fallenCubes: Vertex[]) {
@@ -134,7 +136,7 @@ class GameState {
   }
 
   willTouchFloor() {
-    const position = this.#gameRenderer.getCurrentPiecePosition();
+    const position = this.getCurrentPiece().position;
     const cubes = getCubesFromOffsets(
       position,
       this.#getCurrentPiece().offsets
@@ -147,7 +149,7 @@ class GameState {
   }
 
   addFallenPiece() {
-    const position = this.#gameRenderer.getCurrentPiecePosition();
+    const position = this.getCurrentPiece().position;
     const cubes = getCubesFromOffsets(
       position,
       this.#getCurrentPiece().offsets

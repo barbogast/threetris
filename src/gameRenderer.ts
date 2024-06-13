@@ -145,8 +145,6 @@ class GameRenderer {
     lines.renderOrder = 1;
 
     this.#scene.add(lines);
-
-    this.#callbacks!.currentPiecePosition(this.getCurrentPiecePosition());
   }
 
   getCurrentPiece() {
@@ -161,10 +159,6 @@ class GameRenderer {
       | undefined;
   }
 
-  getCurrentPiecePosition(): Vertex {
-    return this.getCurrentPiece().position.toArray();
-  }
-
   removeCurrentPiece() {
     const piece = this.getCurrentPieceMaybe();
     if (piece) {
@@ -177,7 +171,6 @@ class GameRenderer {
   setCurrentPiecePosition(position: Vertex) {
     const piece = this.getCurrentPiece();
     piece.position.set(...position);
-    this.#callbacks!.currentPiecePosition(this.getCurrentPiecePosition());
   }
 
   renderFallenCubes(cubes: Vertex[]) {
