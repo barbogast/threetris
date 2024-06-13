@@ -121,7 +121,7 @@ class GameState {
   }
 
   willBeOutsideOfShaft(newPosition: Vertex, newOffsets: Vertex[]) {
-    const { shaftSizeX, shaftSizeY, shaftSizeZ } = this.#settings;
+    const { shaftSizeX, shaftSizeZ } = this.#settings;
     const cubes = getCubesFromOffsets(newPosition, newOffsets);
     return cubes.some(
       (cube) =>
