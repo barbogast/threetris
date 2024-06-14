@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import ReactDOM from "react-dom/client";
-import * as THREE from "three";
 
 import { parseShapeDefinition } from "./shape";
 import SettingsPanel from "./components/SettingsPanel";
@@ -41,8 +40,6 @@ const setup = (context: Context) => {
   renderWallGridShortLines(gameRenderer, settings);
 };
 
-let mixer: THREE.AnimationMixer;
-
 const onKeyPress = (context: Context, key: string) => {
   console.log("keyPress", key);
   const { state, renderer: gameRenderer } = context;
@@ -57,25 +54,7 @@ const onKeyPress = (context: Context, key: string) => {
     posZ -= 1;
   }
   if (key === "ArrowDown") {
-    const piece = context.renderer.getCurrentPiece();
-    const positionKF = new THREE.VectorKeyframeTrack(
-      ".position",
-      [0, 0.2],
-      [
-        piece.position.x,
-        piece.position.y,
-        piece.position.z,
-        piece.position.x,
-        piece.position.y,
-        piece.position.z + 1,
-      ]
-    );
-    const clip = new THREE.AnimationClip("Action", -1, [positionKF]);
-    mixer = new THREE.AnimationMixer(piece);
-    const clipAction = mixer.clipAction(clip);
-    clipAction.loop = THREE.LoopOnce;
-    clipAction.clampWhenFinished = true;
-    clipAction.play();
+    context.animator.startAnimation(gameRenderer.getCurrentPiece());
 
     posZ += 1;
   }
@@ -150,10 +129,12 @@ const main = (
   callbacks: StateUpdateCallbacks
 ): GameController => {
   const state = new GameState(settings, gameRenderer, callbacks);
+  const animator = new GameAnimator();
   const context: Context = {
     state,
     callbacks,
     renderer: gameRenderer,
+    animator,
     settings,
   };
 
@@ -169,7 +150,6 @@ const main = (
 
   let stop = false;
   let pause = false;
-  const clock = new THREE.Clock();
 
   const mainLoop = (tick: number) => {
     const {
@@ -199,12 +179,10 @@ const main = (
       }
     }
 
-    const delta = clock.getDelta();
-    mixer?.update(delta);
-
     gameRenderer.removeCurrentPiece();
     gameRenderer.renderCurrentPiece(offsets, [posX, posY, posZ]);
 
+    animator.update();
     gameRenderer.renderScene();
     if (!stop) requestAnimationFrame(() => mainLoop(tick + 1));
   };

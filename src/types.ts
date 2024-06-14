@@ -1,3 +1,4 @@
+import GameAnimator from "./gameAnimator";
 import GameRenderer from "./gameRenderer";
 import GameState from "./gameState";
 
@@ -42,6 +43,7 @@ export type Context = {
   state: GameState;
   callbacks: StateUpdateCallbacks;
   renderer: GameRenderer;
+  animator: GameAnimator;
   settings: Settings;
 };
 
