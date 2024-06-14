@@ -58,6 +58,7 @@ const onKeyPress = (context: Context, key: string) => {
   }
   if (key === "ArrowRight") {
     posX += 1;
+    gameRenderer.startAnimation();
   }
 
   if (key === "q") {

@@ -11,6 +11,11 @@ type CurrentPiece = THREE.LineSegments<
   THREE.Object3DEventMap
 >;
 
+type Animation = {
+  progress: number;
+  target: number;
+};
+
 const SHAFT_LINES_ID = "shaft-lines";
 const CURRENT_PIECE_ID = "current-piece";
 const FALLEN_CUBES_ID = "fallen-cubes";
@@ -20,10 +25,13 @@ class GameRenderer {
   #callbacks?: StateUpdateCallbacks;
   #renderer: THREE.WebGLRenderer;
   #camera?: THREE.PerspectiveCamera;
+  #clock: THREE.Clock;
+  #animation?: Animation;
 
   constructor() {
     this.#scene = new THREE.Scene();
     this.#renderer = new THREE.WebGLRenderer();
+    this.#clock = new THREE.Clock();
   }
 
   setup(settings: Settings, callbacks: StateUpdateCallbacks) {
@@ -76,7 +84,42 @@ class GameRenderer {
     }
   }
 
+  startAnimation() {
+    this.#animation = {
+      progress: 0,
+      target: 1,
+    };
+  }
+
   renderScene() {
+    const elapsedTime = this.#clock.getDelta();
+    // this.getCurrentPiece().rotateOnAxis(
+    //   new THREE.Vector3(0, 1, 0),
+    //   elapsedTime * 2
+    // );
+
+    if (this.#animation) {
+      const duration = 0.3;
+      const distance = (this.#animation.target * elapsedTime) / duration;
+
+      let fixedDistance: number;
+      if (this.#animation.progress + distance >= this.#animation.target) {
+        // Animation is finished, set distance = target and stop animation
+        fixedDistance = this.#animation.target - this.#animation.progress;
+        this.#animation = undefined;
+      } else {
+        fixedDistance = distance;
+        this.#animation.progress += distance;
+      }
+
+      const piece = this.getCurrentPiece();
+      piece.position.set(
+        piece.position.x + fixedDistance,
+        piece.position.y,
+        piece.position.z
+      );
+    }
+
     this.#renderer.render(this.#scene, this.#camera!);
     this.#callbacks!.rendererInfo({
       geometries: this.#renderer.info.memory.geometries,
