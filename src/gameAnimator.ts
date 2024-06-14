@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { Vertex } from "./types";
 
 class GameAnimator {
   #clock: THREE.Clock;
@@ -8,17 +9,17 @@ class GameAnimator {
     this.#clock = new THREE.Clock();
   }
 
-  startAnimation(mesh: THREE.Object3D<THREE.Object3DEventMap>) {
+  startAnimation(mesh: THREE.Object3D<THREE.Object3DEventMap>, offset: Vertex) {
     const positionKF = new THREE.VectorKeyframeTrack(
       ".position",
-      [0, 0.2],
+      [0, 0.15],
       [
         mesh.position.x,
         mesh.position.y,
         mesh.position.z,
-        mesh.position.x,
-        mesh.position.y,
-        mesh.position.z + 1,
+        mesh.position.x + offset[0],
+        mesh.position.y + offset[1],
+        mesh.position.z + offset[2],
       ]
     );
     const clip = new THREE.AnimationClip("Action", -1, [positionKF]);
@@ -26,6 +27,7 @@ class GameAnimator {
     const clipAction = this.#mixer.clipAction(clip);
     clipAction.loop = THREE.LoopOnce;
     clipAction.clampWhenFinished = true;
+    this.#clock.getDelta();
     clipAction.play();
   }
 

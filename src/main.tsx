@@ -48,17 +48,19 @@ const onKeyPress = (context: Context, key: string) => {
   let offsets = state.getCurrentPiece().offsets;
 
   if (key === "ArrowLeft") {
+    context.animator.startAnimation(gameRenderer.getCurrentPiece(), [-1, 0, 0]);
     posX -= 1;
   }
   if (key === "ArrowUp") {
+    context.animator.startAnimation(gameRenderer.getCurrentPiece(), [0, 0, -1]);
     posZ -= 1;
   }
   if (key === "ArrowDown") {
-    context.animator.startAnimation(gameRenderer.getCurrentPiece());
-
+    context.animator.startAnimation(gameRenderer.getCurrentPiece(), [0, 0, 1]);
     posZ += 1;
   }
   if (key === "ArrowRight") {
+    context.animator.startAnimation(gameRenderer.getCurrentPiece(), [1, 0, 0]);
     posX += 1;
     gameRenderer.startAnimation();
   }
