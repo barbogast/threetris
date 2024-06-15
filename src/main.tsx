@@ -49,6 +49,29 @@ const onKeyPress = (context: Context, key: string) => {
   let offsets = state.getCurrentPiece().offsets;
   let animationTrack: THREE.KeyframeTrack | undefined = undefined;
 
+  if (key === " ") {
+    let newPosition: Vertex = [posX, posY - 1, posZ];
+    let lastValidPosition = newPosition;
+    while (
+      !state.willTouchFallenCube(newPosition, offsets) &&
+      !state.willBeOutsideOfShaft(newPosition, offsets)
+    ) {
+      lastValidPosition = newPosition;
+      newPosition = [newPosition[0], newPosition[1] - 1, newPosition[2]];
+    }
+
+    if (lastValidPosition[1] !== posY) {
+      animationTrack = context.animator.getMoveTrack([
+        0,
+        -(posY - lastValidPosition[1]),
+        0,
+      ]);
+      context.animator.playAnimation(animationTrack);
+      state.setCurrentPiece({ position: lastValidPosition, offsets });
+      return;
+    }
+  }
+
   // Moving a piece requires to update the position in the game state and
   // to set up the animation which visually moves the piece by moving the
   // three.js object.
