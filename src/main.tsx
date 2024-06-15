@@ -66,23 +66,35 @@ const onKeyPress = (context: Context, key: string) => {
 
   if (key === "q") {
     offsets = rotateXAxis(offsets, 1);
+    offsets = offsets.map(([x, y, z]) => [x, y - 1, z]);
+    context.animator.startRotateAnimation("x", 1);
   }
   if (key === "a") {
     offsets = rotateXAxis(offsets, -1);
+    offsets = offsets.map(([x, y, z]) => [x, y, z - 1]);
+    context.animator.startRotateAnimation("x", -1);
   }
 
   if (key === "w") {
     offsets = rotateZAxis(offsets, -1);
+    offsets = offsets.map(([x, y, z]) => [x, y - 1, z]);
+    context.animator.startRotateAnimation("z", -1);
   }
   if (key === "s") {
     offsets = rotateZAxis(offsets, 1);
+    offsets = offsets.map(([x, y, z]) => [x - 1, y, z]);
+    context.animator.startRotateAnimation("z", 1);
   }
 
   if (key === "e") {
     offsets = rotateYAxis(offsets, -1);
+    offsets = offsets.map(([x, y, z]) => [x, y, z - 1]);
+    context.animator.startRotateAnimation("y", 1);
   }
   if (key === "d") {
     offsets = rotateYAxis(offsets, 1);
+    offsets = offsets.map(([x, y, z]) => [x - 1, y, z]);
+    context.animator.startRotateAnimation("y", -1);
   }
 
   const newPosition: Vertex = [posX, posY, posZ];
@@ -91,7 +103,6 @@ const onKeyPress = (context: Context, key: string) => {
     !state.willBeOutsideOfShaft(newPosition, offsets)
   ) {
     state.setCurrentPiece({ position: newPosition, offsets });
-    gameRenderer.setCurrentPiecePosition(newPosition);
   }
 };
 
