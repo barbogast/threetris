@@ -5,6 +5,7 @@ export const getGameDefaults = (): GameSettings => ({
   shaftSizeY: 10,
   shaftSizeZ: 4,
   fallingSpeed: 15,
+  animationDuration: 0.3,
 });
 
 export const getCameraDefaults = (settings: GameSettings): CameraSettings => ({

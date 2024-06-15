@@ -156,7 +156,7 @@ const main = (
   callbacks: StateUpdateCallbacks
 ): GameController => {
   const state = new GameState(settings, gameRenderer, callbacks);
-  const animator = new GameAnimator();
+  const animator = new GameAnimator(settings.animationDuration);
   const context: Context = {
     state,
     callbacks,
@@ -227,6 +227,7 @@ const main = (
     },
     updateSettings: (s: Settings) => {
       settings = s;
+      animator.duration = settings.animationDuration;
     },
     updateCamera: {
       fov: (...args) => gameRenderer.updateCameraFov(...args),
@@ -281,7 +282,7 @@ const App = () => {
   // Some settings can be updated while the game is running.
   useEffect(() => {
     gameController.current!.updateSettings(settings);
-  }, [settings.fallingSpeed]);
+  }, [settings.fallingSpeed, settings.animationDuration]);
 
   return (
     <div style={{ display: "flex", flexDirection: "row" }}>

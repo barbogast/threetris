@@ -7,6 +7,7 @@ export type GameSettings = {
   shaftSizeY: number;
   shaftSizeZ: number;
   fallingSpeed: number;
+  animationDuration: number;
 };
 
 export type CameraSettings = {

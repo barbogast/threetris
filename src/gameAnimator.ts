@@ -4,9 +4,11 @@ import { Vertex } from "./types";
 class GameAnimator {
   #clock: THREE.Clock;
   #mixer?: THREE.AnimationMixer;
+  duration: number;
 
-  constructor() {
+  constructor(animationDuration: number) {
     this.#clock = new THREE.Clock();
+    this.duration = animationDuration;
   }
 
   setTarget(mesh: THREE.Object3D<THREE.Object3DEventMap>) {
@@ -16,7 +18,7 @@ class GameAnimator {
   getMoveTrack(offset: Vertex) {
     return new THREE.VectorKeyframeTrack(
       ".position",
-      [0, 0.3], // time
+      [0, this.duration], // time
       [0, 0, 0, ...offset] // position
     );
   }
@@ -24,7 +26,7 @@ class GameAnimator {
   getRotateTrack(axis: "x" | "y" | "z", direction: 1 | -1) {
     return new THREE.NumberKeyframeTrack(
       `.rotation[${axis}]`,
-      [0, 0.3], // time
+      [0, this.duration], // time
       [0, (Math.PI / 2) * direction] // rotation
     );
   }

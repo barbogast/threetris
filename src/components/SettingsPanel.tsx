@@ -44,6 +44,13 @@ const SettingsPanel = ({ gameController }: Props) => {
         step={1}
         type={"int"}
       />
+      <RangeSetting
+        name="animationDuration"
+        min={0}
+        max={1}
+        step={0.01}
+        type={"float"}
+      />
       <button onClick={() => updateSettings(getGameDefaults())}>Reset</button>
       <br />
       <br />
