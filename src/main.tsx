@@ -231,14 +231,10 @@ const main = (
       ) {
         handlePieceReachedFloor(context);
       } else {
-        gameRenderer.setCurrentPiecePosition(newPosition);
         state.setCurrentPiece({ position: newPosition, offsets });
-        animator.startMoveAnimation([0, -1, 0]);
+        animator.playAnimation(animator.getMoveTrack([0, -1, 0]));
       }
     }
-
-    gameRenderer.removeCurrentPiece();
-    gameRenderer.renderCurrentPiece(offsets, [posX, posY, posZ]);
 
     animator.update();
     gameRenderer.renderScene();
