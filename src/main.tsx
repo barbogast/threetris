@@ -61,12 +61,12 @@ const onKeyPress = (context: Context, key: string) => {
     }
 
     if (lastValidPosition[1] !== posY) {
-      animationTrack = context.animator.getMoveTrack([
+      animationTrack = animator.getMoveTrack([
         0,
         -(posY - lastValidPosition[1]),
         0,
       ]);
-      context.animator.playAnimation(animationTrack);
+      animator.playAnimation(animationTrack);
       state.setCurrentPiece({ position: lastValidPosition, offsets });
       animator.onEventFinished(() => handlePieceReachedFloor(context));
       return;
@@ -77,19 +77,19 @@ const onKeyPress = (context: Context, key: string) => {
   // to set up the animation which visually moves the piece by moving the
   // three.js object.
   if (key === "ArrowLeft") {
-    animationTrack = context.animator.getMoveTrack([-1, 0, 0]);
+    animationTrack = animator.getMoveTrack([-1, 0, 0]);
     posX -= 1;
   }
   if (key === "ArrowUp") {
-    animationTrack = context.animator.getMoveTrack([0, 0, -1]);
+    animationTrack = animator.getMoveTrack([0, 0, -1]);
     posZ -= 1;
   }
   if (key === "ArrowDown") {
-    animationTrack = context.animator.getMoveTrack([0, 0, 1]);
+    animationTrack = animator.getMoveTrack([0, 0, 1]);
     posZ += 1;
   }
   if (key === "ArrowRight") {
-    animationTrack = context.animator.getMoveTrack([1, 0, 0]);
+    animationTrack = animator.getMoveTrack([1, 0, 0]);
     posX += 1;
   }
 
@@ -102,34 +102,34 @@ const onKeyPress = (context: Context, key: string) => {
   if (key === "q") {
     offsets = rotateXAxis(offsets, 1);
     offsets = offsets.map(([x, y, z]) => [x, y - 1, z]);
-    animationTrack = context.animator.getRotateTrack("x", 1);
+    animationTrack = animator.getRotateTrack("x", 1);
   }
   if (key === "a") {
     offsets = rotateXAxis(offsets, -1);
     offsets = offsets.map(([x, y, z]) => [x, y, z - 1]);
-    animationTrack = context.animator.getRotateTrack("x", -1);
+    animationTrack = animator.getRotateTrack("x", -1);
   }
 
   if (key === "w") {
     offsets = rotateZAxis(offsets, -1);
     offsets = offsets.map(([x, y, z]) => [x, y - 1, z]);
-    animationTrack = context.animator.getRotateTrack("z", -1);
+    animationTrack = animator.getRotateTrack("z", -1);
   }
   if (key === "s") {
     offsets = rotateZAxis(offsets, 1);
     offsets = offsets.map(([x, y, z]) => [x - 1, y, z]);
-    animationTrack = context.animator.getRotateTrack("z", 1);
+    animationTrack = animator.getRotateTrack("z", 1);
   }
 
   if (key === "e") {
     offsets = rotateYAxis(offsets, -1);
     offsets = offsets.map(([x, y, z]) => [x, y, z - 1]);
-    animationTrack = context.animator.getRotateTrack("y", 1);
+    animationTrack = animator.getRotateTrack("y", 1);
   }
   if (key === "d") {
     offsets = rotateYAxis(offsets, 1);
     offsets = offsets.map(([x, y, z]) => [x - 1, y, z]);
-    animationTrack = context.animator.getRotateTrack("y", -1);
+    animationTrack = animator.getRotateTrack("y", -1);
   }
 
   // Check of collision with fallen cubes and shaft walls
@@ -140,7 +140,7 @@ const onKeyPress = (context: Context, key: string) => {
     animationTrack
   ) {
     state.setCurrentPiece({ position: newPosition, offsets });
-    context.animator.playAnimation(animationTrack);
+    animator.playAnimation(animationTrack);
   }
 };
 
