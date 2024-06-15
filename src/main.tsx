@@ -43,7 +43,7 @@ const setup = (context: Context) => {
 
 const onKeyPress = (context: Context, key: string) => {
   console.log("keyPress", key);
-  const { state } = context;
+  const { state, animator } = context;
 
   let [posX, posY, posZ] = state.getCurrentPiece().position;
   let offsets = state.getCurrentPiece().offsets;
@@ -68,6 +68,7 @@ const onKeyPress = (context: Context, key: string) => {
       ]);
       context.animator.playAnimation(animationTrack);
       state.setCurrentPiece({ position: lastValidPosition, offsets });
+      animator.onEventFinished(() => handlePieceReachedFloor(context));
       return;
     }
   }
@@ -172,6 +173,22 @@ const addPiece = (context: Context) => {
   state.setCurrentPiece(newPiece);
 };
 
+const handlePieceReachedFloor = (context: Context) => {
+  const { state, renderer: gameRenderer, settings } = context;
+
+  state.addFallenPiece();
+  addPiece(context);
+
+  let fallenCubes = state.getFallenCubes();
+  const fullLevels = findFullLevels(settings, fallenCubes);
+  for (const level of fullLevels) {
+    fallenCubes = removeLevel(fallenCubes, level);
+    gameRenderer.removeFallenCubes();
+    gameRenderer.renderFallenCubes(fallenCubes);
+  }
+  state.setFallenCubes(fallenCubes);
+};
+
 const gameRenderer = new GameRenderer();
 
 const main = (
@@ -212,17 +229,7 @@ const main = (
         state.willTouchFallenCube(newPosition, offsets) ||
         state.willTouchFloor()
       ) {
-        state.addFallenPiece();
-        addPiece(context);
-
-        let fallenCubes = state.getFallenCubes();
-        const fullLevels = findFullLevels(settings, fallenCubes);
-        for (const level of fullLevels) {
-          fallenCubes = removeLevel(fallenCubes, level);
-          gameRenderer.removeFallenCubes();
-          gameRenderer.renderFallenCubes(fallenCubes);
-        }
-        state.setFallenCubes(fallenCubes);
+        handlePieceReachedFloor(context);
       } else {
         gameRenderer.setCurrentPiecePosition(newPosition);
         state.setCurrentPiece({ position: newPosition, offsets });

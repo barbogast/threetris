@@ -5,6 +5,7 @@ class GameAnimator {
   #clock: THREE.Clock;
   #mixer?: THREE.AnimationMixer;
   duration: number;
+  #eventFinishedCallback?: () => void;
 
   constructor(animationDuration: number) {
     this.#clock = new THREE.Clock();
@@ -13,6 +14,16 @@ class GameAnimator {
 
   setTarget(mesh: THREE.Object3D<THREE.Object3DEventMap>) {
     this.#mixer = new THREE.AnimationMixer(mesh);
+    this.#mixer.addEventListener("finished", (e) => {
+      if (this.#eventFinishedCallback) {
+        this.#eventFinishedCallback();
+        this.#eventFinishedCallback = undefined;
+      }
+    });
+  }
+
+  onEventFinished(callback: () => void) {
+    this.#eventFinishedCallback = callback;
   }
 
   getMoveTrack(offset: Vertex) {
