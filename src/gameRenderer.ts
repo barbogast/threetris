@@ -145,6 +145,7 @@ class GameRenderer {
     lines.renderOrder = 1;
 
     this.#scene.add(lines);
+    return lines;
   }
 
   getCurrentPiece() {

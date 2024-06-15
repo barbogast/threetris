@@ -48,19 +48,19 @@ const onKeyPress = (context: Context, key: string) => {
   let offsets = state.getCurrentPiece().offsets;
 
   if (key === "ArrowLeft") {
-    context.animator.startAnimation(gameRenderer.getCurrentPiece(), [-1, 0, 0]);
+    context.animator.startMoveAnimation([-1, 0, 0]);
     posX -= 1;
   }
   if (key === "ArrowUp") {
-    context.animator.startAnimation(gameRenderer.getCurrentPiece(), [0, 0, -1]);
+    context.animator.startMoveAnimation([0, 0, -1]);
     posZ -= 1;
   }
   if (key === "ArrowDown") {
-    context.animator.startAnimation(gameRenderer.getCurrentPiece(), [0, 0, 1]);
+    context.animator.startMoveAnimation([0, 0, 1]);
     posZ += 1;
   }
   if (key === "ArrowRight") {
-    context.animator.startAnimation(gameRenderer.getCurrentPiece(), [1, 0, 0]);
+    context.animator.startMoveAnimation([1, 0, 0]);
     posX += 1;
   }
 
@@ -96,7 +96,7 @@ const onKeyPress = (context: Context, key: string) => {
 };
 
 const addPiece = (context: Context) => {
-  const { state, renderer: gameRenderer, settings } = context;
+  const { state, renderer: gameRenderer, settings, animator } = context;
   state.removeCurrentPiece();
   gameRenderer.removeCurrentPiece();
 
@@ -117,7 +117,8 @@ const addPiece = (context: Context) => {
     settings.shaftSizeY,
     Math.floor(settings.shaftSizeZ / 2),
   ];
-  gameRenderer.renderCurrentPiece(pieceOffset, position);
+  const piece = gameRenderer.renderCurrentPiece(pieceOffset, position);
+  animator.setTarget(piece);
 
   const newPiece = { offsets: pieceOffset, position };
   state.setCurrentPiece(newPiece);
@@ -177,6 +178,7 @@ const main = (
       } else {
         gameRenderer.setCurrentPiecePosition(newPosition);
         state.setCurrentPiece({ position: newPosition, offsets });
+        animator.startMoveAnimation([0, -1, 0]);
       }
     }
 

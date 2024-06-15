@@ -9,24 +9,21 @@ class GameAnimator {
     this.#clock = new THREE.Clock();
   }
 
-  startAnimation(mesh: THREE.Object3D<THREE.Object3DEventMap>, offset: Vertex) {
+  setTarget(mesh: THREE.Object3D<THREE.Object3DEventMap>) {
+    this.#mixer = new THREE.AnimationMixer(mesh);
+  }
+
+  startMoveAnimation(offset: Vertex) {
     const positionKF = new THREE.VectorKeyframeTrack(
       ".position",
-      [0, 0.15],
-      [
-        mesh.position.x,
-        mesh.position.y,
-        mesh.position.z,
-        mesh.position.x + offset[0],
-        mesh.position.y + offset[1],
-        mesh.position.z + offset[2],
-      ]
+      [0, 0.3], // time
+      [0, 0, 0, ...offset] // position
     );
     const clip = new THREE.AnimationClip("Action", -1, [positionKF]);
-    this.#mixer = new THREE.AnimationMixer(mesh);
-    const clipAction = this.#mixer.clipAction(clip);
+    const clipAction = this.#mixer!.clipAction(clip);
     clipAction.loop = THREE.LoopOnce;
     clipAction.clampWhenFinished = true;
+    clipAction.blendMode = THREE.AdditiveAnimationBlendMode;
     this.#clock.getDelta();
     clipAction.play();
   }
