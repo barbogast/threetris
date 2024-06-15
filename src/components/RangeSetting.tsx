@@ -8,7 +8,7 @@ type Props = {
   step?: number;
   type: "int" | "float";
 };
-const RangSetting = ({ name, min, max, step, type }: Props) => {
+const RangeSetting = ({ name, min, max, step, type }: Props) => {
   const value = useAppStore((state) => state.settings[name]);
   if (typeof value !== "number")
     throw new Error(`value ${value} is not a string but ${typeof value}`);
@@ -45,4 +45,4 @@ const RangSetting = ({ name, min, max, step, type }: Props) => {
   );
 };
 
-export default RangSetting;
+export default RangeSetting;
