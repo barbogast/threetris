@@ -56,4 +56,5 @@ export type GameController = {
     position: (position: Vertex) => void;
     lookAt: (position: Vertex) => void;
   };
+  forceRenderCurrentPiece: () => void;
 };

@@ -208,6 +208,12 @@ const main = (
       position: (...args) => gameRenderer.updateCameraPosition(...args),
       lookAt: (...args) => gameRenderer.updateCameraLookAt(...args),
     },
+    forceRenderCurrentPiece: () => {
+      const { offsets, position } = state.getCurrentPiece();
+      gameRenderer.removeCurrentPiece();
+      const piece = gameRenderer.renderCurrentPiece(offsets, position);
+      animator.setTarget(piece);
+    },
   };
 };
 
@@ -272,6 +278,12 @@ const App = () => {
         <br />
         {gameController.current && (
           <SettingsPanel gameController={gameController.current} />
+        )}
+        <br />
+        {gameController.current && (
+          <button onClick={gameController.current.forceRenderCurrentPiece}>
+            Update current piece{" "}
+          </button>
         )}
       </div>
     </div>
