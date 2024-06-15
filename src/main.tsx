@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import ReactDOM from "react-dom/client";
+import * as THREE from "three";
 
 import { parseShapeDefinition } from "./shape";
 import SettingsPanel from "./components/SettingsPanel";
@@ -42,67 +43,70 @@ const setup = (context: Context) => {
 
 const onKeyPress = (context: Context, key: string) => {
   console.log("keyPress", key);
-  const { state, renderer: gameRenderer } = context;
+  const { state } = context;
 
   let [posX, posY, posZ] = state.getCurrentPiece().position;
   let offsets = state.getCurrentPiece().offsets;
+  let animationTrack: THREE.KeyframeTrack | undefined = undefined;
 
   if (key === "ArrowLeft") {
-    context.animator.startMoveAnimation([-1, 0, 0]);
+    animationTrack = context.animator.getMoveTrack([-1, 0, 0]);
     posX -= 1;
   }
   if (key === "ArrowUp") {
-    context.animator.startMoveAnimation([0, 0, -1]);
+    animationTrack = context.animator.getMoveTrack([0, 0, -1]);
     posZ -= 1;
   }
   if (key === "ArrowDown") {
-    context.animator.startMoveAnimation([0, 0, 1]);
+    animationTrack = context.animator.getMoveTrack([0, 0, 1]);
     posZ += 1;
   }
   if (key === "ArrowRight") {
-    context.animator.startMoveAnimation([1, 0, 0]);
+    animationTrack = context.animator.getMoveTrack([1, 0, 0]);
     posX += 1;
   }
 
   if (key === "q") {
     offsets = rotateXAxis(offsets, 1);
     offsets = offsets.map(([x, y, z]) => [x, y - 1, z]);
-    context.animator.startRotateAnimation("x", 1);
+    animationTrack = context.animator.getRotateTrack("x", 1);
   }
   if (key === "a") {
     offsets = rotateXAxis(offsets, -1);
     offsets = offsets.map(([x, y, z]) => [x, y, z - 1]);
-    context.animator.startRotateAnimation("x", -1);
+    animationTrack = context.animator.getRotateTrack("x", -1);
   }
 
   if (key === "w") {
     offsets = rotateZAxis(offsets, -1);
     offsets = offsets.map(([x, y, z]) => [x, y - 1, z]);
-    context.animator.startRotateAnimation("z", -1);
+    animationTrack = context.animator.getRotateTrack("z", -1);
   }
   if (key === "s") {
     offsets = rotateZAxis(offsets, 1);
     offsets = offsets.map(([x, y, z]) => [x - 1, y, z]);
-    context.animator.startRotateAnimation("z", 1);
+    animationTrack = context.animator.getRotateTrack("z", 1);
   }
 
   if (key === "e") {
     offsets = rotateYAxis(offsets, -1);
     offsets = offsets.map(([x, y, z]) => [x, y, z - 1]);
-    context.animator.startRotateAnimation("y", 1);
+    animationTrack = context.animator.getRotateTrack("y", 1);
   }
   if (key === "d") {
     offsets = rotateYAxis(offsets, 1);
     offsets = offsets.map(([x, y, z]) => [x - 1, y, z]);
-    context.animator.startRotateAnimation("y", -1);
+    animationTrack = context.animator.getRotateTrack("y", -1);
   }
 
   const newPosition: Vertex = [posX, posY, posZ];
   if (
     !state.willTouchFallenCube(newPosition, offsets) &&
-    !state.willBeOutsideOfShaft(newPosition, offsets)
+    !state.willBeOutsideOfShaft(newPosition, offsets) &&
+    animationTrack
   ) {
     state.setCurrentPiece({ position: newPosition, offsets });
+    context.animator.playAnimation(animationTrack);
   }
 };
 
