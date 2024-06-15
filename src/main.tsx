@@ -173,6 +173,25 @@ const addPiece = (context: Context) => {
   state.setCurrentPiece(newPiece);
 };
 
+const letCurrentPieceFallDown = (context: Context) => {
+  const { state, animator } = context;
+  const {
+    offsets,
+    position: [posX, posY, posZ],
+  } = state.getCurrentPiece();
+
+  const newPosition: Vertex = [posX, posY - 1, posZ];
+  if (
+    state.willTouchFallenCube(newPosition, offsets) ||
+    state.willTouchFloor()
+  ) {
+    handlePieceReachedFloor(context);
+  } else {
+    state.setCurrentPiece({ position: newPosition, offsets });
+    animator.playAnimation(animator.getMoveTrack([0, -1, 0]));
+  }
+};
+
 const handlePieceReachedFloor = (context: Context) => {
   const { state, renderer: gameRenderer, settings } = context;
 
@@ -219,21 +238,8 @@ const main = (
   let pause = false;
 
   const mainLoop = (tick: number) => {
-    const {
-      offsets,
-      position: [posX, posY, posZ],
-    } = state.getCurrentPiece();
     if (!pause && tick % settings.fallingSpeed === 0) {
-      const newPosition: Vertex = [posX, posY - 1, posZ];
-      if (
-        state.willTouchFallenCube(newPosition, offsets) ||
-        state.willTouchFloor()
-      ) {
-        handlePieceReachedFloor(context);
-      } else {
-        state.setCurrentPiece({ position: newPosition, offsets });
-        animator.playAnimation(animator.getMoveTrack([0, -1, 0]));
-      }
+      letCurrentPieceFallDown(context);
     }
 
     animator.update();
