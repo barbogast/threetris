@@ -196,6 +196,8 @@ const handlePieceReachedFloor = (context: Context) => {
   const { state, renderer: gameRenderer, settings } = context;
 
   state.addFallenPiece();
+  gameRenderer.renderFallenCubes(state.getFallenCubes());
+
   addPiece(context);
 
   let fallenCubes = state.getFallenCubes();
@@ -214,7 +216,7 @@ const main = (
   settings: Settings,
   callbacks: StateUpdateCallbacks
 ): GameController => {
-  const state = new GameState(settings, gameRenderer, callbacks);
+  const state = new GameState(settings, callbacks);
   const animator = new GameAnimator(settings.animationDuration);
   const context: Context = {
     state,

@@ -1,5 +1,4 @@
 import { Settings, StateUpdateCallbacks, Vertex } from "./types";
-import GameRenderer from "./gameRenderer";
 
 export type CurrentPiece = {
   position: Vertex;
@@ -68,20 +67,14 @@ class GameState {
     fallenCubes: [number, number, number][];
   };
   #callbacks: StateUpdateCallbacks;
-  #gameRenderer: GameRenderer;
   #settings: Settings;
 
-  constructor(
-    settings: Settings,
-    gameRenderer: GameRenderer,
-    callbacks: StateUpdateCallbacks
-  ) {
+  constructor(settings: Settings, callbacks: StateUpdateCallbacks) {
     this.#state = {
       currentPiece: undefined,
       fallenCubes: [],
     };
     this.#settings = settings;
-    this.#gameRenderer = gameRenderer;
     this.#callbacks = callbacks;
   }
 
@@ -154,8 +147,6 @@ class GameState {
       position,
       this.#getCurrentPiece().offsets
     );
-
-    this.#gameRenderer.renderFallenCubes(cubes);
 
     this.#state.fallenCubes.push(...cubes);
     this.#callbacks.fallenCubes(this.#state.fallenCubes);
