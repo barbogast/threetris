@@ -49,6 +49,9 @@ const onKeyPress = (context: Context, key: string) => {
   let offsets = state.getCurrentPiece().offsets;
   let animationTrack: THREE.KeyframeTrack | undefined = undefined;
 
+  // Moving a piece requires to update the position in the game state and
+  // to set up the animation which visually moves the piece by moving the
+  // three.js object.
   if (key === "ArrowLeft") {
     animationTrack = context.animator.getMoveTrack([-1, 0, 0]);
     posX -= 1;
@@ -66,6 +69,12 @@ const onKeyPress = (context: Context, key: string) => {
     posX += 1;
   }
 
+  // Rotating a piece requires to update the offsets in the game state and
+  // to set up the animation which visually rotates the piece by rotating the
+  // three.js object.
+  // Note that offsets in the game state need to be adjusted after the rotation, so that
+  // the logical position matches the visual position. Not sure why, somewhow the rotation
+  // in the game state and the rotation in the three.js object are not in sync.
   if (key === "q") {
     offsets = rotateXAxis(offsets, 1);
     offsets = offsets.map(([x, y, z]) => [x, y - 1, z]);
@@ -99,6 +108,7 @@ const onKeyPress = (context: Context, key: string) => {
     animationTrack = context.animator.getRotateTrack("y", -1);
   }
 
+  // Check of collision with fallen cubes and shaft walls
   const newPosition: Vertex = [posX, posY, posZ];
   if (
     !state.willTouchFallenCube(newPosition, offsets) &&
