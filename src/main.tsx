@@ -29,6 +29,7 @@ import shapeDefinitions from "./shapeDefinitions";
 import { SETTINGS_WIDTH } from "./config";
 import GameAnimator from "./gameAnimator";
 import GamePiece from "./gamePiece";
+
 const setup = (context: Context) => {
   const { renderer: gameRenderer, settings, callbacks } = context;
 
@@ -207,7 +208,7 @@ const handlePieceReachedFloor = (context: Context) => {
 };
 
 // Needs to be a global since we can have only one THREE.WebGLRenderer()
-const gameRenderer = new GameRenderer();
+const renderer = new GameRenderer();
 
 const main = (
   settings: Settings,
@@ -218,7 +219,7 @@ const main = (
   const context: Context = {
     state,
     callbacks,
-    renderer: gameRenderer,
+    renderer,
     animator,
     settings,
   };
@@ -242,7 +243,7 @@ const main = (
     }
 
     animator.update();
-    gameRenderer.renderScene();
+    renderer.renderScene();
     if (!stop) requestAnimationFrame(() => mainLoop(tick + 1));
   };
 
@@ -261,14 +262,14 @@ const main = (
       animator.duration = settings.animationDuration;
     },
     updateCamera: {
-      fov: (...args) => gameRenderer.updateCameraFov(...args),
-      position: (...args) => gameRenderer.updateCameraPosition(...args),
-      lookAt: (...args) => gameRenderer.updateCameraLookAt(...args),
+      fov: (...args) => renderer.updateCameraFov(...args),
+      position: (...args) => renderer.updateCameraPosition(...args),
+      lookAt: (...args) => renderer.updateCameraLookAt(...args),
     },
     forceRenderCurrentPiece: () => {
       const { offsets, position } = state.getCurrentPiece();
-      gameRenderer.removeCurrentPiece();
-      const piece = gameRenderer.renderCurrentPiece(offsets, position);
+      renderer.removeCurrentPiece();
+      const piece = renderer.renderCurrentPiece(offsets, position);
       animator.setTarget(piece);
     },
   };
