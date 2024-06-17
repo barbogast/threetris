@@ -1,5 +1,5 @@
-import GameAnimator from "./gameAnimator";
-import GameRenderer from "./gameRenderer";
+import GameAnimator from "./rendering/gameAnimator";
+import GameRenderer from "./rendering/gameRenderer";
 import GameState from "./gameState";
 
 export type GameSettings = {

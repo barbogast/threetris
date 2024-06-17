@@ -1,4 +1,4 @@
-import { Settings, Vertex } from "./types";
+import { Settings, Vertex } from "../types";
 import GameRenderer from "./gameRenderer";
 
 export const renderContainer = (

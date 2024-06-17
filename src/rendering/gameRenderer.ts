@@ -1,9 +1,13 @@
 import * as THREE from "three";
+// import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
+// import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
+// import { LineMaterial } from "three/addons/lines/LineMaterial.js";
+
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { Edge, Settings, Vertex } from "./types";
-import { StateUpdateCallbacks } from "./types";
-import { filterEdges, getCubeGeometry } from "./shape";
-import { SETTINGS_WIDTH } from "./config";
+import { Edge, Settings, Vertex } from "../types";
+import { StateUpdateCallbacks } from "../types";
+import { filterEdges, getCubeGeometry } from "../shape";
+import { SETTINGS_WIDTH } from "../config";
 
 type CurrentPiece = THREE.LineSegments<
   THREE.BufferGeometry<THREE.NormalBufferAttributes>,
@@ -141,6 +145,24 @@ class GameRenderer {
     const material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
     const lines = new THREE.LineSegments(geometry, material);
     lines.position.set(...position);
+
+    // const geometry = new LineSegmentsGeometry();
+
+    // // Add the vertices and edges to the geometry
+    // // geometry.setAttribute(
+    // //   "position",
+    // //   new THREE.BufferAttribute(new Float32Array(vertices.flat()), 3)
+    // // );
+
+    // const material = new LineMaterial({
+    //   color: 0x00ff00,
+    //   linewidth: 5,
+    //   vertexColors: true,
+    // });
+    // geometry.setPositions(vertices.flat());
+    // geometry.setIndex(filteredEdges.flat());
+    // const lines = new LineSegments2(geometry, material);
+
     lines.name = CURRENT_PIECE_ID;
     lines.renderOrder = 1;
 

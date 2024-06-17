@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Vertex } from "./types";
+import { Vertex } from "../types";
 
 class GameAnimator {
   #clock: THREE.Clock;
