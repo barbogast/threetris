@@ -64,26 +64,57 @@ export const removeLevel = (fallenCubes: Vertex[], y: number): Vertex[] => {
   });
 };
 
+export const willTouchFallenCube = (
+  newPosition: Vertex,
+  newOffsets: Vertex[],
+  fallenCubes: Vertex[]
+) => {
+  const cubes = getCubesFromOffsets(newPosition, newOffsets);
+  return cubes.some((cube) =>
+    fallenCubes.some(
+      (fallenCube) =>
+        fallenCube[0] === cube[0] &&
+        fallenCube[1] === cube[1] &&
+        fallenCube[2] === cube[2]
+    )
+  );
+};
+
+export const willBeOutsideOfShaft = (
+  newPosition: Vertex,
+  newOffsets: Vertex[],
+  settings: Settings
+) => {
+  const { shaftSizeX, shaftSizeZ } = settings;
+  const cubes = getCubesFromOffsets(newPosition, newOffsets);
+  return cubes.some(
+    (cube) =>
+      cube[0] < 0 ||
+      cube[0] >= shaftSizeX ||
+      cube[1] < 0 ||
+      cube[2] < 0 ||
+      cube[2] >= shaftSizeZ
+  );
+};
+
+export const willTouchFloor = (piece: CurrentPiece) => {
+  const cubes = getCubesFromOffsets(piece.position, piece.offsets);
+  return cubes.some((cube) => cube[1] === 0);
+};
+
 class GameState {
   #state: {
     currentPiece: CurrentPiece | undefined;
     fallenCubes: [number, number, number][];
   };
   #callbacks: StateUpdateCallbacks;
-  #settings: Settings;
 
-  constructor(settings: Settings, callbacks: StateUpdateCallbacks) {
+  constructor(callbacks: StateUpdateCallbacks) {
     this.#state = {
       currentPiece: undefined,
       fallenCubes: [],
     };
-    this.#settings = settings;
     this.#callbacks = callbacks;
-  }
-
-  #getCurrentPiece() {
-    if (!this.#state.currentPiece) throw new Error("No current piece");
-    return this.#state.currentPiece;
   }
 
   getCurrentPiece() {
@@ -104,40 +135,6 @@ class GameState {
 
   removeCurrentPiece() {
     this.#state.currentPiece = undefined;
-  }
-
-  willTouchFallenCube(newPosition: Vertex, newOffsets: Vertex[]) {
-    const cubes = getCubesFromOffsets(newPosition, newOffsets);
-    return cubes.some((cube) =>
-      this.#state.fallenCubes.some(
-        (fallenCube) =>
-          fallenCube[0] === cube[0] &&
-          fallenCube[1] === cube[1] &&
-          fallenCube[2] === cube[2]
-      )
-    );
-  }
-
-  willBeOutsideOfShaft(newPosition: Vertex, newOffsets: Vertex[]) {
-    const { shaftSizeX, shaftSizeZ } = this.#settings;
-    const cubes = getCubesFromOffsets(newPosition, newOffsets);
-    return cubes.some(
-      (cube) =>
-        cube[0] < 0 ||
-        cube[0] >= shaftSizeX ||
-        cube[1] < 0 ||
-        cube[2] < 0 ||
-        cube[2] >= shaftSizeZ
-    );
-  }
-
-  willTouchFloor() {
-    const position = this.getCurrentPiece().position;
-    const cubes = getCubesFromOffsets(
-      position,
-      this.#getCurrentPiece().offsets
-    );
-    return cubes.some((cube) => cube[1] === 0);
   }
 
   getFallenCubes() {

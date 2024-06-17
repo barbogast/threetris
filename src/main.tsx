@@ -26,6 +26,9 @@ import GameState, {
   rotateXAxis,
   rotateYAxis,
   rotateZAxis,
+  willBeOutsideOfShaft,
+  willTouchFallenCube,
+  willTouchFloor,
 } from "./gameState";
 import GameRenderer from "./gameRenderer";
 import shapeDefinitions from "./shapeDefinitions";
@@ -44,7 +47,7 @@ const setup = (context: Context) => {
 
 const onKeyPress = (context: Context, key: string) => {
   console.log("keyPress", key);
-  const { state, animator } = context;
+  const { state, animator, settings } = context;
 
   let [posX, posY, posZ] = state.getCurrentPiece().position;
   let offsets = state.getCurrentPiece().offsets;
@@ -54,8 +57,8 @@ const onKeyPress = (context: Context, key: string) => {
     let newPosition: Vertex = [posX, posY - 1, posZ];
     let lastValidPosition = newPosition;
     while (
-      !state.willTouchFallenCube(newPosition, offsets) &&
-      !state.willBeOutsideOfShaft(newPosition, offsets)
+      !willTouchFallenCube(newPosition, offsets, state.getFallenCubes()) &&
+      !willBeOutsideOfShaft(newPosition, offsets, settings)
     ) {
       lastValidPosition = newPosition;
       newPosition = [newPosition[0], newPosition[1] - 1, newPosition[2]];
@@ -136,8 +139,8 @@ const onKeyPress = (context: Context, key: string) => {
   // Check of collision with fallen cubes and shaft walls
   const newPosition: Vertex = [posX, posY, posZ];
   if (
-    !state.willTouchFallenCube(newPosition, offsets) &&
-    !state.willBeOutsideOfShaft(newPosition, offsets) &&
+    !willTouchFallenCube(newPosition, offsets, state.getFallenCubes()) &&
+    !willBeOutsideOfShaft(newPosition, offsets, settings) &&
     animationTrack
   ) {
     state.setCurrentPiece({ position: newPosition, offsets });
@@ -183,8 +186,8 @@ const letCurrentPieceFallDown = (context: Context) => {
 
   const newPosition: Vertex = [posX, posY - 1, posZ];
   if (
-    state.willTouchFallenCube(newPosition, offsets) ||
-    state.willTouchFloor()
+    willTouchFallenCube(newPosition, offsets, state.getFallenCubes()) ||
+    willTouchFloor(state.getCurrentPiece())
   ) {
     handlePieceReachedFloor(context);
   } else {
@@ -220,7 +223,7 @@ const main = (
   settings: Settings,
   callbacks: StateUpdateCallbacks
 ): GameController => {
-  const state = new GameState(settings, callbacks);
+  const state = new GameState(callbacks);
   const animator = new GameAnimator(settings.animationDuration);
   const context: Context = {
     state,
