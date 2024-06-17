@@ -5,7 +5,10 @@ export type CurrentPiece = {
   offsets: Vertex[];
 };
 
-const getCubesFromOffsets = (position: Vertex, offsets: Vertex[]): Vertex[] => {
+export const getCubesFromOffsets = (
+  position: Vertex,
+  offsets: Vertex[]
+): Vertex[] => {
   return offsets.map((offset) => [
     position[0] + offset[0],
     position[1] + offset[1],
@@ -139,17 +142,6 @@ class GameState {
 
   getFallenCubes() {
     return this.#state.fallenCubes;
-  }
-
-  addFallenPiece() {
-    const position = this.getCurrentPiece().position;
-    const cubes = getCubesFromOffsets(
-      position,
-      this.#getCurrentPiece().offsets
-    );
-
-    this.#state.fallenCubes.push(...cubes);
-    this.#callbacks.fallenCubes(this.#state.fallenCubes);
   }
 }
 

@@ -21,6 +21,7 @@ import {
 
 import GameState, {
   findFullLevels,
+  getCubesFromOffsets,
   removeLevel,
   rotateXAxis,
   rotateYAxis,
@@ -195,7 +196,9 @@ const letCurrentPieceFallDown = (context: Context) => {
 const handlePieceReachedFloor = (context: Context) => {
   const { state, renderer: gameRenderer, settings } = context;
 
-  state.addFallenPiece();
+  const piece = state.getCurrentPiece();
+  const cubes = getCubesFromOffsets(piece.position, piece.offsets);
+  state.setFallenCubes(cubes);
   gameRenderer.renderFallenCubes(state.getFallenCubes());
 
   addPiece(context);
