@@ -29,6 +29,7 @@ import shapeDefinitions from "./shapeDefinitions";
 import { SETTINGS_WIDTH } from "./config";
 import GameAnimator from "./rendering/gameAnimator";
 import GamePiece from "./state/gamePiece";
+import Scheduler from "./scheduler";
 
 const setup = (context: Context) => {
   const { renderer: gameRenderer, settings, callbacks } = context;
@@ -237,17 +238,18 @@ const main = (
   let stop = false;
   let pause = false;
 
-  const mainLoop = (tick: number) => {
-    if (!pause && tick % settings.fallingSpeed === 0) {
-      letCurrentPieceFallDown(context);
-    }
+  const fallingScheduler = new Scheduler(settings.fallingSpeed, () =>
+    letCurrentPieceFallDown(context)
+  );
 
+  const mainLoop = () => {
+    fallingScheduler.tick();
     animator.update();
     renderer.renderScene();
-    if (!stop) requestAnimationFrame(() => mainLoop(tick + 1));
+    if (!stop) requestAnimationFrame(mainLoop);
   };
 
-  mainLoop(0);
+  mainLoop();
 
   return {
     stop: () => {
@@ -260,6 +262,7 @@ const main = (
     updateSettings: (s: Settings) => {
       settings = s;
       animator.duration = settings.animationDuration;
+      fallingScheduler.updateInterval(settings.fallingSpeed);
     },
     updateCamera: {
       fov: (...args) => renderer.updateCameraFov(...args),

@@ -39,10 +39,10 @@ const SettingsPanel = ({ gameController }: Props) => {
       <RangeSetting name="shaftSizeZ" min={1} max={10} step={1} type={"int"} />
       <RangeSetting
         name="fallingSpeed"
-        min={1}
-        max={400}
-        step={1}
-        type={"int"}
+        min={0}
+        max={3}
+        step={0.01}
+        type={"float"}
       />
       <RangeSetting
         name="animationDuration"
