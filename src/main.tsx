@@ -43,7 +43,7 @@ const setup = (context: Context) => {
 };
 
 const onKeyPress = (context: Context, key: string) => {
-  console.log("keyPress", key);
+  console.log(`keyPress "${key}"`);
   const { state, animator, settings, schedulers } = context;
   const currentPiece = state.getCurrentPiece();
 
@@ -82,7 +82,7 @@ const onKeyPress = (context: Context, key: string) => {
     return;
   }
 
-  const updatedPiece = state.getCurrentPiece();
+  const updatedPiece = currentPiece.clone();
   let animationTrack: THREE.KeyframeTrack | undefined = undefined;
 
   // Moving a piece requires to update the position in the game state and
@@ -112,35 +112,35 @@ const onKeyPress = (context: Context, key: string) => {
   // the logical position matches the visual position. Not sure why, somewhow the rotation
   // in the game state and the rotation in the three.js object are not in sync.
   if (key === "q") {
-    currentPiece.rotateXAxis(1);
-    currentPiece.move([0, -1, 0]);
+    updatedPiece.rotateXAxis(1);
+    updatedPiece.move([0, -1, 0]);
     animationTrack = animator.getRotateTrack("x", 1);
   }
   if (key === "a") {
-    currentPiece.rotateXAxis(-1);
-    currentPiece.move([0, 0, -1]);
+    updatedPiece.rotateXAxis(-1);
+    updatedPiece.move([0, 0, -1]);
     animationTrack = animator.getRotateTrack("x", -1);
   }
 
   if (key === "w") {
-    currentPiece.rotateZAxis(-1);
-    currentPiece.move([0, -1, 0]);
+    updatedPiece.rotateZAxis(-1);
+    updatedPiece.move([0, -1, 0]);
     animationTrack = animator.getRotateTrack("z", -1);
   }
   if (key === "s") {
-    currentPiece.rotateZAxis(1);
-    currentPiece.move([-1, 0, 0]);
+    updatedPiece.rotateZAxis(1);
+    updatedPiece.move([-1, 0, 0]);
     animationTrack = animator.getRotateTrack("z", 1);
   }
 
   if (key === "e") {
-    currentPiece.rotateYAxis(-1);
-    currentPiece.move([0, 0, -1]);
+    updatedPiece.rotateYAxis(-1);
+    updatedPiece.move([0, 0, -1]);
     animationTrack = animator.getRotateTrack("y", 1);
   }
   if (key === "d") {
-    currentPiece.rotateYAxis(1);
-    currentPiece.move([-1, 0, 0]);
+    updatedPiece.rotateYAxis(1);
+    updatedPiece.move([-1, 0, 0]);
     animationTrack = animator.getRotateTrack("y", -1);
   }
 
