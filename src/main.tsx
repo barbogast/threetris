@@ -55,13 +55,15 @@ const onKeyPress = (context: Context, key: string) => {
 
   if (key === " ") {
     let newPosition: Vertex = [posX, posY - 1, posZ];
+    let newPiece: CurrentPiece = { position: newPosition, offsets };
     let lastValidPosition = newPosition;
     while (
-      !willTouchFallenCube(newPosition, offsets, state.getFallenCubes()) &&
-      !willBeOutsideOfShaft(newPosition, offsets, settings)
+      !willTouchFallenCube(newPiece, state.getFallenCubes()) &&
+      !willBeOutsideOfShaft(newPiece, settings)
     ) {
       lastValidPosition = newPosition;
       newPosition = [newPosition[0], newPosition[1] - 1, newPosition[2]];
+      newPiece = { position: newPosition, offsets };
     }
 
     if (lastValidPosition[1] !== posY) {
@@ -138,9 +140,10 @@ const onKeyPress = (context: Context, key: string) => {
 
   // Check of collision with fallen cubes and shaft walls
   const newPosition: Vertex = [posX, posY, posZ];
+  const newPiece: CurrentPiece = { position: newPosition, offsets };
   if (
-    !willTouchFallenCube(newPosition, offsets, state.getFallenCubes()) &&
-    !willBeOutsideOfShaft(newPosition, offsets, settings) &&
+    !willTouchFallenCube(newPiece, state.getFallenCubes()) &&
+    !willBeOutsideOfShaft(newPiece, settings) &&
     animationTrack
   ) {
     state.setCurrentPiece({ position: newPosition, offsets });
@@ -185,8 +188,9 @@ const letCurrentPieceFallDown = (context: Context) => {
   } = state.getCurrentPiece();
 
   const newPosition: Vertex = [posX, posY - 1, posZ];
+  const newPiece: CurrentPiece = { position: newPosition, offsets };
   if (
-    willTouchFallenCube(newPosition, offsets, state.getFallenCubes()) ||
+    willTouchFallenCube(newPiece, state.getFallenCubes()) ||
     willTouchFloor(state.getCurrentPiece())
   ) {
     handlePieceReachedFloor(context);
@@ -200,7 +204,7 @@ const handlePieceReachedFloor = (context: Context) => {
   const { state, renderer: gameRenderer, settings } = context;
 
   const piece = state.getCurrentPiece();
-  const cubes = getCubesFromOffsets(piece.position, piece.offsets);
+  const cubes = getCubesFromOffsets(piece);
   state.setFallenCubes(cubes);
   gameRenderer.renderFallenCubes(state.getFallenCubes());
 

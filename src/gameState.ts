@@ -5,10 +5,8 @@ export type CurrentPiece = {
   offsets: Vertex[];
 };
 
-export const getCubesFromOffsets = (
-  position: Vertex,
-  offsets: Vertex[]
-): Vertex[] => {
+export const getCubesFromOffsets = (piece: CurrentPiece): Vertex[] => {
+  const { position, offsets } = piece;
   return offsets.map((offset) => [
     position[0] + offset[0],
     position[1] + offset[1],
@@ -65,11 +63,10 @@ export const removeLevel = (fallenCubes: Vertex[], y: number): Vertex[] => {
 };
 
 export const willTouchFallenCube = (
-  newPosition: Vertex,
-  newOffsets: Vertex[],
+  piece: CurrentPiece,
   fallenCubes: Vertex[]
 ) => {
-  const cubes = getCubesFromOffsets(newPosition, newOffsets);
+  const cubes = getCubesFromOffsets(piece);
   return cubes.some((cube) =>
     fallenCubes.some(
       (fallenCube) =>
@@ -81,12 +78,11 @@ export const willTouchFallenCube = (
 };
 
 export const willBeOutsideOfShaft = (
-  newPosition: Vertex,
-  newOffsets: Vertex[],
+  piece: CurrentPiece,
   settings: Settings
 ) => {
   const { shaftSizeX, shaftSizeZ } = settings;
-  const cubes = getCubesFromOffsets(newPosition, newOffsets);
+  const cubes = getCubesFromOffsets(piece);
   return cubes.some(
     (cube) =>
       cube[0] < 0 ||
@@ -98,7 +94,7 @@ export const willBeOutsideOfShaft = (
 };
 
 export const willTouchFloor = (piece: CurrentPiece) => {
-  const cubes = getCubesFromOffsets(piece.position, piece.offsets);
+  const cubes = getCubesFromOffsets(piece);
   return cubes.some((cube) => cube[1] === 0);
 };
 
