@@ -1,6 +1,6 @@
 import GameAnimator from "./rendering/gameAnimator";
 import GameRenderer from "./rendering/gameRenderer";
-import GameState from "./gameState";
+import GameState from "./state/gameState";
 
 export type GameSettings = {
   shaftSizeX: number;

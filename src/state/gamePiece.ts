@@ -1,4 +1,4 @@
-import { Vertex } from "./types";
+import { Vertex } from "../types";
 
 class GamePiece {
   position: Vertex;

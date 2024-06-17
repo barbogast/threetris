@@ -1,6 +1,6 @@
 import FallenCubes from "./fallenCubes";
 import GamePiece from "./gamePiece";
-import { Settings, StateUpdateCallbacks } from "./types";
+import { Settings, StateUpdateCallbacks } from "../types";
 
 export const willTouchFallenCube = (
   piece: GamePiece,

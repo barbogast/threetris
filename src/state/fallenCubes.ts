@@ -1,4 +1,4 @@
-import { Settings, StateUpdateCallbacks, Vertex } from "./types";
+import { Settings, StateUpdateCallbacks, Vertex } from "../types";
 
 class FallenCubes {
   #cubes: Vertex[];

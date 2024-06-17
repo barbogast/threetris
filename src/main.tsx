@@ -23,12 +23,12 @@ import GameState, {
   willBeOutsideOfShaft,
   willTouchFallenCube,
   willTouchFloor,
-} from "./gameState";
+} from "./state/gameState";
 import GameRenderer from "./rendering/gameRenderer";
 import shapeDefinitions from "./shapeDefinitions";
 import { SETTINGS_WIDTH } from "./config";
 import GameAnimator from "./rendering/gameAnimator";
-import GamePiece from "./gamePiece";
+import GamePiece from "./state/gamePiece";
 
 const setup = (context: Context) => {
   const { renderer: gameRenderer, settings, callbacks } = context;
