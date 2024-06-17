@@ -30,7 +30,7 @@ import GameState, {
 import GameRenderer from "./gameRenderer";
 import shapeDefinitions from "./shapeDefinitions";
 import { SETTINGS_WIDTH } from "./config";
-
+import GameAnimator from "./gameAnimator";
 const setup = (context: Context) => {
   const { renderer: gameRenderer, settings, callbacks } = context;
 
@@ -213,6 +213,7 @@ const handlePieceReachedFloor = (context: Context) => {
   state.setFallenCubes(fallenCubes);
 };
 
+// Needs to be a global since we can have only one THREE.WebGLRenderer()
 const gameRenderer = new GameRenderer();
 
 const main = (
