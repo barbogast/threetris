@@ -14,7 +14,7 @@ class GameAnimator {
 
   setTarget(mesh: THREE.Object3D<THREE.Object3DEventMap>) {
     this.#mixer = new THREE.AnimationMixer(mesh);
-    this.#mixer.addEventListener("finished", (e) => {
+    this.#mixer.addEventListener("finished", () => {
       if (this.#eventFinishedCallback) {
         this.#eventFinishedCallback();
         this.#eventFinishedCallback = undefined;
