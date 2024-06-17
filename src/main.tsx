@@ -32,14 +32,14 @@ import GamePiece from "./state/gamePiece";
 import Scheduler from "./scheduler";
 
 const setup = (context: Context) => {
-  const { renderer: gameRenderer, settings, callbacks } = context;
+  const { renderer, settings, callbacks } = context;
 
-  gameRenderer.setup(settings, callbacks);
+  renderer.setup(settings, callbacks);
 
-  renderContainer(gameRenderer, settings);
-  renderFloorGrid(gameRenderer, settings);
-  renderWallGridLongLines(gameRenderer, settings);
-  renderWallGridShortLines(gameRenderer, settings);
+  renderContainer(renderer, settings);
+  renderFloorGrid(renderer, settings);
+  renderWallGridLongLines(renderer, settings);
+  renderWallGridShortLines(renderer, settings);
 };
 
 const onKeyPress = (context: Context, key: string) => {
@@ -67,8 +67,8 @@ const onKeyPress = (context: Context, key: string) => {
       animator.playAnimation(animationTrack);
       state.setCurrentPiece(lastValidPiece);
       animator.onEventFinished(() => handlePieceReachedFloor(context));
-      return;
     }
+    return;
   }
 
   const updatedPiece = state.getCurrentPiece();
@@ -145,9 +145,9 @@ const onKeyPress = (context: Context, key: string) => {
 };
 
 const addPiece = (context: Context) => {
-  const { state, renderer: gameRenderer, settings, animator } = context;
+  const { state, renderer, settings, animator } = context;
   state.removeCurrentPiece();
-  gameRenderer.removeCurrentPiece();
+  renderer.removeCurrentPiece();
 
   // Tetris pieces are constructed from cubes aligned next to or on top of each other.
   // In addition to aligning the cubes we need to remove mesh-lines between cubes where
@@ -159,17 +159,17 @@ const addPiece = (context: Context) => {
   // is not rendered. If an edge is touched by 3 cubes we assume it is a fold and we render
   // it. Edges touched by 4 cubes are skipped however, they are in the middle of a bigger cube.
 
-  const pieceOffset = parseShapeDefinition(shapeDefinitions.shape2.shape);
+  const offsets = parseShapeDefinition(shapeDefinitions.shape2.shape);
 
   const position: Vertex = [
     Math.floor(settings.shaftSizeX / 2),
     settings.shaftSizeY,
     Math.floor(settings.shaftSizeZ / 2),
   ];
-  const mesh = gameRenderer.renderCurrentPiece(pieceOffset, position);
+  const newPiece = new GamePiece(position, offsets);
+  const mesh = renderer.renderCurrentPiece(newPiece);
   animator.setTarget(mesh);
 
-  const newPiece = new GamePiece(position, pieceOffset);
   state.setCurrentPiece(newPiece);
 };
 
@@ -193,9 +193,9 @@ const handlePieceReachedFloor = (context: Context) => {
   const { state, renderer: gameRenderer, settings } = context;
 
   const piece = state.getCurrentPiece();
-  const cubes = piece.getCubesFromOffsets();
+  const cubes = piece.getCubes();
   state.getFallenCubes().addCubes(cubes);
-  gameRenderer.renderFallenCubes(state.getFallenCubes().getCubes());
+  gameRenderer.renderFallenCubes(state.getFallenCubes());
 
   addPiece(context);
 
@@ -204,7 +204,7 @@ const handlePieceReachedFloor = (context: Context) => {
   for (const level of fullLevels) {
     fallenCubes.removeLevel(level);
     gameRenderer.removeFallenCubes();
-    gameRenderer.renderFallenCubes(fallenCubes.getCubes());
+    gameRenderer.renderFallenCubes(fallenCubes);
   }
 };
 
@@ -270,10 +270,10 @@ const main = (
       lookAt: (...args) => renderer.updateCameraLookAt(...args),
     },
     forceRenderCurrentPiece: () => {
-      const { offsets, position } = state.getCurrentPiece();
+      const piece = state.getCurrentPiece();
       renderer.removeCurrentPiece();
-      const piece = renderer.renderCurrentPiece(offsets, position);
-      animator.setTarget(piece);
+      const mesh = renderer.renderCurrentPiece(piece);
+      animator.setTarget(mesh);
     },
   };
 };

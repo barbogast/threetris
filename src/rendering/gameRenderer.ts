@@ -8,6 +8,8 @@ import { Edge, Settings, Vertex } from "../types";
 import { StateUpdateCallbacks } from "../types";
 import { filterEdges, getCubeGeometry } from "../shape";
 import { SETTINGS_WIDTH } from "../config";
+import GamePiece from "../state/gamePiece";
+import FallenCubes from "../state/fallenCubes";
 
 type CurrentPiece = THREE.LineSegments<
   THREE.BufferGeometry<THREE.NormalBufferAttributes>,
@@ -124,10 +126,10 @@ class GameRenderer {
     this.#scene.getObjectByName(SHAFT_LINES_ID)!.add(lines);
   }
 
-  renderCurrentPiece(offsets: Vertex[], position: Vertex) {
+  renderCurrentPiece(piece: GamePiece) {
     const vertices: Vertex[] = [];
     const allEdges: Edge[] = [];
-    for (const offset of offsets) {
+    for (const offset of piece.offsets) {
       getCubeGeometry(vertices, allEdges, 1, offset[0], offset[1], offset[2]);
     }
 
@@ -144,7 +146,7 @@ class GameRenderer {
 
     const material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
     const lines = new THREE.LineSegments(geometry, material);
-    lines.position.set(...position);
+    lines.position.set(...piece.position);
 
     // const geometry = new LineSegmentsGeometry();
 
@@ -196,8 +198,8 @@ class GameRenderer {
     piece.position.set(...position);
   }
 
-  renderFallenCubes(cubes: Vertex[]) {
-    for (const [x, y, z] of cubes) {
+  renderFallenCubes(fallenCubes: FallenCubes) {
+    for (const [x, y, z] of fallenCubes.getCubes()) {
       const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
       const cubeMaterial = new THREE.MeshNormalMaterial();
       const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);

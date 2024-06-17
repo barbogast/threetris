@@ -6,7 +6,7 @@ export const willTouchFallenCube = (
   piece: GamePiece,
   fallenCubes: FallenCubes
 ) => {
-  const cubes = piece.getCubesFromOffsets();
+  const cubes = piece.getCubes();
   return cubes.some((cube) =>
     fallenCubes
       .getCubes()
@@ -21,7 +21,7 @@ export const willTouchFallenCube = (
 
 export const willBeOutsideOfShaft = (piece: GamePiece, settings: Settings) => {
   const { shaftSizeX, shaftSizeZ } = settings;
-  const cubes = piece.getCubesFromOffsets();
+  const cubes = piece.getCubes();
   return cubes.some(
     (cube) =>
       cube[0] < 0 ||
@@ -33,7 +33,7 @@ export const willBeOutsideOfShaft = (piece: GamePiece, settings: Settings) => {
 };
 
 export const willTouchFloor = (piece: GamePiece) => {
-  const cubes = piece.getCubesFromOffsets();
+  const cubes = piece.getCubes();
   return cubes.some((cube) => cube[1] === 0);
 };
 

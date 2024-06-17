@@ -45,7 +45,7 @@ class GamePiece {
     ]);
   }
 
-  getCubesFromOffsets(): Vertex[] {
+  getCubes(): Vertex[] {
     return this.offsets.map((offset) => [
       this.position[0] + offset[0],
       this.position[1] + offset[1],
