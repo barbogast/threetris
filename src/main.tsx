@@ -20,8 +20,6 @@ import {
 } from "./shaft";
 
 import GameState, {
-  findFullLevels,
-  removeLevel,
   willBeOutsideOfShaft,
   willTouchFallenCube,
   willTouchFloor,
@@ -194,19 +192,18 @@ const handlePieceReachedFloor = (context: Context) => {
 
   const piece = state.getCurrentPiece();
   const cubes = piece.getCubesFromOffsets();
-  state.setFallenCubes(cubes);
-  gameRenderer.renderFallenCubes(state.getFallenCubes());
+  state.getFallenCubes().addCubes(cubes);
+  gameRenderer.renderFallenCubes(state.getFallenCubes().getCubes());
 
   addPiece(context);
 
-  let fallenCubes = state.getFallenCubes();
-  const fullLevels = findFullLevels(settings, fallenCubes);
+  const fallenCubes = state.getFallenCubes();
+  const fullLevels = fallenCubes.findFullLevels(settings);
   for (const level of fullLevels) {
-    fallenCubes = removeLevel(fallenCubes, level);
+    fallenCubes.removeLevel(level);
     gameRenderer.removeFallenCubes();
-    gameRenderer.renderFallenCubes(fallenCubes);
+    gameRenderer.renderFallenCubes(fallenCubes.getCubes());
   }
-  state.setFallenCubes(fallenCubes);
 };
 
 // Needs to be a global since we can have only one THREE.WebGLRenderer()
