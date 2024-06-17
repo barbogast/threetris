@@ -44,7 +44,7 @@ const setup = (context: Context) => {
 
 const onKeyPress = (context: Context, key: string) => {
   console.log("keyPress", key);
-  const { state, animator, settings } = context;
+  const { state, animator, settings, schedulers } = context;
   const currentPiece = state.getCurrentPiece();
 
   if (key === " ") {
@@ -59,6 +59,14 @@ const onKeyPress = (context: Context, key: string) => {
     }
 
     if (lastValidPiece.position[1] !== currentPiece.position[1]) {
+      // Stop falling down during the animation.
+      // Otherwise we might end up with 2 pieces at the same time,
+      // or have the piece reach the floor during the animation
+      // Also, we need to reset the timer so that the new piece gets
+      // the full interval before it starts falling down (instead of the
+      // remainder of the last interval of the previous piece
+      schedulers.falling.stop();
+
       const animationTrack = animator.getMoveTrack([
         0,
         -(currentPiece.position[1] - lastValidPiece.position[1]),
@@ -66,7 +74,10 @@ const onKeyPress = (context: Context, key: string) => {
       ]);
       animator.playAnimation(animationTrack);
       state.setCurrentPiece(lastValidPiece);
-      animator.onEventFinished(() => handlePieceReachedFloor(context));
+      animator.onEventFinished(() => {
+        handlePieceReachedFloor(context);
+        schedulers.falling.start();
+      });
     }
     return;
   }
@@ -217,12 +228,20 @@ const main = (
 ): GameController => {
   const state = new GameState(callbacks);
   const animator = new GameAnimator(settings.animationDuration);
+
+  const fallingScheduler = new Scheduler(settings.fallingSpeed, () =>
+    letCurrentPieceFallDown(context)
+  );
+
   const context: Context = {
     state,
     callbacks,
     renderer,
     animator,
     settings,
+    schedulers: {
+      falling: fallingScheduler,
+    },
   };
 
   setup(context);
@@ -237,10 +256,6 @@ const main = (
 
   let stop = false;
   let pause = false;
-
-  const fallingScheduler = new Scheduler(settings.fallingSpeed, () =>
-    letCurrentPieceFallDown(context)
-  );
 
   const mainLoop = () => {
     fallingScheduler.tick();

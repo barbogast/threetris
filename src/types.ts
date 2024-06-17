@@ -1,5 +1,6 @@
 import GameAnimator from "./rendering/gameAnimator";
 import GameRenderer from "./rendering/gameRenderer";
+import Scheduler from "./scheduler";
 import GameState from "./state/gameState";
 
 export type GameSettings = {
@@ -46,6 +47,9 @@ export type Context = {
   renderer: GameRenderer;
   animator: GameAnimator;
   settings: Settings;
+  schedulers: {
+    falling: Scheduler;
+  };
 };
 
 export type GameController = {
