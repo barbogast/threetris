@@ -21,11 +21,7 @@ import {
 
 import GameState, {
   findFullLevels,
-  getCubesFromOffsets,
   removeLevel,
-  rotateXAxis,
-  rotateYAxis,
-  rotateZAxis,
   willBeOutsideOfShaft,
   willTouchFallenCube,
   willTouchFloor,
@@ -34,6 +30,7 @@ import GameRenderer from "./gameRenderer";
 import shapeDefinitions from "./shapeDefinitions";
 import { SETTINGS_WIDTH } from "./config";
 import GameAnimator from "./gameAnimator";
+import GamePiece from "./gamePiece";
 const setup = (context: Context) => {
   const { renderer: gameRenderer, settings, callbacks } = context;
 
@@ -48,55 +45,53 @@ const setup = (context: Context) => {
 const onKeyPress = (context: Context, key: string) => {
   console.log("keyPress", key);
   const { state, animator, settings } = context;
-
-  let [posX, posY, posZ] = state.getCurrentPiece().position;
-  let offsets = state.getCurrentPiece().offsets;
-  let animationTrack: THREE.KeyframeTrack | undefined = undefined;
+  const currentPiece = state.getCurrentPiece();
 
   if (key === " ") {
-    let newPosition: Vertex = [posX, posY - 1, posZ];
-    let newPiece: CurrentPiece = { position: newPosition, offsets };
-    let lastValidPosition = newPosition;
+    let newPiece = currentPiece.clone();
+    let lastValidPiece = newPiece;
     while (
       !willTouchFallenCube(newPiece, state.getFallenCubes()) &&
       !willBeOutsideOfShaft(newPiece, settings)
     ) {
-      lastValidPosition = newPosition;
-      newPosition = [newPosition[0], newPosition[1] - 1, newPosition[2]];
-      newPiece = { position: newPosition, offsets };
+      lastValidPiece = newPiece.clone();
+      newPiece.move([0, -1, 0]);
     }
 
-    if (lastValidPosition[1] !== posY) {
-      animationTrack = animator.getMoveTrack([
+    if (lastValidPiece.position[1] !== currentPiece.position[1]) {
+      const animationTrack = animator.getMoveTrack([
         0,
-        -(posY - lastValidPosition[1]),
+        -(currentPiece.position[1] - lastValidPiece.position[1]),
         0,
       ]);
       animator.playAnimation(animationTrack);
-      state.setCurrentPiece({ position: lastValidPosition, offsets });
+      state.setCurrentPiece(lastValidPiece);
       animator.onEventFinished(() => handlePieceReachedFloor(context));
       return;
     }
   }
+
+  const updatedPiece = state.getCurrentPiece();
+  let animationTrack: THREE.KeyframeTrack | undefined = undefined;
 
   // Moving a piece requires to update the position in the game state and
   // to set up the animation which visually moves the piece by moving the
   // three.js object.
   if (key === "ArrowLeft") {
     animationTrack = animator.getMoveTrack([-1, 0, 0]);
-    posX -= 1;
+    updatedPiece.move([-1, 0, 0]);
   }
   if (key === "ArrowUp") {
     animationTrack = animator.getMoveTrack([0, 0, -1]);
-    posZ -= 1;
+    updatedPiece.move([0, 0, -1]);
   }
   if (key === "ArrowDown") {
     animationTrack = animator.getMoveTrack([0, 0, 1]);
-    posZ += 1;
+    updatedPiece.move([0, 0, 1]);
   }
   if (key === "ArrowRight") {
     animationTrack = animator.getMoveTrack([1, 0, 0]);
-    posX += 1;
+    updatedPiece.move([1, 0, 0]);
   }
 
   // Rotating a piece requires to update the offsets in the game state and
@@ -106,47 +101,45 @@ const onKeyPress = (context: Context, key: string) => {
   // the logical position matches the visual position. Not sure why, somewhow the rotation
   // in the game state and the rotation in the three.js object are not in sync.
   if (key === "q") {
-    offsets = rotateXAxis(offsets, 1);
-    offsets = offsets.map(([x, y, z]) => [x, y - 1, z]);
+    currentPiece.rotateXAxis(1);
+    currentPiece.move([0, -1, 0]);
     animationTrack = animator.getRotateTrack("x", 1);
   }
   if (key === "a") {
-    offsets = rotateXAxis(offsets, -1);
-    offsets = offsets.map(([x, y, z]) => [x, y, z - 1]);
+    currentPiece.rotateXAxis(-1);
+    currentPiece.move([0, 0, -1]);
     animationTrack = animator.getRotateTrack("x", -1);
   }
 
   if (key === "w") {
-    offsets = rotateZAxis(offsets, -1);
-    offsets = offsets.map(([x, y, z]) => [x, y - 1, z]);
+    currentPiece.rotateZAxis(-1);
+    currentPiece.move([0, -1, 0]);
     animationTrack = animator.getRotateTrack("z", -1);
   }
   if (key === "s") {
-    offsets = rotateZAxis(offsets, 1);
-    offsets = offsets.map(([x, y, z]) => [x - 1, y, z]);
+    currentPiece.rotateZAxis(1);
+    currentPiece.move([-1, 0, 0]);
     animationTrack = animator.getRotateTrack("z", 1);
   }
 
   if (key === "e") {
-    offsets = rotateYAxis(offsets, -1);
-    offsets = offsets.map(([x, y, z]) => [x, y, z - 1]);
+    currentPiece.rotateYAxis(-1);
+    currentPiece.move([0, 0, -1]);
     animationTrack = animator.getRotateTrack("y", 1);
   }
   if (key === "d") {
-    offsets = rotateYAxis(offsets, 1);
-    offsets = offsets.map(([x, y, z]) => [x - 1, y, z]);
+    currentPiece.rotateYAxis(1);
+    currentPiece.move([-1, 0, 0]);
     animationTrack = animator.getRotateTrack("y", -1);
   }
 
   // Check of collision with fallen cubes and shaft walls
-  const newPosition: Vertex = [posX, posY, posZ];
-  const newPiece: CurrentPiece = { position: newPosition, offsets };
   if (
-    !willTouchFallenCube(newPiece, state.getFallenCubes()) &&
-    !willBeOutsideOfShaft(newPiece, settings) &&
+    !willTouchFallenCube(updatedPiece, state.getFallenCubes()) &&
+    !willBeOutsideOfShaft(updatedPiece, settings) &&
     animationTrack
   ) {
-    state.setCurrentPiece({ position: newPosition, offsets });
+    state.setCurrentPiece(updatedPiece);
     animator.playAnimation(animationTrack);
   }
 };
@@ -173,29 +166,25 @@ const addPiece = (context: Context) => {
     settings.shaftSizeY,
     Math.floor(settings.shaftSizeZ / 2),
   ];
-  const piece = gameRenderer.renderCurrentPiece(pieceOffset, position);
-  animator.setTarget(piece);
+  const mesh = gameRenderer.renderCurrentPiece(pieceOffset, position);
+  animator.setTarget(mesh);
 
-  const newPiece = { offsets: pieceOffset, position };
+  const newPiece = new GamePiece(position, pieceOffset);
   state.setCurrentPiece(newPiece);
 };
 
 const letCurrentPieceFallDown = (context: Context) => {
   const { state, animator } = context;
-  const {
-    offsets,
-    position: [posX, posY, posZ],
-  } = state.getCurrentPiece();
 
-  const newPosition: Vertex = [posX, posY - 1, posZ];
-  const newPiece: CurrentPiece = { position: newPosition, offsets };
+  const newPiece = state.getCurrentPiece().clone();
+  newPiece.move([0, -1, 0]);
   if (
     willTouchFallenCube(newPiece, state.getFallenCubes()) ||
     willTouchFloor(state.getCurrentPiece())
   ) {
     handlePieceReachedFloor(context);
   } else {
-    state.setCurrentPiece({ position: newPosition, offsets });
+    state.setCurrentPiece(newPiece);
     animator.playAnimation(animator.getMoveTrack([0, -1, 0]));
   }
 };
@@ -204,7 +193,7 @@ const handlePieceReachedFloor = (context: Context) => {
   const { state, renderer: gameRenderer, settings } = context;
 
   const piece = state.getCurrentPiece();
-  const cubes = getCubesFromOffsets(piece);
+  const cubes = piece.getCubesFromOffsets();
   state.setFallenCubes(cubes);
   gameRenderer.renderFallenCubes(state.getFallenCubes());
 

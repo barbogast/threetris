@@ -1,27 +1,5 @@
+import GamePiece from "./gamePiece";
 import { Settings, StateUpdateCallbacks, Vertex } from "./types";
-
-export type CurrentPiece = {
-  position: Vertex;
-  offsets: Vertex[];
-};
-
-export const getCubesFromOffsets = (piece: CurrentPiece): Vertex[] => {
-  const { position, offsets } = piece;
-  return offsets.map((offset) => [
-    position[0] + offset[0],
-    position[1] + offset[1],
-    position[2] + offset[2],
-  ]);
-};
-
-export const rotateXAxis = (offsets: Vertex[], clockwise: number): Vertex[] =>
-  offsets.map(([oX, oY, oZ]) => [oX, -oZ * clockwise, oY * clockwise]);
-
-export const rotateYAxis = (offsets: Vertex[], clockwise: number): Vertex[] =>
-  offsets.map(([oX, oY, oZ]) => [-oZ * clockwise, oY, oX * clockwise]);
-
-export const rotateZAxis = (offsets: Vertex[], clockwise: number): Vertex[] =>
-  offsets.map(([oX, oY, oZ]) => [-oY * clockwise, oX * clockwise, oZ]);
 
 const isLevelFull = (settings: Settings, fallenCubes: Vertex[], y: number) => {
   const { shaftSizeX, shaftSizeZ } = settings;
@@ -63,10 +41,10 @@ export const removeLevel = (fallenCubes: Vertex[], y: number): Vertex[] => {
 };
 
 export const willTouchFallenCube = (
-  piece: CurrentPiece,
+  piece: GamePiece,
   fallenCubes: Vertex[]
 ) => {
-  const cubes = getCubesFromOffsets(piece);
+  const cubes = piece.getCubesFromOffsets();
   return cubes.some((cube) =>
     fallenCubes.some(
       (fallenCube) =>
@@ -77,12 +55,9 @@ export const willTouchFallenCube = (
   );
 };
 
-export const willBeOutsideOfShaft = (
-  piece: CurrentPiece,
-  settings: Settings
-) => {
+export const willBeOutsideOfShaft = (piece: GamePiece, settings: Settings) => {
   const { shaftSizeX, shaftSizeZ } = settings;
-  const cubes = getCubesFromOffsets(piece);
+  const cubes = piece.getCubesFromOffsets();
   return cubes.some(
     (cube) =>
       cube[0] < 0 ||
@@ -93,14 +68,14 @@ export const willBeOutsideOfShaft = (
   );
 };
 
-export const willTouchFloor = (piece: CurrentPiece) => {
-  const cubes = getCubesFromOffsets(piece);
+export const willTouchFloor = (piece: GamePiece) => {
+  const cubes = piece.getCubesFromOffsets();
   return cubes.some((cube) => cube[1] === 0);
 };
 
 class GameState {
   #state: {
-    currentPiece: CurrentPiece | undefined;
+    currentPiece: GamePiece | undefined;
     fallenCubes: [number, number, number][];
   };
   #callbacks: StateUpdateCallbacks;
@@ -118,7 +93,7 @@ class GameState {
     return this.#state.currentPiece;
   }
 
-  setCurrentPiece(currentPiece: CurrentPiece) {
+  setCurrentPiece(currentPiece: GamePiece) {
     this.#state.currentPiece = currentPiece;
     this.#callbacks.currentPieceOffsets(currentPiece.offsets);
     this.#callbacks.currentPiecePosition(currentPiece.position);
