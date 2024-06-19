@@ -29,6 +29,10 @@ class Scheduler {
     this.#stopped = true;
   }
 
+  isStopped() {
+    return this.#stopped;
+  }
+
   tick() {
     if (this.#stopped) return;
 

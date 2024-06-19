@@ -255,7 +255,6 @@ const main = (
   addEventListener("keydown", keyPress);
 
   let stop = false;
-  let pause = false;
 
   const mainLoop = () => {
     fallingScheduler.tick();
@@ -272,7 +271,9 @@ const main = (
       removeEventListener("keydown", keyPress);
     },
     togglePause: () => {
-      pause = !pause;
+      fallingScheduler.isStopped()
+        ? fallingScheduler.start()
+        : fallingScheduler.stop();
     },
     updateSettings: (s: Settings) => {
       settings = s;
