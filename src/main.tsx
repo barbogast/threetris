@@ -233,6 +233,8 @@ const main = (
     letCurrentPieceFallDown(context)
   );
 
+  if (settings.paused) fallingScheduler.stop();
+
   const context: Context = {
     state,
     callbacks,
@@ -339,10 +341,6 @@ const App = () => {
     <div style={{ display: "flex", flexDirection: "row" }}>
       <div id="scene"></div>
       <div id="settings" style={{ width: SETTINGS_WIDTH }}>
-        <button onClick={() => gameController.current!.togglePause()}>
-          Pause
-        </button>
-        <br />
         Geometries: {rendererInfo.geometries}
         <br />
         currentPiecePosition<pre>{JSON.stringify(currentPiecePosition)}</pre>

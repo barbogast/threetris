@@ -33,6 +33,19 @@ const SettingsPanel = ({ gameController }: Props) => {
 
   return (
     <>
+      <input
+        type="checkbox"
+        checked={settings.paused}
+        onChange={() => {
+          updateSettings({
+            paused: !settings.paused,
+          });
+          gameController.togglePause();
+        }}
+      />{" "}
+      Paused
+      <br />
+      <br />
       <strong>Game Settings</strong>
       <RangeSetting name="shaftSizeX" min={1} max={10} step={1} type={"int"} />
       <RangeSetting name="shaftSizeY" min={5} max={15} step={1} type={"int"} />
