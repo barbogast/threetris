@@ -1,5 +1,7 @@
 import { Vertex } from "../types";
 
+export type Axis = "x" | "y" | "z";
+
 class GamePiece {
   position: Vertex;
   offsets: Vertex[];
@@ -31,9 +33,9 @@ class GamePiece {
 
   rotateYAxis(clockwise: number) {
     this.offsets = this.offsets.map(([oX, oY, oZ]) => [
-      -oZ * clockwise,
+      oZ * clockwise,
       oY,
-      oX * clockwise,
+      -oX * clockwise,
     ]);
   }
 
