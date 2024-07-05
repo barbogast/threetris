@@ -1,18 +1,21 @@
 import { Vertex } from "../types";
 
 export type Axis = "x" | "y" | "z";
+export type Rotation = { x: number; y: number; z: number };
 
 class GamePiece {
   position: Vertex;
   offsets: Vertex[];
+  rotation: Rotation;
 
-  constructor(position: Vertex, offsets: Vertex[]) {
+  constructor(position: Vertex, offsets: Vertex[], rotation: Rotation) {
     this.position = position;
     this.offsets = offsets;
+    this.rotation = rotation;
   }
 
   clone() {
-    return new GamePiece(this.position, this.offsets);
+    return new GamePiece(this.position, this.offsets, this.rotation);
   }
 
   move(offset: Vertex) {
@@ -29,6 +32,7 @@ class GamePiece {
       -oZ * clockwise,
       oY * clockwise,
     ]);
+    this.rotation.x = (this.rotation.x + clockwise * 90) % 360;
   }
 
   rotateYAxis(clockwise: number) {
@@ -37,6 +41,7 @@ class GamePiece {
       oY,
       -oX * clockwise,
     ]);
+    this.rotation.y = (this.rotation.y + clockwise * 90) % 360;
   }
 
   rotateZAxis(clockwise: number) {
@@ -45,6 +50,7 @@ class GamePiece {
       oX * clockwise,
       oZ,
     ]);
+    this.rotation.z = (this.rotation.z + clockwise * 90) % 360;
   }
 
   getCubes(): Vertex[] {

@@ -28,7 +28,7 @@ import GameRenderer from "./rendering/gameRenderer";
 import shapeDefinitions from "./shapeDefinitions";
 import { SETTINGS_WIDTH } from "./config";
 import GameAnimator from "./rendering/gameAnimator";
-import GamePiece, { Axis } from "./state/gamePiece";
+import GamePiece, { Axis, Rotation } from "./state/gamePiece";
 import Scheduler from "./scheduler";
 
 const setup = (context: Context) => {
@@ -166,7 +166,11 @@ const addPiece = (context: Context) => {
     settings.shaftSizeY,
     Math.floor(settings.shaftSizeZ / 2),
   ];
-  const newPiece = new GamePiece(position, offsets);
+  const newPiece = new GamePiece(position, offsets, {
+    x: 0,
+    y: 0,
+    z: 0,
+  });
   const mesh = renderer.renderCurrentPiece(newPiece);
   animator.setTarget(mesh);
 
@@ -289,6 +293,7 @@ const App = () => {
   const [currentPiece, setCurrentPiece] = React.useState<{
     position: Vertex;
     offsets: Vertex[];
+    rotation: Rotation;
   }>();
   const [fallenCubes, setFallenCubes] = React.useState<
     [number, number, number][]
@@ -340,6 +345,12 @@ const App = () => {
         {currentPiece?.offsets.map((off, i) => (
           <pre key={i}>{JSON.stringify(off)}</pre>
         ))}
+        <br />
+        Rotation:{" "}
+        <pre style={{ display: "inline" }}>
+          {JSON.stringify(currentPiece?.rotation)}
+        </pre>
+        <br />
         Fallen cubes: {fallenCubes.length}
         <br />
         <br />
