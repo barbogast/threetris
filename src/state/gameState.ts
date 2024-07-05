@@ -59,8 +59,7 @@ class GameState {
 
   setCurrentPiece(currentPiece: GamePiece) {
     this.#state.currentPiece = currentPiece;
-    this.#callbacks.currentPieceOffsets(currentPiece.offsets);
-    this.#callbacks.currentPiecePosition(currentPiece.position);
+    this.#callbacks.currentPiece(currentPiece);
   }
 
   removeCurrentPiece() {

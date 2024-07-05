@@ -190,7 +190,7 @@ class GameRenderer {
       if (piece.geometry) piece.geometry.dispose();
       this.#scene.remove(piece);
     }
-    this.#callbacks!.currentPiecePosition(undefined);
+    this.#callbacks!.currentPiece(undefined);
   }
 
   setCurrentPiecePosition(position: Vertex) {

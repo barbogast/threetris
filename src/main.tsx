@@ -297,11 +297,10 @@ const main = (
 };
 
 const App = () => {
-  const [currentPieceOffsets, setCurrentPieceOffsets] = React.useState<
-    Vertex[]
-  >([]);
-  const [currentPiecePosition, setCurrentPiecePosition] =
-    React.useState<Vertex>();
+  const [currentPiece, setCurrentPiece] = React.useState<{
+    position: Vertex;
+    offsets: Vertex[];
+  }>();
   const [fallenCubes, setFallenCubes] = React.useState<
     [number, number, number][]
   >([]);
@@ -311,8 +310,12 @@ const App = () => {
   const settings = useAppStore().settings;
 
   const callbacks = {
-    currentPiecePosition: setCurrentPiecePosition,
-    currentPieceOffsets: setCurrentPieceOffsets,
+    currentPiece: (piece: GamePiece | undefined) => {
+      if (!piece) return setCurrentPiece(undefined);
+      return setCurrentPiece({
+        ...piece,
+      });
+    },
     fallenCubes: setFallenCubes,
     rendererInfo: setRendererInfo,
   };
@@ -343,9 +346,9 @@ const App = () => {
       <div id="settings" style={{ width: SETTINGS_WIDTH }}>
         Geometries: {rendererInfo.geometries}
         <br />
-        currentPiecePosition<pre>{JSON.stringify(currentPiecePosition)}</pre>
+        currentPiecePosition<pre>{JSON.stringify(currentPiece?.position)}</pre>
         currentPieceOffsets
-        {currentPieceOffsets.map((off, i) => (
+        {currentPiece?.offsets.map((off, i) => (
           <pre key={i}>{JSON.stringify(off)}</pre>
         ))}
         Fallen cubes: {fallenCubes.length}

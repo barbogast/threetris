@@ -1,6 +1,7 @@
 import GameAnimator from "./rendering/gameAnimator";
 import GameRenderer from "./rendering/gameRenderer";
 import Scheduler from "./scheduler";
+import GamePiece from "./state/gamePiece";
 import GameState from "./state/gameState";
 
 export type GameSettings = {
@@ -36,8 +37,7 @@ export type PieceOffset = [number, number, number];
 export type Edge = [number, number];
 
 export type StateUpdateCallbacks = {
-  currentPiecePosition: (position: Vertex | undefined) => void;
-  currentPieceOffsets: (offsets: Vertex[]) => void;
+  currentPiece: (piece: GamePiece | undefined) => void;
   fallenCubes: (fallenCubes: [number, number, number][]) => void;
   rendererInfo: (info: { geometries: number }) => void;
 };
