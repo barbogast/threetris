@@ -28,7 +28,7 @@ import GameRenderer from "./rendering/gameRenderer";
 import shapeDefinitions from "./shapeDefinitions";
 import { SETTINGS_WIDTH } from "./config";
 import GameAnimator from "./rendering/gameAnimator";
-import GamePiece from "./state/gamePiece";
+import GamePiece, { Axis } from "./state/gamePiece";
 import Scheduler from "./scheduler";
 
 const setup = (context: Context) => {
@@ -76,7 +76,7 @@ const onKeyPress = (context: Context, key: string) => {
       state.setCurrentPiece(lastValidPiece);
       animator.onEventFinished(() => {
         handlePieceReachedFloor(context);
-        schedulers.falling.start();
+        !settings.paused && schedulers.falling.start();
       });
     }
     return;
@@ -111,37 +111,26 @@ const onKeyPress = (context: Context, key: string) => {
   // Note that offsets in the game state need to be adjusted after the rotation, so that
   // the logical position matches the visual position. Not sure why, somewhow the rotation
   // in the game state and the rotation in the three.js object are not in sync.
-  if (key === "q") {
-    updatedPiece.rotateXAxis(1);
-    updatedPiece.move([0, -1, 0]);
-    animationTrack = animator.getRotateTrack("x", 1);
-  }
-  if (key === "a") {
-    updatedPiece.rotateXAxis(-1);
-    updatedPiece.move([0, 0, -1]);
-    animationTrack = animator.getRotateTrack("x", -1);
-  }
+  const rotationMap: Record<string, { axis: Axis; direction: 1 | -1 }> = {
+    q: { axis: "x", direction: 1 },
+    a: { axis: "x", direction: -1 },
+    w: { axis: "z", direction: -1 },
+    s: { axis: "z", direction: 1 },
+    e: { axis: "y", direction: -1 },
+    d: { axis: "y", direction: 1 },
+  };
 
-  if (key === "w") {
-    updatedPiece.rotateZAxis(-1);
-    updatedPiece.move([0, -1, 0]);
-    animationTrack = animator.getRotateTrack("z", -1);
-  }
-  if (key === "s") {
-    updatedPiece.rotateZAxis(1);
-    updatedPiece.move([-1, 0, 0]);
-    animationTrack = animator.getRotateTrack("z", 1);
-  }
-
-  if (key === "e") {
-    updatedPiece.rotateYAxis(-1);
-    updatedPiece.move([0, 0, -1]);
-    animationTrack = animator.getRotateTrack("y", 1);
-  }
-  if (key === "d") {
-    updatedPiece.rotateYAxis(1);
-    updatedPiece.move([-1, 0, 0]);
-    animationTrack = animator.getRotateTrack("y", -1);
+  const config = rotationMap[key];
+  if (config) {
+    const { axis, direction } = rotationMap[key];
+    if (axis === "x") {
+      updatedPiece.rotateXAxis(direction);
+    } else if (axis === "y") {
+      updatedPiece.rotateYAxis(direction);
+    } else if (axis === "z") {
+      updatedPiece.rotateZAxis(direction);
+    }
+    animationTrack = animator.getRotateTrackQuaternion(axis, direction);
   }
 
   // Check of collision with fallen cubes and shaft walls

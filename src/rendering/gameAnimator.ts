@@ -5,6 +5,7 @@ class GameAnimator {
   #clock: THREE.Clock;
   #mixer?: THREE.AnimationMixer;
   duration: number;
+  #target: THREE.Object3D<THREE.Object3DEventMap> | undefined;
   #eventFinishedCallback?: () => void;
 
   constructor(animationDuration: number) {
@@ -13,6 +14,7 @@ class GameAnimator {
   }
 
   setTarget(mesh: THREE.Object3D<THREE.Object3DEventMap>) {
+    this.#target = mesh;
     this.#mixer = new THREE.AnimationMixer(mesh);
     this.#mixer.addEventListener("finished", () => {
       if (this.#eventFinishedCallback) {
@@ -34,11 +36,42 @@ class GameAnimator {
     );
   }
 
-  getRotateTrack(axis: "x" | "y" | "z", direction: 1 | -1) {
+  getRotateTrackEuler(axis: "x" | "y" | "z", direction: number) {
+    console.log(`getRotateTrackEuler() .rotation[${axis}]`, direction);
     return new THREE.NumberKeyframeTrack(
       `.rotation[${axis}]`,
       [0, this.duration], // time
       [0, (Math.PI / 2) * direction] // rotation
+    );
+  }
+
+  getRotateTrackQuaternion(axis: "x" | "y" | "z", direction: number) {
+    console.log(`getRotateTrackQuaternion() .rotation[${axis}]`, direction);
+    const current = this.#target!.quaternion.clone();
+
+    const from = new THREE.Quaternion();
+    const target = current.clone();
+
+    // Rotate along world axis
+    const axisVector = new THREE.Vector3(
+      axis === "x" ? 1 : 0,
+      axis === "y" ? 1 : 0,
+      axis === "z" ? 1 : 0
+    );
+    const offset = new THREE.Quaternion().setFromAxisAngle(
+      axisVector,
+      (Math.PI / 2) * direction
+    );
+    target.premultiply(offset);
+
+    // Since we are using AdditiveAnimationBlendMode we need to only add the difference between the current and the target
+    // See https://stackoverflow.com/a/22167097
+    target.premultiply(current.invert());
+
+    return new THREE.QuaternionKeyframeTrack(
+      `.quaternion`,
+      [0, this.duration],
+      [...from, ...target]
     );
   }
 
