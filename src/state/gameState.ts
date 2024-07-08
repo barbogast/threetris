@@ -1,28 +1,29 @@
 import FallenCubes from "./fallenCubes";
 import GamePiece from "./gamePiece";
-import { Settings, StateUpdateCallbacks } from "../types";
+import { Settings, StateUpdateCallbacks, Vertex } from "../types";
 
-export const willTouchFallenCube = (
-  piece: GamePiece,
+export const collidesWithFallenCube = (
+  pieceCubes: Vertex[],
   fallenCubes: FallenCubes
 ) => {
-  const cubes = piece.getCubes();
-  return cubes.some((cube) =>
-    fallenCubes
+  return pieceCubes.some((cube) => {
+    return fallenCubes
       .getCubes()
       .some(
         (fallenCube) =>
           fallenCube[0] === cube[0] &&
           fallenCube[1] === cube[1] &&
           fallenCube[2] === cube[2]
-      )
-  );
+      );
+  });
 };
 
-export const willBeOutsideOfShaft = (piece: GamePiece, settings: Settings) => {
+export const willBeOutsideOfShaft = (
+  pieceCubes: Vertex[],
+  settings: Settings
+) => {
   const { shaftSizeX, shaftSizeZ } = settings;
-  const cubes = piece.getCubes();
-  return cubes.some(
+  return pieceCubes.some(
     (cube) =>
       cube[0] < 0 ||
       cube[0] >= shaftSizeX ||
@@ -32,9 +33,8 @@ export const willBeOutsideOfShaft = (piece: GamePiece, settings: Settings) => {
   );
 };
 
-export const willTouchFloor = (piece: GamePiece) => {
-  const cubes = piece.getCubes();
-  return cubes.some((cube) => cube[1] === 0);
+export const collidesWithFloor = (pieceCubes: Vertex[]) => {
+  return pieceCubes.some((cube) => cube[1] < 0);
 };
 
 class GameState {

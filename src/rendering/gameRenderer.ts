@@ -8,7 +8,7 @@ import { Edge, Settings, Vertex } from "../types";
 import { StateUpdateCallbacks } from "../types";
 import { filterEdges, getCubeGeometry } from "../shape";
 import { SETTINGS_WIDTH } from "../config";
-import GamePiece from "../state/gamePiece";
+import GamePiece, { Axis, Direction } from "../state/gamePiece";
 import FallenCubes from "../state/fallenCubes";
 
 type CurrentPiece = THREE.LineSegments<
@@ -168,6 +168,18 @@ class GameRenderer {
     lines.name = CURRENT_PIECE_ID;
     lines.renderOrder = 1;
 
+    // Add invisible objects and attach them as children to the mesh.
+    // This allows us to determine the position of the individual cubes after rotation.
+    for (const offset of piece.offsets) {
+      const pointGeometry = new THREE.SphereGeometry(0.1);
+      const pointMaterial = new THREE.MeshBasicMaterial({ visible: true });
+      const point = new THREE.Mesh(pointGeometry, pointMaterial);
+
+      // Move the point to the center of the cube, so that it stays in place when the cube is rotated
+      point.position.set(offset[0] + 0.5, offset[1] + 0.5, offset[2] + 0.5);
+      lines.add(point);
+    }
+
     this.#scene.add(lines);
     return lines;
   }
@@ -215,3 +227,34 @@ class GameRenderer {
 }
 
 export default GameRenderer;
+
+export const getCurrentCubes = (obj: THREE.Object3D) => {
+  return obj.children.map((child) => {
+    const v = child.getWorldPosition(new THREE.Vector3()).toArray();
+
+    // Move the point back to the edge of the cube so that we are aligned with the grid
+    const fixedPoint = [
+      Math.round(v[0] - 0.5),
+      Math.round(v[1] - 0.5),
+      Math.round(v[2] - 0.5),
+    ] as Vertex;
+
+    return fixedPoint;
+  });
+};
+
+export const rotate = (
+  obj: THREE.Object3D,
+  axis: Axis,
+  direction: Direction
+) => {
+  const angle = (Math.PI / 2) * direction;
+  obj.rotateOnWorldAxis(
+    new THREE.Vector3(
+      axis === "x" ? 1 : 0,
+      axis === "y" ? 1 : 0,
+      axis === "z" ? 1 : 0
+    ),
+    angle
+  );
+};

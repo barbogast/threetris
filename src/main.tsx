@@ -21,10 +21,13 @@ import {
 
 import GameState, {
   willBeOutsideOfShaft,
-  willTouchFallenCube,
-  willTouchFloor,
+  collidesWithFallenCube,
+  collidesWithFloor,
 } from "./state/gameState";
-import GameRenderer from "./rendering/gameRenderer";
+import GameRenderer, {
+  getCurrentCubes,
+  rotate,
+} from "./rendering/gameRenderer";
 import shapeDefinitions from "./shapeDefinitions";
 import { SETTINGS_WIDTH } from "./config";
 import GameAnimator from "./rendering/gameAnimator";
@@ -44,21 +47,26 @@ const setup = (context: Context) => {
 
 const onKeyPress = (context: Context, key: string) => {
   console.log(`keyPress "${key}"`);
-  const { state, animator, settings, schedulers } = context;
-  const currentPiece = state.getCurrentPiece();
+  const { state, animator, settings, schedulers, renderer } = context;
+  const currentPiece = renderer.getCurrentPiece();
 
   if (key === " ") {
-    let newPiece = currentPiece.clone();
-    let lastValidPiece = newPiece;
+    let newPiece = renderer.getCurrentPiece().clone();
+
     while (
-      !willTouchFallenCube(newPiece, state.getFallenCubes()) &&
-      !willBeOutsideOfShaft(newPiece, settings)
+      !collidesWithFallenCube(
+        getCurrentCubes(newPiece),
+        state.getFallenCubes()
+      ) &&
+      !willBeOutsideOfShaft(getCurrentCubes(newPiece), settings)
     ) {
-      lastValidPiece = newPiece.clone();
-      newPiece.move([0, -1, 0]);
+      newPiece.position.y -= 1;
     }
 
-    if (lastValidPiece.position[1] !== currentPiece.position[1]) {
+    // The last position resulted in a collision, go one block back up
+    newPiece.position.y += 1;
+
+    if (newPiece.position.y + 1 !== currentPiece.position.y) {
       // Stop falling down during the animation.
       // Otherwise we might end up with 2 pieces at the same time,
       // or have the piece reach the floor during the animation
@@ -69,13 +77,12 @@ const onKeyPress = (context: Context, key: string) => {
 
       const animationTrack = animator.getMoveTrack([
         0,
-        -(currentPiece.position[1] - lastValidPiece.position[1]),
+        -(currentPiece.position.y - newPiece.position.y),
         0,
       ]);
       animator.playAnimation(animationTrack);
-      state.setCurrentPiece(lastValidPiece);
       animator.onEventFinished(() => {
-        handlePieceReachedFloor(context);
+        handlePieceReachedFloor(context, getCurrentCubes(newPiece));
         !settings.paused && schedulers.falling.start();
       });
     }
@@ -90,19 +97,19 @@ const onKeyPress = (context: Context, key: string) => {
   // three.js object.
   if (key === "ArrowLeft") {
     animationTrack = animator.getMoveTrack([-1, 0, 0]);
-    updatedPiece.move([-1, 0, 0]);
+    updatedPiece.position.x -= 1;
   }
   if (key === "ArrowUp") {
     animationTrack = animator.getMoveTrack([0, 0, -1]);
-    updatedPiece.move([0, 0, -1]);
+    updatedPiece.position.z -= 1;
   }
   if (key === "ArrowDown") {
     animationTrack = animator.getMoveTrack([0, 0, 1]);
-    updatedPiece.move([0, 0, 1]);
+    updatedPiece.position.z += 1;
   }
   if (key === "ArrowRight") {
     animationTrack = animator.getMoveTrack([1, 0, 0]);
-    updatedPiece.move([1, 0, 0]);
+    updatedPiece.position.x += 1;
   }
 
   // Rotating a piece requires to update the offsets in the game state and
@@ -123,25 +130,19 @@ const onKeyPress = (context: Context, key: string) => {
   const config = rotationMap[key];
   if (config) {
     const { axis, direction } = rotationMap[key];
-    if (axis === "x") {
-      updatedPiece.rotateXAxis(direction);
-    } else if (axis === "y") {
-      updatedPiece.rotateYAxis(direction);
-    } else if (axis === "z") {
-      updatedPiece.rotateZAxis(direction);
-    }
-    updatedPiece.fixPositionAfterRotation(axis, direction);
-
+    rotate(updatedPiece, axis, direction);
     animationTrack = animator.getRotateTrackQuaternion(axis, direction);
   }
 
   // Check of collision with fallen cubes and shaft walls
   if (
-    !willTouchFallenCube(updatedPiece, state.getFallenCubes()) &&
-    !willBeOutsideOfShaft(updatedPiece, settings) &&
+    !collidesWithFallenCube(
+      getCurrentCubes(updatedPiece),
+      state.getFallenCubes()
+    ) &&
+    !willBeOutsideOfShaft(getCurrentCubes(updatedPiece), settings) &&
     animationTrack
   ) {
-    state.setCurrentPiece(updatedPiece);
     animator.playAnimation(animationTrack);
   }
 };
@@ -181,27 +182,28 @@ const addPiece = (context: Context) => {
 };
 
 const letCurrentPieceFallDown = (context: Context) => {
-  const { state, animator } = context;
+  const { state, animator, renderer } = context;
 
-  const newPiece = state.getCurrentPiece().clone();
-  newPiece.move([0, -1, 0]);
+  const newPiece = renderer.getCurrentPiece().clone();
+  newPiece.position.y -= 1;
+  const currentCubes = getCurrentCubes(newPiece);
   if (
-    willTouchFallenCube(newPiece, state.getFallenCubes()) ||
-    willTouchFloor(state.getCurrentPiece())
+    collidesWithFallenCube(currentCubes, state.getFallenCubes()) ||
+    collidesWithFloor(currentCubes)
   ) {
-    handlePieceReachedFloor(context);
+    handlePieceReachedFloor(
+      context,
+      getCurrentCubes(renderer.getCurrentPiece())
+    );
   } else {
-    state.setCurrentPiece(newPiece);
     animator.playAnimation(animator.getMoveTrack([0, -1, 0]));
   }
 };
 
-const handlePieceReachedFloor = (context: Context) => {
+const handlePieceReachedFloor = (context: Context, currentCubes: Vertex[]) => {
   const { state, renderer: gameRenderer, settings } = context;
 
-  const piece = state.getCurrentPiece();
-  const cubes = piece.getCubes();
-  state.getFallenCubes().addCubes(cubes);
+  state.getFallenCubes().addCubes(currentCubes);
   gameRenderer.renderFallenCubes(state.getFallenCubes());
 
   addPiece(context);
@@ -345,9 +347,9 @@ const App = () => {
         <br />
         currentPiecePosition<pre>{JSON.stringify(currentPiece?.position)}</pre>
         currentPieceOffsets
-        {currentPiece?.offsets.map((off, i) => (
+        {/* {currentPiece?.offsets.map((off, i) => (
           <pre key={i}>{JSON.stringify(off)}</pre>
-        ))}
+        ))} */}
         <br />
         Rotation:{" "}
         <pre style={{ display: "inline" }}>
