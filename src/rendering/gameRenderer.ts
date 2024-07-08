@@ -209,10 +209,27 @@ class GameRenderer {
   }
 
   renderFallenCubes(fallenCubes: FallenCubes) {
+    const COLORS = [
+      "darkblue",
+      "green",
+      "lightblue",
+      "red",
+      "pink",
+      "organe",
+      "white",
+      "darkblue",
+    ];
+
     for (const [x, y, z] of fallenCubes.getCubes()) {
       const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-      const cubeMaterial = new THREE.MeshNormalMaterial();
+      const cubeMaterial = new THREE.MeshBasicMaterial({ color: COLORS[y] });
       const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+
+      var edges = new THREE.EdgesGeometry(cubeGeometry);
+      var lineMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
+      var wireframe = new THREE.LineSegments(edges, lineMaterial);
+      cube.add(wireframe);
+
       cube.position.set(x + 0.5, y + 0.5, z + 0.5);
       this.#scene.getObjectByName(FALLEN_CUBES_ID)!.add(cube);
     }
