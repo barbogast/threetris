@@ -130,6 +130,8 @@ const onKeyPress = (context: Context, key: string) => {
     } else if (axis === "z") {
       updatedPiece.rotateZAxis(direction);
     }
+    updatedPiece.fixPositionAfterRotation(axis, direction);
+
     animationTrack = animator.getRotateTrackQuaternion(axis, direction);
   }
 
@@ -166,11 +168,12 @@ const addPiece = (context: Context) => {
     settings.shaftSizeY,
     Math.floor(settings.shaftSizeZ / 2),
   ];
-  const newPiece = new GamePiece(position, offsets, {
-    x: 0,
-    y: 0,
-    z: 0,
-  });
+  const newPiece = new GamePiece(
+    position,
+    offsets,
+    { x: 0, y: 0, z: 0 },
+    { x: "x", y: "y", z: "z" }
+  );
   const mesh = renderer.renderCurrentPiece(newPiece);
   animator.setTarget(mesh);
 
