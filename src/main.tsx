@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { parseShapeDefinition } from "./shape";
 import SettingsPanel from "./components/SettingsPanel";
 import {
+  Axis,
   Context,
   GameController,
   Settings,
@@ -31,7 +32,6 @@ import GameRenderer, {
 import shapeDefinitions from "./shapeDefinitions";
 import { SETTINGS_WIDTH } from "./config";
 import GameAnimator from "./rendering/gameAnimator";
-import GamePiece, { Axis, Rotation } from "./state/gamePiece";
 import Scheduler from "./scheduler";
 
 const setup = (context: Context) => {
@@ -148,8 +148,7 @@ const onKeyPress = (context: Context, key: string) => {
 };
 
 const addPiece = (context: Context) => {
-  const { state, renderer, settings, animator } = context;
-  state.removeCurrentPiece();
+  const { renderer, settings, animator } = context;
   renderer.removeCurrentPiece();
 
   // Tetris pieces are constructed from cubes aligned next to or on top of each other.
@@ -169,16 +168,8 @@ const addPiece = (context: Context) => {
     settings.shaftSizeY,
     Math.floor(settings.shaftSizeZ / 2),
   ];
-  const newPiece = new GamePiece(
-    position,
-    offsets,
-    { x: 0, y: 0, z: 0 },
-    { x: "x", y: "y", z: "z" }
-  );
-  const mesh = renderer.renderCurrentPiece(newPiece);
+  const mesh = renderer.renderCurrentPiece(offsets, position);
   animator.setTarget(mesh);
-
-  state.setCurrentPiece(newPiece);
 };
 
 const letCurrentPieceFallDown = (context: Context) => {
@@ -285,21 +276,10 @@ const main = (
       position: (...args) => renderer.updateCameraPosition(...args),
       lookAt: (...args) => renderer.updateCameraLookAt(...args),
     },
-    forceRenderCurrentPiece: () => {
-      const piece = state.getCurrentPiece();
-      renderer.removeCurrentPiece();
-      const mesh = renderer.renderCurrentPiece(piece);
-      animator.setTarget(mesh);
-    },
   };
 };
 
 const App = () => {
-  const [currentPiece, setCurrentPiece] = React.useState<{
-    position: Vertex;
-    offsets: Vertex[];
-    rotation: Rotation;
-  }>();
   const [fallenCubes, setFallenCubes] = React.useState<
     [number, number, number][]
   >([]);
@@ -309,12 +289,7 @@ const App = () => {
   const settings = useAppStore().settings;
 
   const callbacks = {
-    currentPiece: (piece: GamePiece | undefined) => {
-      if (!piece) return setCurrentPiece(undefined);
-      return setCurrentPiece({
-        ...piece,
-      });
-    },
+    currentPiece: () => {},
     fallenCubes: setFallenCubes,
     rendererInfo: setRendererInfo,
   };
@@ -345,28 +320,12 @@ const App = () => {
       <div id="settings" style={{ width: SETTINGS_WIDTH }}>
         Geometries: {rendererInfo.geometries}
         <br />
-        currentPiecePosition<pre>{JSON.stringify(currentPiece?.position)}</pre>
-        currentPieceOffsets
-        {/* {currentPiece?.offsets.map((off, i) => (
-          <pre key={i}>{JSON.stringify(off)}</pre>
-        ))} */}
-        <br />
-        Rotation:{" "}
-        <pre style={{ display: "inline" }}>
-          {JSON.stringify(currentPiece?.rotation)}
-        </pre>
         <br />
         Fallen cubes: {fallenCubes.length}
         <br />
         <br />
         {gameController.current && (
           <SettingsPanel gameController={gameController.current} />
-        )}
-        <br />
-        {gameController.current && (
-          <button onClick={gameController.current.forceRenderCurrentPiece}>
-            Update current piece{" "}
-          </button>
         )}
       </div>
     </div>

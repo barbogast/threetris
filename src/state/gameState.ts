@@ -1,5 +1,4 @@
 import FallenCubes from "./fallenCubes";
-import GamePiece from "./gamePiece";
 import { Settings, StateUpdateCallbacks, Vertex } from "../types";
 
 export const collidesWithFallenCube = (
@@ -39,31 +38,13 @@ export const collidesWithFloor = (pieceCubes: Vertex[]) => {
 
 class GameState {
   #state: {
-    currentPiece: GamePiece | undefined;
     fallenCubes: FallenCubes;
   };
-  #callbacks: StateUpdateCallbacks;
 
   constructor(callbacks: StateUpdateCallbacks) {
     this.#state = {
-      currentPiece: undefined,
       fallenCubes: new FallenCubes(callbacks),
     };
-    this.#callbacks = callbacks;
-  }
-
-  getCurrentPiece() {
-    if (!this.#state.currentPiece) throw new Error("No current piece");
-    return this.#state.currentPiece;
-  }
-
-  setCurrentPiece(currentPiece: GamePiece) {
-    this.#state.currentPiece = currentPiece;
-    this.#callbacks.currentPiece(currentPiece);
-  }
-
-  removeCurrentPiece() {
-    this.#state.currentPiece = undefined;
   }
 
   getFallenCubes() {

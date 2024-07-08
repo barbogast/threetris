@@ -1,7 +1,6 @@
 import GameAnimator from "./rendering/gameAnimator";
 import GameRenderer from "./rendering/gameRenderer";
 import Scheduler from "./scheduler";
-import GamePiece from "./state/gamePiece";
 import GameState from "./state/gameState";
 
 export type GameSettings = {
@@ -35,9 +34,11 @@ export type AppState = {
 export type Vertex = [number, number, number];
 export type PieceOffset = [number, number, number];
 export type Edge = [number, number];
+export type Axis = "x" | "y" | "z";
+export type Direction = 1 | -1;
 
 export type StateUpdateCallbacks = {
-  currentPiece: (piece: GamePiece | undefined) => void;
+  currentPiece: () => void;
   fallenCubes: (fallenCubes: [number, number, number][]) => void;
   rendererInfo: (info: { geometries: number }) => void;
 };
@@ -62,5 +63,4 @@ export type GameController = {
     position: (position: Vertex) => void;
     lookAt: (position: Vertex) => void;
   };
-  forceRenderCurrentPiece: () => void;
 };

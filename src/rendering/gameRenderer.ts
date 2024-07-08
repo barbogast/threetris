@@ -4,11 +4,10 @@ import * as THREE from "three";
 // import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { Edge, Settings, Vertex } from "../types";
+import { Axis, Direction, Edge, Settings, Vertex } from "../types";
 import { StateUpdateCallbacks } from "../types";
 import { filterEdges, getCubeGeometry } from "../shape";
 import { SETTINGS_WIDTH } from "../config";
-import GamePiece, { Axis, Direction } from "../state/gamePiece";
 import FallenCubes from "../state/fallenCubes";
 
 type CurrentPiece = THREE.LineSegments<
@@ -126,10 +125,10 @@ class GameRenderer {
     this.#scene.getObjectByName(SHAFT_LINES_ID)!.add(lines);
   }
 
-  renderCurrentPiece(piece: GamePiece) {
+  renderCurrentPiece(offsets: Vertex[], position: Vertex) {
     const vertices: Vertex[] = [];
     const allEdges: Edge[] = [];
-    for (const offset of piece.offsets) {
+    for (const offset of offsets) {
       getCubeGeometry(vertices, allEdges, 1, offset[0], offset[1], offset[2]);
     }
 
@@ -146,7 +145,7 @@ class GameRenderer {
 
     const material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
     const lines = new THREE.LineSegments(geometry, material);
-    lines.position.set(...piece.position);
+    lines.position.set(...position);
 
     // const geometry = new LineSegmentsGeometry();
 
@@ -170,7 +169,7 @@ class GameRenderer {
 
     // Add invisible objects and attach them as children to the mesh.
     // This allows us to determine the position of the individual cubes after rotation.
-    for (const offset of piece.offsets) {
+    for (const offset of offsets) {
       const pointGeometry = new THREE.SphereGeometry(0.1);
       const pointMaterial = new THREE.MeshBasicMaterial({ visible: true });
       const point = new THREE.Mesh(pointGeometry, pointMaterial);
@@ -202,7 +201,6 @@ class GameRenderer {
       if (piece.geometry) piece.geometry.dispose();
       this.#scene.remove(piece);
     }
-    this.#callbacks!.currentPiece(undefined);
   }
 
   setCurrentPiecePosition(position: Vertex) {
