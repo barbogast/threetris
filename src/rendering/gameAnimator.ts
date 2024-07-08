@@ -1,5 +1,17 @@
 import * as THREE from "three";
 import { Vertex } from "../types";
+import { toAxisAngle } from "../utils";
+
+const roundTo90Degrees = (q: THREE.Quaternion) => {
+  const { angle, x, y, z } = toAxisAngle(q);
+
+  // We assume that the angle is approximately 90 degrees
+  const fixedAngle = angle > 0 ? Math.PI / 2 : -Math.PI / 2;
+
+  const vec = new THREE.Vector3(x, y, z);
+  vec.round();
+  return new THREE.Quaternion().setFromAxisAngle(vec, fixedAngle);
+};
 
 class GameAnimator {
   #clock: THREE.Clock;
@@ -68,10 +80,14 @@ class GameAnimator {
     // See https://stackoverflow.com/a/22167097
     target.premultiply(current.invert());
 
+    // The resulting quaternion has rounding inaccuracies, which would accumulate over
+    // multiple rotations and cause the piece to drift away from the grid.
+    const fixedTarget = roundTo90Degrees(target);
+
     return new THREE.QuaternionKeyframeTrack(
       `.quaternion`,
       [0, this.duration],
-      [...from, ...target]
+      [...from, ...fixedTarget]
     );
   }
 
