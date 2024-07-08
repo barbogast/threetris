@@ -123,8 +123,8 @@ const onKeyPress = (context: Context, key: string) => {
     a: { axis: "x", direction: -1 },
     w: { axis: "z", direction: -1 },
     s: { axis: "z", direction: 1 },
-    e: { axis: "y", direction: -1 },
-    d: { axis: "y", direction: 1 },
+    e: { axis: "y", direction: 1 },
+    d: { axis: "y", direction: -1 },
   };
 
   const config = rotationMap[key];
