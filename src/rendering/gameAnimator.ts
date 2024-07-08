@@ -1,9 +1,9 @@
 import * as THREE from "three";
 import { Vertex } from "../types";
-import { toAxisAngle } from "../utils";
+import { getAxisAndAngelFromQuaternion } from "../utils";
 
 const roundTo90Degrees = (q: THREE.Quaternion) => {
-  const { angle, x, y, z } = toAxisAngle(q);
+  const { angle, x, y, z } = getAxisAndAngelFromQuaternion(q);
 
   // We assume that the angle is approximately 90 degrees
   const fixedAngle = angle > 0 ? Math.PI / 2 : -Math.PI / 2;
