@@ -192,7 +192,7 @@ const letCurrentPieceFallDown = (context: Context) => {
 };
 
 const handlePieceReachedFloor = (context: Context, currentCubes: Vertex[]) => {
-  const { state, renderer: gameRenderer, settings } = context;
+  const { state, renderer: gameRenderer, settings, callbacks } = context;
 
   state.getFallenCubes().addCubes(currentCubes);
   gameRenderer.renderFallenCubes(state.getFallenCubes());
@@ -205,6 +205,7 @@ const handlePieceReachedFloor = (context: Context, currentCubes: Vertex[]) => {
     fallenCubes.removeLevel(level);
     gameRenderer.removeFallenCubes();
     gameRenderer.renderFallenCubes(fallenCubes);
+    callbacks.removeRow();
   }
 };
 
@@ -286,12 +287,14 @@ const App = () => {
   const [rendererInfo, setRendererInfo] = React.useState<{
     geometries: number;
   }>({ geometries: 0 });
+  const [removedRows, setRemovedRows] = React.useState<number>(0);
   const settings = useAppStore().settings;
 
-  const callbacks = {
+  const callbacks: StateUpdateCallbacks = {
     currentPiece: () => {},
     fallenCubes: setFallenCubes,
     rendererInfo: setRendererInfo,
+    removeRow: () => setRemovedRows((prev) => prev + 1),
   };
 
   const gameController = useRef<GameController>();
@@ -318,6 +321,9 @@ const App = () => {
     <div style={{ display: "flex", flexDirection: "row" }}>
       <div id="scene"></div>
       <div id="settings" style={{ width: SETTINGS_WIDTH }}>
+        Removed rows: {removedRows}
+        <br />
+        <br />
         Geometries: {rendererInfo.geometries}
         <br />
         <br />

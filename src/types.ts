@@ -41,6 +41,7 @@ export type StateUpdateCallbacks = {
   currentPiece: () => void;
   fallenCubes: (fallenCubes: [number, number, number][]) => void;
   rendererInfo: (info: { geometries: number }) => void;
+  removeRow: () => void;
 };
 
 export type Context = {
