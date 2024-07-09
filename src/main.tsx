@@ -151,10 +151,15 @@ const addPiece = (context: Context) => {
   const { renderer, settings, animator } = context;
   renderer.removeCurrentPiece();
 
-  const keys = Object.keys(shapeDefinitions);
-  const shape = keys[
-    Math.floor(Math.random() * keys.length)
-  ] as keyof typeof shapeDefinitions;
+  const shapeNames = Object.keys(
+    shapeDefinitions
+  ) as (keyof typeof shapeDefinitions)[];
+
+  const shapesOfSet = shapeNames.filter(
+    (shapeName) => shapeDefinitions[shapeName].sets[settings.blockSet]
+  );
+
+  const shape = shapesOfSet[Math.floor(Math.random() * shapesOfSet.length)];
   // Tetris pieces are constructed from cubes aligned next to or on top of each other.
   // In addition to aligning the cubes we need to remove mesh-lines between cubes where
   // cubes touch and form a flat continuous surface. Mesh lines between cubes which form

@@ -7,6 +7,7 @@ export const getGameDefaults = (): GameSettings => ({
   fallingSpeed: 15,
   animationDuration: 0.3,
   paused: false,
+  blockSet: "flat",
 });
 
 export const getCameraDefaults = (settings: GameSettings): CameraSettings => ({

@@ -3,6 +3,8 @@ import GameRenderer from "./rendering/gameRenderer";
 import Scheduler from "./scheduler";
 import GameState from "./state/gameState";
 
+export type BlockSet = "flat" | "basic" | "extended";
+
 export type GameSettings = {
   shaftSizeX: number;
   shaftSizeY: number;
@@ -10,6 +12,7 @@ export type GameSettings = {
   fallingSpeed: number;
   animationDuration: number;
   paused: boolean;
+  blockSet: BlockSet;
 };
 
 export type CameraSettings = {

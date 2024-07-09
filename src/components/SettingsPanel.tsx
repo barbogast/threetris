@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import RangeSetting from "./RangeSetting";
 import useAppStore, { updateSettings } from "../appStore";
 import { getCameraDefaults, getGameDefaults } from "../config";
-import { GameController } from "../types";
+import { BlockSet, GameController } from "../types";
 
 type Props = {
   gameController: GameController;
@@ -47,6 +47,40 @@ const SettingsPanel = ({ gameController }: Props) => {
       <br />
       <br />
       <strong>Game Settings</strong>
+      <br />
+      <div>
+        <label>
+          <input
+            type="radio"
+            name="blockSet"
+            value="flat"
+            checked={settings.blockSet === "flat"}
+            onChange={() => updateSettings({ blockSet: "flat" })}
+          />
+          Flat
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="blockSet"
+            value="basic"
+            checked={settings.blockSet === "basic"}
+            onChange={() => updateSettings({ blockSet: "basic" })}
+          />
+          Basic
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="blockSet"
+            value="extended"
+            checked={settings.blockSet === "extended"}
+            onChange={() => updateSettings({ blockSet: "extended" })}
+          />
+          Extended
+        </label>
+      </div>
+      <br />
       <RangeSetting name="shaftSizeX" min={1} max={10} step={1} type={"int"} />
       <RangeSetting name="shaftSizeY" min={5} max={15} step={1} type={"int"} />
       <RangeSetting name="shaftSizeZ" min={1} max={10} step={1} type={"int"} />
