@@ -147,23 +147,6 @@ class GameRenderer {
     const lines = new THREE.LineSegments(geometry, material);
     lines.position.set(...position);
 
-    // const geometry = new LineSegmentsGeometry();
-
-    // // Add the vertices and edges to the geometry
-    // // geometry.setAttribute(
-    // //   "position",
-    // //   new THREE.BufferAttribute(new Float32Array(vertices.flat()), 3)
-    // // );
-
-    // const material = new LineMaterial({
-    //   color: 0x00ff00,
-    //   linewidth: 5,
-    //   vertexColors: true,
-    // });
-    // geometry.setPositions(vertices.flat());
-    // geometry.setIndex(filteredEdges.flat());
-    // const lines = new LineSegments2(geometry, material);
-
     lines.name = CURRENT_PIECE_ID;
     lines.renderOrder = 1;
 
