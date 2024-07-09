@@ -171,7 +171,7 @@ class GameRenderer {
     // This allows us to determine the position of the individual cubes after rotation.
     for (const offset of offsets) {
       const pointGeometry = new THREE.SphereGeometry(0.1);
-      const pointMaterial = new THREE.MeshBasicMaterial({ visible: true });
+      const pointMaterial = new THREE.MeshBasicMaterial({ visible: false });
       const point = new THREE.Mesh(pointGeometry, pointMaterial);
 
       // Move the point to the center of the cube, so that it stays in place when the cube is rotated
