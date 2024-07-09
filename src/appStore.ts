@@ -9,7 +9,7 @@ const useAppStore = create<AppState>()(
       settings: getAllDefaults(),
     }),
     {
-      name: "bear-storage",
+      name: "threetris",
     }
   )
 );
