@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import RangeSetting from "./RangeSetting";
 import useAppStore, { updateSettings } from "../appStore";
 import { getCameraDefaults, getGameDefaults } from "../config";
-import { BlockSet, GameController } from "../types";
+import { GameController } from "../types";
 
 type Props = {
   gameController: GameController;
