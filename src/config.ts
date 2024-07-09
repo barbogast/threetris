@@ -1,9 +1,9 @@
 import { CameraSettings, GameSettings, Settings } from "./types";
 
 export const getGameDefaults = (): GameSettings => ({
-  shaftSizeX: 4,
-  shaftSizeY: 10,
-  shaftSizeZ: 4,
+  shaftSizeX: 5,
+  shaftSizeY: 12,
+  shaftSizeZ: 5,
   fallingSpeed: 15,
   animationDuration: 0.3,
   paused: false,
@@ -11,9 +11,9 @@ export const getGameDefaults = (): GameSettings => ({
 });
 
 export const getCameraDefaults = (settings: GameSettings): CameraSettings => ({
-  aspect: 0.5,
+  aspect: 0.8,
   fov: 50,
-  zoom: 0.7,
+  zoom: 0.3,
   positionX: settings.shaftSizeX / 2,
   positionY: settings.shaftSizeY + 5,
   positionZ: settings.shaftSizeZ / 2,
