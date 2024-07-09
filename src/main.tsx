@@ -151,6 +151,10 @@ const addPiece = (context: Context) => {
   const { renderer, settings, animator } = context;
   renderer.removeCurrentPiece();
 
+  const keys = Object.keys(shapeDefinitions);
+  const shape = keys[
+    Math.floor(Math.random() * keys.length)
+  ] as keyof typeof shapeDefinitions;
   // Tetris pieces are constructed from cubes aligned next to or on top of each other.
   // In addition to aligning the cubes we need to remove mesh-lines between cubes where
   // cubes touch and form a flat continuous surface. Mesh lines between cubes which form
@@ -161,7 +165,7 @@ const addPiece = (context: Context) => {
   // is not rendered. If an edge is touched by 3 cubes we assume it is a fold and we render
   // it. Edges touched by 4 cubes are skipped however, they are in the middle of a bigger cube.
 
-  const offsets = parseShapeDefinition(shapeDefinitions.shape2.shape);
+  const offsets = parseShapeDefinition(shapeDefinitions[shape].shape);
 
   const position: Vertex = [
     Math.floor(settings.shaftSizeX / 2),
