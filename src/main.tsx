@@ -174,7 +174,7 @@ const addPiece = (context: Context) => {
 
   const position: Vertex = [
     Math.floor(settings.shaftSizeX / 2),
-    settings.shaftSizeY,
+    settings.shaftSizeY - 1,
     Math.floor(settings.shaftSizeZ / 2),
   ];
   const mesh = renderer.renderCurrentPiece(offsets, position);
