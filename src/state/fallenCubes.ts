@@ -1,36 +1,91 @@
-import { Settings, StateUpdateCallbacks, Vertex } from "../types";
+import * as THREE from "three";
+import { Settings, Vertex } from "../types";
+
+const FALLEN_CUBES_ID = "fallen-cubes";
+
+const COLORS = [
+  "darkblue",
+  "green",
+  "lightblue",
+  "red",
+  "pink",
+  "organe",
+  "white",
+  "darkblue",
+];
 
 class FallenCubes {
-  #cubes: Vertex[];
-  #callbacks: StateUpdateCallbacks;
+  #scene: THREE.Scene;
+  #settings?: Settings;
 
-  constructor(callbacks: StateUpdateCallbacks) {
-    this.#cubes = [];
-    this.#callbacks = callbacks;
+  constructor(scene: THREE.Scene) {
+    this.#scene = scene;
+  }
+
+  #getAllLayers() {
+    return this.#scene.getObjectByName(FALLEN_CUBES_ID)!.children;
+  }
+
+  #getLayer(y: number) {
+    const layer = this.#getAllLayers().find((layer) => layer.position.y === y);
+    if (!layer) {
+      throw new Error(`Layer ${y} not found`);
+    }
+    return layer;
+  }
+
+  #addLayer(y: number) {
+    const group = this.#scene.getObjectByName(FALLEN_CUBES_ID)!;
+    const layer = new THREE.Object3D();
+    layer.position.y = y;
+    group.add(layer);
+    console.log("Added layer", y);
+  }
+
+  setup(settings: Settings) {
+    this.#settings = settings;
+    const group = new THREE.Group();
+    group.name = FALLEN_CUBES_ID;
+    this.#scene.add(group);
+    for (let i = 0; i < settings.shaftSizeY; i++) {
+      this.#addLayer(i);
+    }
+  }
+
+  addPiece(cubes: Vertex[]) {
+    for (const [x, y, z] of cubes) {
+      const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+      const cubeMaterial = new THREE.MeshBasicMaterial({ color: COLORS[y] });
+      const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+
+      var edges = new THREE.EdgesGeometry(cubeGeometry);
+      var lineMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
+      var wireframe = new THREE.LineSegments(edges, lineMaterial);
+      cube.add(wireframe);
+
+      cube.position.set(x + 0.5, 0.5, z + 0.5);
+      this.#getLayer(y).add(cube);
+    }
   }
 
   #isLevelFull(settings: Settings, y: number) {
     const { shaftSizeX, shaftSizeZ } = settings;
-
-    for (let x = 0; x < shaftSizeX; x++) {
-      for (let z = 0; z < shaftSizeZ; z++) {
-        if (
-          !this.#cubes.some(([cX, cY, cZ]) => cX === x && cY === y && cZ === z)
-        ) {
-          return false;
-        }
-      }
-    }
-    return true;
+    return this.#getLayer(y)?.children.length === shaftSizeX * shaftSizeZ;
   }
 
   getCubes() {
-    return this.#cubes;
-  }
-
-  addCubes(cubes: Vertex[]) {
-    this.#cubes.push(...cubes);
-    this.#callbacks.fallenCubes(this.#cubes);
+    return this.#getAllLayers()
+      .map((layer) =>
+        layer.children.map(
+          (child) =>
+            [
+              child.position.x - 0.5,
+              child.position.y - 0.5 + layer.position.y,
+              child.position.z - 0.5,
+            ] as Vertex
+        )
+      )
+      .flat();
   }
 
   findFullLevels(settings: Settings) {
@@ -46,15 +101,22 @@ class FallenCubes {
 
   removeLevel(y: number) {
     // Remove cubes of this level
-    const newFallenCubes = this.#cubes.filter(([_, cY, __]) => cY !== y);
+    this.#getLayer(y).removeFromParent();
 
-    this.#cubes = newFallenCubes.map(([cX, cY, cZ]) => {
-      if (cY > y) {
-        // Move all cubes which are above the removed level down
-        return [cX, cY - 1, cZ];
+    // Move all layers which are above the removed layer one level down
+    this.#getAllLayers().map((layer) => {
+      if (layer.position.y > y) {
+        layer.position.y = layer.position.y - 1;
+        layer.children.forEach((child) => {
+          // Recalulate the color of each cube
+          ((child as THREE.Mesh).material as THREE.MeshBasicMaterial).color =
+            new THREE.Color(COLORS[layer.position.y]);
+        });
       }
-      return [cX, cY, cZ];
     });
+
+    // Add a new layer at the top
+    this.#addLayer(this.#settings!.shaftSizeY - 1);
   }
 }
 

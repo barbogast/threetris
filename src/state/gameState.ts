@@ -1,19 +1,18 @@
 import FallenCubes from "./fallenCubes";
-import { Settings, StateUpdateCallbacks, Vertex } from "../types";
+import { Settings, Vertex } from "../types";
 
 export const collidesWithFallenCube = (
   pieceCubes: Vertex[],
-  fallenCubes: FallenCubes
+  fallenCubesObj: FallenCubes
 ) => {
+  const fallenCubes = fallenCubesObj.getCubes();
   return pieceCubes.some((cube) => {
-    return fallenCubes
-      .getCubes()
-      .some(
-        (fallenCube) =>
-          fallenCube[0] === cube[0] &&
-          fallenCube[1] === cube[1] &&
-          fallenCube[2] === cube[2]
-      );
+    return fallenCubes.some(
+      (fallenCube) =>
+        fallenCube[0] === cube[0] &&
+        fallenCube[1] === cube[1] &&
+        fallenCube[2] === cube[2]
+    );
   });
 };
 
@@ -35,21 +34,3 @@ export const willBeOutsideOfShaft = (
 export const collidesWithFloor = (pieceCubes: Vertex[]) => {
   return pieceCubes.some((cube) => cube[1] < 0);
 };
-
-class GameState {
-  #state: {
-    fallenCubes: FallenCubes;
-  };
-
-  constructor(callbacks: StateUpdateCallbacks) {
-    this.#state = {
-      fallenCubes: new FallenCubes(callbacks),
-    };
-  }
-
-  getFallenCubes() {
-    return this.#state.fallenCubes;
-  }
-}
-
-export default GameState;

@@ -18,17 +18,18 @@ type CurrentPiece = THREE.LineSegments<
 
 const SHAFT_LINES_ID = "shaft-lines";
 const CURRENT_PIECE_ID = "current-piece";
-const FALLEN_CUBES_ID = "fallen-cubes";
 
 class GameRenderer {
   #scene: THREE.Scene;
   #callbacks?: StateUpdateCallbacks;
   #renderer: THREE.WebGLRenderer;
   #camera?: THREE.PerspectiveCamera;
+  fallenCubes: FallenCubes;
 
   constructor() {
     this.#scene = new THREE.Scene();
     this.#renderer = new THREE.WebGLRenderer();
+    this.fallenCubes = new FallenCubes(this.#scene);
   }
 
   setup(settings: Settings, callbacks: StateUpdateCallbacks) {
@@ -39,10 +40,6 @@ class GameRenderer {
     const group1 = new THREE.Group();
     group1.name = SHAFT_LINES_ID;
     this.#scene.add(group1);
-
-    const group2 = new THREE.Group();
-    group2.name = FALLEN_CUBES_ID;
-    this.#scene.add(group2);
 
     this.#camera = new THREE.PerspectiveCamera(settings.fov, settings.aspect);
     this.#camera.zoom = settings.zoom;
@@ -79,6 +76,8 @@ class GameRenderer {
         settings.shaftSizeZ / 2
       );
     }
+
+    this.fallenCubes.setup(settings);
   }
 
   renderScene() {
@@ -182,7 +181,7 @@ class GameRenderer {
     const piece = this.getCurrentPieceMaybe();
     if (piece) {
       if (piece.geometry) piece.geometry.dispose();
-      this.#scene.remove(piece);
+      piece.removeFromParent();
     }
   }
 
@@ -190,51 +189,20 @@ class GameRenderer {
     const piece = this.getCurrentPiece();
     piece.position.set(...position);
   }
-
-  renderFallenCubes(fallenCubes: FallenCubes) {
-    const COLORS = [
-      "darkblue",
-      "green",
-      "lightblue",
-      "red",
-      "pink",
-      "organe",
-      "white",
-      "darkblue",
-    ];
-
-    for (const [x, y, z] of fallenCubes.getCubes()) {
-      const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-      const cubeMaterial = new THREE.MeshBasicMaterial({ color: COLORS[y] });
-      const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-
-      var edges = new THREE.EdgesGeometry(cubeGeometry);
-      var lineMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
-      var wireframe = new THREE.LineSegments(edges, lineMaterial);
-      cube.add(wireframe);
-
-      cube.position.set(x + 0.5, y + 0.5, z + 0.5);
-      this.#scene.getObjectByName(FALLEN_CUBES_ID)!.add(cube);
-    }
-  }
-
-  removeFallenCubes() {
-    const fallenCubes = this.#scene.getObjectByName(FALLEN_CUBES_ID);
-    if (fallenCubes) fallenCubes.clear();
-  }
 }
 
 export default GameRenderer;
 
 export const getCurrentCubes = (obj: THREE.Object3D) => {
   return obj.children.map((child) => {
-    const v = child.getWorldPosition(new THREE.Vector3()).toArray();
+    const v = new THREE.Vector3();
+    child.getWorldPosition(v).toArray();
 
     // Move the point back to the edge of the cube so that we are aligned with the grid
     const fixedPoint = [
-      Math.round(v[0] - 0.5),
-      Math.round(v[1] - 0.5),
-      Math.round(v[2] - 0.5),
+      Math.round(v.x - 0.5),
+      Math.round(v.y - 0.5),
+      Math.round(v.z - 0.5),
     ] as Vertex;
 
     return fixedPoint;

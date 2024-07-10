@@ -1,7 +1,6 @@
 import GameAnimator from "./rendering/gameAnimator";
 import GameRenderer from "./rendering/gameRenderer";
 import Scheduler from "./scheduler";
-import GameState from "./state/gameState";
 
 export type BlockSet = "flat" | "basic" | "extended";
 
@@ -48,7 +47,6 @@ export type StateUpdateCallbacks = {
 };
 
 export type Context = {
-  state: GameState;
   callbacks: StateUpdateCallbacks;
   renderer: GameRenderer;
   animator: GameAnimator;
