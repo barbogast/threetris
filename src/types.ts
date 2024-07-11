@@ -1,3 +1,4 @@
+import FallenCubes from "./rendering/fallenCubes";
 import GameAnimator from "./rendering/gameAnimator";
 import GameRenderer from "./rendering/gameRenderer";
 import Scheduler from "./scheduler";
@@ -49,6 +50,7 @@ export type StateUpdateCallbacks = {
 export type Context = {
   callbacks: StateUpdateCallbacks;
   renderer: GameRenderer;
+  fallenCubes: FallenCubes;
   animator: GameAnimator;
   settings: Settings;
   schedulers: {

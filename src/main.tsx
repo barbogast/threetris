@@ -29,11 +29,13 @@ import { getRandomShape } from "./shapeDefinitions";
 import { SETTINGS_WIDTH } from "./config";
 import GameAnimator from "./rendering/gameAnimator";
 import Scheduler from "./scheduler";
+import FallenCubes from "./rendering/fallenCubes";
 
 const setup = (context: Context) => {
-  const { renderer, settings, callbacks } = context;
+  const { renderer, fallenCubes, settings, callbacks } = context;
 
   renderer.setup(settings, callbacks);
+  fallenCubes.setup(settings);
 
   renderContainer(renderer, settings);
   renderFloorGrid(renderer, settings);
@@ -43,7 +45,7 @@ const setup = (context: Context) => {
 
 const onKeyPress = (context: Context, key: string) => {
   console.log(`keyPress "${key}"`);
-  const { animator, settings, schedulers, renderer } = context;
+  const { animator, settings, schedulers, renderer, fallenCubes } = context;
   const currentPiece = renderer.getCurrentPiece();
 
   if (key === " ") {
@@ -51,9 +53,7 @@ const onKeyPress = (context: Context, key: string) => {
 
     while (
       !willBeOutsideOfShaft(getCurrentCubes(newPiece), settings) &&
-      !renderer.fallenCubes.pieceCollidesWithFallenCube(
-        getCurrentCubes(newPiece)
-      )
+      !fallenCubes.pieceCollidesWithFallenCube(getCurrentCubes(newPiece))
     ) {
       newPiece.position.y -= 1;
     }
@@ -131,9 +131,7 @@ const onKeyPress = (context: Context, key: string) => {
 
   // Check of collision with fallen cubes and shaft walls
   if (
-    !renderer.fallenCubes.pieceCollidesWithFallenCube(
-      getCurrentCubes(updatedPiece)
-    ) &&
+    !fallenCubes.pieceCollidesWithFallenCube(getCurrentCubes(updatedPiece)) &&
     !willBeOutsideOfShaft(getCurrentCubes(updatedPiece), settings) &&
     animationTrack
   ) {
@@ -161,13 +159,13 @@ const addPiece = (context: Context) => {
 };
 
 const letCurrentPieceFallDown = (context: Context) => {
-  const { animator, renderer, settings } = context;
+  const { animator, renderer, settings, fallenCubes } = context;
 
   const newPiece = renderer.getCurrentPiece().clone();
   newPiece.position.y -= 1;
   const currentCubes = getCurrentCubes(newPiece);
   if (
-    renderer.fallenCubes.pieceCollidesWithFallenCube(currentCubes) ||
+    fallenCubes.pieceCollidesWithFallenCube(currentCubes) ||
     willBeOutsideOfShaft(currentCubes, settings)
   ) {
     handlePieceReachedFloor(
@@ -180,16 +178,16 @@ const letCurrentPieceFallDown = (context: Context) => {
 };
 
 const handlePieceReachedFloor = (context: Context, currentCubes: Vertex[]) => {
-  const { renderer: gameRenderer, callbacks } = context;
+  const { fallenCubes, callbacks } = context;
 
-  gameRenderer.fallenCubes.addPiece(currentCubes);
+  fallenCubes.addPiece(currentCubes);
 
   renderer.removeCurrentPiece();
   addPiece(context);
 
-  const fullLevels = renderer.fallenCubes.findFullLevels();
+  const fullLevels = fallenCubes.findFullLevels();
   for (const level of fullLevels) {
-    renderer.fallenCubes.removeLevel(level);
+    fallenCubes.removeLevel(level);
     callbacks.removeRow();
   }
 };
@@ -202,6 +200,7 @@ const main = (
   callbacks: StateUpdateCallbacks
 ): GameController => {
   const animator = new GameAnimator(settings.animationDuration);
+  const fallenCubes = new FallenCubes(renderer.getScene());
 
   const fallingScheduler = new Scheduler(settings.fallingSpeed, () =>
     letCurrentPieceFallDown(context)
@@ -212,6 +211,7 @@ const main = (
   const context: Context = {
     callbacks,
     renderer,
+    fallenCubes,
     animator,
     settings,
     schedulers: {

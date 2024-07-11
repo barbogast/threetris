@@ -8,7 +8,6 @@ import { Axis, Direction, Edge, Settings, Vertex } from "../types";
 import { StateUpdateCallbacks } from "../types";
 import { filterEdges, getCubeGeometry } from "../shape";
 import { SETTINGS_WIDTH } from "../config";
-import FallenCubes from "./fallenCubes";
 
 type CurrentPiece = THREE.LineSegments<
   THREE.BufferGeometry<THREE.NormalBufferAttributes>,
@@ -24,13 +23,15 @@ class GameRenderer {
   #callbacks?: StateUpdateCallbacks;
   #renderer: THREE.WebGLRenderer;
   #camera?: THREE.PerspectiveCamera;
-  fallenCubes: FallenCubes;
   #settings?: Settings;
 
   constructor() {
     this.#scene = new THREE.Scene();
     this.#renderer = new THREE.WebGLRenderer();
-    this.fallenCubes = new FallenCubes(this.#scene);
+  }
+
+  getScene() {
+    return this.#scene;
   }
 
   setup(settings: Settings, callbacks: StateUpdateCallbacks) {
@@ -78,8 +79,6 @@ class GameRenderer {
         settings.shaftSizeZ / 2
       );
     }
-
-    this.fallenCubes.setup(settings);
   }
 
   renderScene() {
