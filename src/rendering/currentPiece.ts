@@ -3,7 +3,14 @@ import * as THREE from "three";
 // import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
 // import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 
-import { Axis, Direction, Edge, Settings, VectorArray } from "../types";
+import {
+  Axis,
+  Context,
+  Direction,
+  Edge,
+  Settings,
+  VectorArray,
+} from "../types";
 import { filterEdges, getCubeGeometry } from "../shape";
 
 const CURRENT_PIECE_ID = "current-piece";
@@ -12,68 +19,60 @@ const currentPieceMatieral = new THREE.LineBasicMaterial({ color: 0x00ff00 });
 const shadowGeometry = new THREE.SphereGeometry(0.1);
 const shadowMaterial = new THREE.MeshBasicMaterial({ visible: false });
 
-class CurrentPiece {
-  #scene: THREE.Scene;
-  #settings: Settings;
-  constructor(settings: Settings, scene: THREE.Scene) {
-    this.#settings = settings;
-    this.#scene = scene;
+export const renderCurrentPiece = (
+  { scene, settings }: Context,
+  offsets: THREE.Vector3[]
+) => {
+  const vectors: VectorArray[] = [];
+  const allEdges: Edge[] = [];
+  for (const offset of offsets) {
+    getCubeGeometry(vectors, allEdges, 1, offset.x, offset.y, offset.z);
   }
 
-  renderCurrentPiece(offsets: THREE.Vector3[]) {
-    const vectors: VectorArray[] = [];
-    const allEdges: Edge[] = [];
-    for (const offset of offsets) {
-      getCubeGeometry(vectors, allEdges, 1, offset.x, offset.y, offset.z);
-    }
+  const filteredEdges = filterEdges(vectors, allEdges);
 
-    const filteredEdges = filterEdges(vectors, allEdges);
+  const geometry = new THREE.BufferGeometry();
 
-    const geometry = new THREE.BufferGeometry();
+  // Add the vertices and edges to the geometry
+  geometry.setAttribute(
+    "position",
+    new THREE.BufferAttribute(new Float32Array(vectors.flat()), 3)
+  );
+  geometry.setIndex(filteredEdges.flat());
 
-    // Add the vertices and edges to the geometry
-    geometry.setAttribute(
-      "position",
-      new THREE.BufferAttribute(new Float32Array(vectors.flat()), 3)
-    );
-    geometry.setIndex(filteredEdges.flat());
+  const lines = new THREE.LineSegments(geometry, currentPieceMatieral);
 
-    const lines = new THREE.LineSegments(geometry, currentPieceMatieral);
+  const { shaftSizeX, shaftSizeY, shaftSizeZ } = settings!;
+  lines.position.set(
+    Math.floor(shaftSizeX / 2),
+    // Move the piece to the top of the shaft but push it down if it is too high
+    shaftSizeY - 1 - Math.max(...offsets.map((o) => o.y)),
+    Math.floor(shaftSizeZ / 2)
+  );
 
-    const { shaftSizeX, shaftSizeY, shaftSizeZ } = this.#settings!;
-    lines.position.set(
-      Math.floor(shaftSizeX / 2),
-      // Move the piece to the top of the shaft but push it down if it is too high
-      shaftSizeY - 1 - Math.max(...offsets.map((o) => o.y)),
-      Math.floor(shaftSizeZ / 2)
-    );
+  lines.name = CURRENT_PIECE_ID;
+  lines.renderOrder = 1;
 
-    lines.name = CURRENT_PIECE_ID;
-    lines.renderOrder = 1;
+  // Add invisible objects and attach them as children to the mesh.
+  // This allows us to determine the position of the individual cubes after rotation.
+  for (const offset of offsets) {
+    const point = new THREE.Mesh(shadowGeometry, shadowMaterial);
+    point.name = `shadow-cube|${offset.x}/${offset.y}/${offset.z}`;
 
-    // Add invisible objects and attach them as children to the mesh.
-    // This allows us to determine the position of the individual cubes after rotation.
-    for (const offset of offsets) {
-      const point = new THREE.Mesh(shadowGeometry, shadowMaterial);
-      point.name = `shadow-cube|${offset.x}/${offset.y}/${offset.z}`;
-
-      // Move the point to the center of the cube, so that it stays in place when the cube is rotated
-      point.position.copy(offset.clone().addScalar(0.5));
-      lines.add(point);
-    }
-
-    this.#scene.add(lines);
-    return lines;
+    // Move the point to the center of the cube, so that it stays in place when the cube is rotated
+    point.position.copy(offset.clone().addScalar(0.5));
+    lines.add(point);
   }
 
-  getThreeObject() {
-    const currentPiece = this.#scene.getObjectByName(CURRENT_PIECE_ID);
-    if (!currentPiece) throw new Error("No current piece");
-    return currentPiece as THREE.Mesh;
-  }
-}
+  scene.add(lines);
+  return lines;
+};
 
-export default CurrentPiece;
+export const getThreeObject = ({ scene }: Context) => {
+  const currentPiece = scene.getObjectByName(CURRENT_PIECE_ID);
+  if (!currentPiece) throw new Error("No current piece");
+  return currentPiece as THREE.Mesh;
+};
 
 export const getCurrentCubes = (obj: THREE.Object3D) => {
   return obj.children.map((child) => {

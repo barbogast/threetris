@@ -20,8 +20,9 @@ import { SETTINGS_WIDTH } from "./config";
 import GameAnimator from "./rendering/gameAnimator";
 import Scheduler from "./scheduler";
 import FallenCubes from "./rendering/fallenCubes";
+import * as currentPiece from "./rendering/currentPiece";
 import { disposeObject } from "./utils";
-import CurrentPiece, {
+import {
   getCurrentCubes,
   rotate,
   willBeOutsideOfShaft,
@@ -49,8 +50,8 @@ const setup = (context: Context) => {
 
 const onKeyPress = (context: Context, key: string) => {
   console.log(`keyPress "${key}"`);
-  const { animator, settings, schedulers, fallenCubes, currentPiece } = context;
-  const currentObject = currentPiece.getThreeObject();
+  const { animator, settings, schedulers, fallenCubes } = context;
+  const currentObject = currentPiece.getThreeObject(context);
 
   if (key === " ") {
     let newPiece = currentObject.clone();
@@ -146,7 +147,7 @@ const onKeyPress = (context: Context, key: string) => {
 };
 
 const addPiece = (context: Context) => {
-  const { settings, animator, currentPiece } = context;
+  const { settings, animator } = context;
 
   // Tetris pieces are constructed from cubes aligned next to or on top of each other.
   // In addition to aligning the cubes we need to remove mesh-lines between cubes where
@@ -160,14 +161,14 @@ const addPiece = (context: Context) => {
 
   const shape = getRandomShape(settings.blockSet);
   const offsets = parseShapeDefinition(shape);
-  const mesh = currentPiece.renderCurrentPiece(offsets);
+  const mesh = currentPiece.renderCurrentPiece(context, offsets);
   animator.setTarget(mesh);
 };
 
 const letCurrentPieceFallDown = (context: Context) => {
-  const { animator, settings, fallenCubes, currentPiece } = context;
+  const { animator, settings, fallenCubes } = context;
 
-  const newPiece = currentPiece.getThreeObject().clone();
+  const newPiece = currentPiece.getThreeObject(context).clone();
   newPiece.position.y -= 1;
   const currentCubes = getCurrentCubes(newPiece);
   if (
@@ -176,7 +177,7 @@ const letCurrentPieceFallDown = (context: Context) => {
   ) {
     handlePieceReachedFloor(
       context,
-      getCurrentCubes(currentPiece.getThreeObject())
+      getCurrentCubes(currentPiece.getThreeObject(context))
     );
   } else {
     animator.playAnimation(animator.getMoveTrack([0, -1, 0]));
@@ -187,11 +188,11 @@ const handlePieceReachedFloor = (
   context: Context,
   currentCubes: THREE.Vector3[]
 ) => {
-  const { fallenCubes, callbacks, currentPiece } = context;
+  const { fallenCubes, callbacks } = context;
 
   fallenCubes.addPiece(currentCubes);
 
-  disposeObject(currentPiece.getThreeObject());
+  disposeObject(currentPiece.getThreeObject(context));
   addPiece(context);
 
   const fullLevels = fallenCubes.findFullLevels();
@@ -210,7 +211,6 @@ const main = (
 ): GameController => {
   const animator = new GameAnimator(settings.animationDuration);
   const fallenCubes = new FallenCubes(renderer.getScene());
-  const currentPiece = new CurrentPiece(settings, renderer.getScene());
   const camera = new Camera(settings);
 
   const fallingScheduler = new Scheduler(settings.fallingSpeed, () =>
@@ -220,13 +220,13 @@ const main = (
   if (settings.paused) fallingScheduler.stop();
 
   const context: Context = {
+    scene: renderer.getScene(),
     callbacks,
     renderer,
     camera,
     fallenCubes,
     animator,
     settings,
-    currentPiece,
     schedulers: {
       falling: fallingScheduler,
     },
