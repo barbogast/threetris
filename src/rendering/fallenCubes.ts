@@ -18,6 +18,9 @@ const MATERIALS = COLORS.map((color) => new THREE.MeshBasicMaterial({ color }));
 
 const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
 
+const cubeWireGeometry = new THREE.EdgesGeometry(cubeGeometry);
+const cubeWireMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
+
 class FallenCubes {
   #scene: THREE.Scene;
   #settings?: Settings;
@@ -61,8 +64,11 @@ class FallenCubes {
       const cubeMaterial = new THREE.MeshBasicMaterial({ color: COLORS[y] });
       const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 
-      var edges = new THREE.EdgesGeometry(cubeGeometry);
-      var wireframe = new THREE.LineSegments(edges, MATERIALS[y]);
+      const wireframe = new THREE.LineSegments(
+        cubeWireGeometry,
+        cubeWireMaterial
+      );
+      wireframe.name = `fallen-cube-wire|${x}/${y}/${z}`;
       cube.add(wireframe);
 
       cube.position.set(x + 0.5, 0.5, z + 0.5);
