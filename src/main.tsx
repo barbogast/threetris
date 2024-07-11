@@ -25,7 +25,7 @@ import GameRenderer, {
   rotate,
   willBeOutsideOfShaft,
 } from "./rendering/gameRenderer";
-import shapeDefinitions from "./shapeDefinitions";
+import { getRandomShape } from "./shapeDefinitions";
 import { SETTINGS_WIDTH } from "./config";
 import GameAnimator from "./rendering/gameAnimator";
 import Scheduler from "./scheduler";
@@ -144,15 +144,6 @@ const onKeyPress = (context: Context, key: string) => {
 const addPiece = (context: Context) => {
   const { renderer, settings, animator } = context;
 
-  const shapeNames = Object.keys(
-    shapeDefinitions
-  ) as (keyof typeof shapeDefinitions)[];
-
-  const shapesOfSet = shapeNames.filter(
-    (shapeName) => shapeDefinitions[shapeName].sets[settings.blockSet]
-  );
-
-  const shape = shapesOfSet[Math.floor(Math.random() * shapesOfSet.length)];
   // Tetris pieces are constructed from cubes aligned next to or on top of each other.
   // In addition to aligning the cubes we need to remove mesh-lines between cubes where
   // cubes touch and form a flat continuous surface. Mesh lines between cubes which form
@@ -163,8 +154,8 @@ const addPiece = (context: Context) => {
   // is not rendered. If an edge is touched by 3 cubes we assume it is a fold and we render
   // it. Edges touched by 4 cubes are skipped however, they are in the middle of a bigger cube.
 
-  const offsets = parseShapeDefinition(shapeDefinitions[shape].shape);
-
+  const shape = getRandomShape(settings.blockSet);
+  const offsets = parseShapeDefinition(shape);
   const mesh = renderer.renderCurrentPiece(offsets);
   animator.setTarget(mesh);
 };

@@ -1,3 +1,5 @@
+import { BlockSet } from "./types";
+
 type ShapeDefinition = Record<
   string,
   {
@@ -476,4 +478,15 @@ const shapeDefinitions: ShapeDefinition = {
   },
 };
 
-export default shapeDefinitions;
+const shapeNames = Object.keys(
+  shapeDefinitions
+) as (keyof typeof shapeDefinitions)[];
+
+export const getRandomShape = (blockSet: BlockSet) => {
+  const shapesOfSet = shapeNames.filter(
+    (shapeName) => shapeDefinitions[shapeName].sets[blockSet]
+  );
+
+  const shape = shapesOfSet[Math.floor(Math.random() * shapesOfSet.length)];
+  return shapeDefinitions[shape].shape;
+};
