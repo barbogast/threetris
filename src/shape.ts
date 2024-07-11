@@ -3,7 +3,7 @@
 //    2. filtering out the edges that are shared by 2 cubes
 
 import * as THREE from "three";
-import { Edge, Vertex } from "./types";
+import { Edge, VectorArray } from "./types";
 
 export const parseShapeDefinition = (shapes: string[]) => {
   const pieceOffsets: THREE.Vector3[] = [];
@@ -47,7 +47,7 @@ export const parseShapeDefinition = (shapes: string[]) => {
 // the first cube, the second edge the vertex of the second cube, and so on.
 
 export const getCubeGeometry = (
-  vertices: Vertex[],
+  vertices: VectorArray[],
   edges: Edge[],
   size: number,
   offsetX: number,
@@ -58,7 +58,7 @@ export const getCubeGeometry = (
 
   // Define the vertices of the cube
   // prettier-ignore
-  const newVertices: Vertex[] = [
+  const newVectors: VectorArray[] = [
     [0, 0, 0 ], // 0
     [s, 0, 0 ], // 1
     [s, s, 0 ], // 2
@@ -70,10 +70,10 @@ export const getCubeGeometry = (
   ];
 
   // Apply offsets
-  for (const vertex of newVertices) {
-    vertex[0] += offsetX * size;
-    vertex[1] += offsetY * size;
-    vertex[2] += offsetZ * size;
+  for (const vector of newVectors) {
+    vector[0] += offsetX * size;
+    vector[1] += offsetY * size;
+    vector[2] += offsetZ * size;
   }
 
   // Define the edges for the 12 triangles that make up the cube
@@ -86,11 +86,11 @@ export const getCubeGeometry = (
   ]
 
   edges.push(...newEdges);
-  vertices.push(...newVertices);
+  vertices.push(...newVectors);
 };
 
-const getKeyForVertex = (vertex: Vertex) =>
-  `${vertex[0]} | ${vertex[1]} | ${vertex[2]}`;
+const getKeyForVector = (vector: VectorArray) =>
+  `${vector[0]} | ${vector[1]} | ${vector[2]}`;
 
 const getKeyForEdge = (s: [number, number]) => `${s[0]}|${s[1]}`;
 
@@ -99,15 +99,15 @@ type TouchedCubeCount = Record<
   { count: number; edges: [number, number][] }
 >;
 
-export const filterEdges = (vertices: Vertex[], edges: Edge[]) => {
+export const filterEdges = (vertices: VectorArray[], edges: Edge[]) => {
   // To detect duplicate edges we need to derive the actual coordinates of both vertices for each edge. We use
   // these stringified coordinates to group and count the edges.
   const touchedCubeCount: TouchedCubeCount = {};
   for (const edge of edges) {
     // Sorting is necessary to make sure we get a stable key, independent of the order in which the vertices are indexed
     const coordinatesSorted = [
-      getKeyForVertex(vertices[edge[0]]),
-      getKeyForVertex(vertices[edge[1]]),
+      getKeyForVector(vertices[edge[0]]),
+      getKeyForVector(vertices[edge[1]]),
     ].sort();
 
     const coordinatesStr = `${coordinatesSorted[0]} || ${coordinatesSorted[1]}`;

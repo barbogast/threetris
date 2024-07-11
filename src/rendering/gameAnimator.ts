@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Vertex } from "../types";
+import { VectorArray } from "../types";
 import { getAxisAndAngelFromQuaternion } from "../utils";
 
 const roundTo90Degrees = (q: THREE.Quaternion) => {
@@ -40,7 +40,7 @@ class GameAnimator {
     this.#eventFinishedCallback = callback;
   }
 
-  getMoveTrack(offset: Vertex) {
+  getMoveTrack(offset: VectorArray) {
     return new THREE.VectorKeyframeTrack(
       ".position",
       [0, this.duration], // time

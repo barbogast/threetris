@@ -4,7 +4,7 @@ import * as THREE from "three";
 // import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { Axis, Direction, Edge, Settings, Vertex } from "../types";
+import { Axis, Direction, Edge, Settings, VectorArray } from "../types";
 import { StateUpdateCallbacks } from "../types";
 import { filterEdges, getCubeGeometry } from "../shape";
 import { SETTINGS_WIDTH } from "../config";
@@ -111,7 +111,7 @@ class GameRenderer {
     this.#scene.add(cube);
   }
 
-  renderShaftLines(name: string, vertices: Vertex[]) {
+  renderShaftLines(name: string, vertices: VectorArray[]) {
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute(
       "position",
@@ -126,20 +126,20 @@ class GameRenderer {
   }
 
   renderCurrentPiece(offsets: THREE.Vector3[]) {
-    const vertices: Vertex[] = [];
+    const vectors: VectorArray[] = [];
     const allEdges: Edge[] = [];
     for (const offset of offsets) {
-      getCubeGeometry(vertices, allEdges, 1, offset.x, offset.y, offset.z);
+      getCubeGeometry(vectors, allEdges, 1, offset.x, offset.y, offset.z);
     }
 
-    const filteredEdges = filterEdges(vertices, allEdges);
+    const filteredEdges = filterEdges(vectors, allEdges);
 
     const geometry = new THREE.BufferGeometry();
 
     // Add the vertices and edges to the geometry
     geometry.setAttribute(
       "position",
-      new THREE.BufferAttribute(new Float32Array(vertices.flat()), 3)
+      new THREE.BufferAttribute(new Float32Array(vectors.flat()), 3)
     );
     geometry.setIndex(filteredEdges.flat());
 
