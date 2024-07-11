@@ -98,7 +98,7 @@ class FallenCubes {
 
   removeLevel(y: number) {
     // Remove cubes of this level
-    this.#getLayer(y).removeFromParent();
+    disposeObject(this.#getLayer(y));
 
     // Move all layers which are above the removed layer one level down
     this.#getAllLayers().map((layer) => {

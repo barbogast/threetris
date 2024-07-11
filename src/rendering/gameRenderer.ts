@@ -172,12 +172,6 @@ class GameRenderer {
     if (!currentPiece) throw new Error("No current piece");
     return currentPiece as THREE.Mesh;
   }
-
-  removeCurrentPiece() {
-    const piece = this.getCurrentPiece();
-    if (piece.geometry) piece.geometry.dispose();
-    piece.removeFromParent();
-  }
 }
 
 export default GameRenderer;

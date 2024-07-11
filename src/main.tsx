@@ -29,6 +29,7 @@ import { SETTINGS_WIDTH } from "./config";
 import GameAnimator from "./rendering/gameAnimator";
 import Scheduler from "./scheduler";
 import FallenCubes from "./rendering/fallenCubes";
+import { disposeObject } from "./utils";
 
 const setup = (context: Context) => {
   const { renderer, fallenCubes, settings, callbacks } = context;
@@ -78,6 +79,7 @@ const onKeyPress = (context: Context, key: string) => {
       animator.onEventFinished(() => {
         handlePieceReachedFloor(context, getCurrentCubes(newPiece));
         !settings.paused && schedulers.falling.start();
+        disposeObject(newPiece);
       });
     }
     return;
@@ -136,6 +138,7 @@ const onKeyPress = (context: Context, key: string) => {
   ) {
     animator.playAnimation(animationTrack);
   }
+  disposeObject(updatedPiece);
 };
 
 const addPiece = (context: Context) => {
@@ -184,7 +187,7 @@ const handlePieceReachedFloor = (
 
   fallenCubes.addPiece(currentCubes);
 
-  renderer.removeCurrentPiece();
+  disposeObject(renderer.getCurrentPiece());
   addPiece(context);
 
   const fullLevels = fallenCubes.findFullLevels();
