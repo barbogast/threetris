@@ -4,6 +4,7 @@ import GameAnimator from "./rendering/gameAnimator";
 import GameRenderer from "./rendering/gameRenderer";
 import Scheduler from "./scheduler";
 import CurrentPiece from "./rendering/currentPiece";
+import Camera from "./rendering/camera";
 
 export type BlockSet = "flat" | "basic" | "extended";
 
@@ -54,6 +55,7 @@ export type Context = {
   renderer: GameRenderer;
   fallenCubes: FallenCubes;
   animator: GameAnimator;
+  camera: Camera;
   settings: Settings;
   schedulers: {
     falling: Scheduler;

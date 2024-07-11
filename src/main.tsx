@@ -26,12 +26,18 @@ import CurrentPiece, {
   rotate,
   willBeOutsideOfShaft,
 } from "./rendering/currentPiece";
+import Camera from "./rendering/camera";
 
 const setup = (context: Context) => {
-  const { renderer, fallenCubes, settings, callbacks } = context;
+  const { renderer, fallenCubes, settings, callbacks, camera } = context;
   const shaft = new Shaft(settings, renderer.getScene());
 
-  renderer.setup(settings, callbacks);
+  camera.setup();
+  renderer.setup(callbacks);
+
+  if (settings.enableOrbitalControl)
+    camera.enableOrbitalControl(renderer.getDomElement());
+
   fallenCubes.setup(settings);
   shaft.setup();
 
@@ -205,6 +211,7 @@ const main = (
   const animator = new GameAnimator(settings.animationDuration);
   const fallenCubes = new FallenCubes(renderer.getScene());
   const currentPiece = new CurrentPiece(settings, renderer.getScene());
+  const camera = new Camera(settings);
 
   const fallingScheduler = new Scheduler(settings.fallingSpeed, () =>
     letCurrentPieceFallDown(context)
@@ -215,6 +222,7 @@ const main = (
   const context: Context = {
     callbacks,
     renderer,
+    camera,
     fallenCubes,
     animator,
     settings,
@@ -239,7 +247,7 @@ const main = (
   const mainLoop = () => {
     fallingScheduler.tick();
     animator.update();
-    renderer.renderScene();
+    renderer.renderScene(camera.getCamera());
     if (!stop) requestAnimationFrame(mainLoop);
   };
 
@@ -261,9 +269,9 @@ const main = (
       fallingScheduler.updateInterval(settings.fallingSpeed);
     },
     updateCamera: {
-      fov: (...args) => renderer.updateCameraFov(...args),
-      position: (...args) => renderer.updateCameraPosition(...args),
-      lookAt: (...args) => renderer.updateCameraLookAt(...args),
+      fov: (...args) => camera.updateFov(...args),
+      position: (...args) => camera.updatePosition(...args),
+      lookAt: (...args) => camera.updateLookAt(...args),
     },
   };
 };
