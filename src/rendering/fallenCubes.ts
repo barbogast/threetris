@@ -37,6 +37,7 @@ class FallenCubes {
   #addLayer(y: number) {
     const group = this.#scene.getObjectByName(FALLEN_CUBES_ID)!;
     const layer = new THREE.Object3D();
+    layer.name = `layer|${y}`;
     layer.position.y = y;
     group.add(layer);
   }
@@ -63,6 +64,7 @@ class FallenCubes {
       cube.add(wireframe);
 
       cube.position.set(x + 0.5, 0.5, z + 0.5);
+      cube.name = `fallen-cube|${x}/${y}/${z}`;
       this.#getLayer(y).add(cube);
     }
   }

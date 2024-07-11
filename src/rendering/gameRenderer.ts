@@ -157,6 +157,7 @@ class GameRenderer {
       const pointGeometry = new THREE.SphereGeometry(0.1);
       const pointMaterial = new THREE.MeshBasicMaterial({ visible: false });
       const point = new THREE.Mesh(pointGeometry, pointMaterial);
+      point.name = `shadow-cube|${offset.x}/${offset.y}/${offset.z}`;
 
       // Move the point to the center of the cube, so that it stays in place when the cube is rotated
       point.position.copy(offset.clone().addScalar(0.5));
