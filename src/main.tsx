@@ -20,10 +20,10 @@ import {
   renderWallGridShortLines,
 } from "./rendering/shaft";
 
-import { willBeOutsideOfShaft } from "./state/gameState";
 import GameRenderer, {
   getCurrentCubes,
   rotate,
+  willBeOutsideOfShaft,
 } from "./rendering/gameRenderer";
 import shapeDefinitions from "./shapeDefinitions";
 import { SETTINGS_WIDTH } from "./config";
