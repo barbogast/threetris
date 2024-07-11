@@ -143,7 +143,6 @@ const onKeyPress = (context: Context, key: string) => {
 
 const addPiece = (context: Context) => {
   const { renderer, settings, animator } = context;
-  renderer.removeCurrentPiece();
 
   const shapeNames = Object.keys(
     shapeDefinitions
@@ -194,6 +193,7 @@ const handlePieceReachedFloor = (context: Context, currentCubes: Vertex[]) => {
 
   gameRenderer.fallenCubes.addPiece(currentCubes);
 
+  renderer.removeCurrentPiece();
   addPiece(context);
 
   const fullLevels = renderer.fallenCubes.findFullLevels();

@@ -180,18 +180,10 @@ class GameRenderer {
     return currentPiece as CurrentPiece;
   }
 
-  getCurrentPieceMaybe() {
-    return this.#scene.getObjectByName(CURRENT_PIECE_ID) as
-      | CurrentPiece
-      | undefined;
-  }
-
   removeCurrentPiece() {
-    const piece = this.getCurrentPieceMaybe();
-    if (piece) {
-      if (piece.geometry) piece.geometry.dispose();
-      piece.removeFromParent();
-    }
+    const piece = this.getCurrentPiece();
+    if (piece.geometry) piece.geometry.dispose();
+    piece.removeFromParent();
   }
 
   setCurrentPiecePosition(position: Vertex) {
