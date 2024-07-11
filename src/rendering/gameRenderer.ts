@@ -185,11 +185,6 @@ class GameRenderer {
     if (piece.geometry) piece.geometry.dispose();
     piece.removeFromParent();
   }
-
-  setCurrentPiecePosition(position: Vertex) {
-    const piece = this.getCurrentPiece();
-    piece.position.set(...position);
-  }
 }
 
 export default GameRenderer;
