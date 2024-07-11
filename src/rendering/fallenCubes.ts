@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Settings, Vertex } from "../types";
+import { Settings } from "../types";
 
 const FALLEN_CUBES_ID = "fallen-cubes";
 
@@ -68,21 +68,19 @@ class FallenCubes {
   }
 
   #getCubesOfLayer(y: number) {
-    return this.#getLayer(y).children.map(
-      (child) =>
-        [
-          child.position.x - 0.5,
-          child.position.y - 0.5 + y,
-          child.position.z - 0.5,
-        ] as Vertex
-    );
+    return this.#getLayer(y).children.map((child) => {
+      const position = child.position.clone();
+      position.subScalar(0.5);
+      position.y += y;
+      return position;
+    });
   }
 
   pieceCollidesWithFallenCube = (pieceCubes: THREE.Vector3[]) => {
     return pieceCubes.some((pieceCube) => {
       return this.#getCubesOfLayer(pieceCube.y).some(
         (fallenCube) =>
-          fallenCube[0] === pieceCube.x && fallenCube[2] === pieceCube.z
+          fallenCube.x === pieceCube.x && fallenCube.z === pieceCube.z
       );
     });
   };
