@@ -9,12 +9,6 @@ import { StateUpdateCallbacks } from "../types";
 import { filterEdges, getCubeGeometry } from "../shape";
 import { SETTINGS_WIDTH } from "../config";
 
-type CurrentPiece = THREE.LineSegments<
-  THREE.BufferGeometry<THREE.NormalBufferAttributes>,
-  THREE.LineBasicMaterial,
-  THREE.Object3DEventMap
->;
-
 const SHAFT_LINES_ID = "shaft-lines";
 const CURRENT_PIECE_ID = "current-piece";
 
@@ -176,7 +170,7 @@ class GameRenderer {
   getCurrentPiece() {
     const currentPiece = this.#scene.getObjectByName(CURRENT_PIECE_ID);
     if (!currentPiece) throw new Error("No current piece");
-    return currentPiece as CurrentPiece;
+    return currentPiece as THREE.Mesh;
   }
 
   removeCurrentPiece() {
