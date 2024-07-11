@@ -93,20 +93,20 @@ class GameRenderer {
     this.#camera!.updateProjectionMatrix();
   }
 
-  updateCameraPosition(position: Vertex) {
-    this.#camera!.position.set(...position);
+  updateCameraPosition(position: THREE.Vector3) {
+    this.#camera!.position.copy(position);
   }
 
-  updateCameraLookAt(lookAt: Vertex) {
-    this.#camera!.lookAt(...lookAt);
+  updateCameraLookAt(lookAt: THREE.Vector3) {
+    this.#camera!.lookAt(lookAt.x, lookAt.y, lookAt.z);
   }
 
-  renderShaftCube(dimension: Vertex, position: Vertex) {
+  renderShaftCube(dimension: THREE.Vector3, position: THREE.Vector3) {
     const cubeGeometry = new THREE.BoxGeometry(...dimension);
     const cubeMaterial = new THREE.LineBasicMaterial({ color: "0x00ff00" });
     const edges = new THREE.EdgesGeometry(cubeGeometry);
     const cube = new THREE.LineSegments(edges, cubeMaterial);
-    cube.position.set(...position);
+    cube.position.copy(position);
     cube.name = "container";
     this.#scene.add(cube);
   }

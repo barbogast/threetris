@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import { Settings, Vertex } from "../types";
 import GameRenderer from "./gameRenderer";
 
@@ -5,16 +6,16 @@ export const renderContainer = (
   gameRenderer: GameRenderer,
   settings: Settings
 ) => {
-  const dimensions: Vertex = [
+  const dimensions = new THREE.Vector3(
     settings.shaftSizeX,
     settings.shaftSizeY,
-    settings.shaftSizeZ,
-  ];
-  const position: Vertex = [
+    settings.shaftSizeZ
+  );
+  const position = new THREE.Vector3(
     settings.shaftSizeX / 2,
     settings.shaftSizeY / 2,
-    settings.shaftSizeZ / 2,
-  ];
+    settings.shaftSizeZ / 2
+  );
   gameRenderer.renderShaftCube(dimensions, position);
 };
 

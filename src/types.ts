@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import FallenCubes from "./rendering/fallenCubes";
 import GameAnimator from "./rendering/gameAnimator";
 import GameRenderer from "./rendering/gameRenderer";
@@ -64,7 +65,7 @@ export type GameController = {
   updateSettings: (s: Settings) => void;
   updateCamera: {
     fov: (fov: number) => void;
-    position: (position: Vertex) => void;
-    lookAt: (position: Vertex) => void;
+    position: (position: THREE.Vector3) => void;
+    lookAt: (position: THREE.Vector3) => void;
   };
 };

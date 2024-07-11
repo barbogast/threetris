@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import * as THREE from "three";
 import RangeSetting from "./RangeSetting";
 import useAppStore, { updateSettings } from "../appStore";
 import { getCameraDefaults, getGameDefaults } from "../config";
@@ -16,19 +17,19 @@ const SettingsPanel = ({ gameController }: Props) => {
   }, [settings.fov]);
 
   useEffect(() => {
-    gameController.updateCamera.position([
-      settings.positionX,
-      settings.positionY,
-      settings.positionZ,
-    ]);
+    gameController.updateCamera.position(
+      new THREE.Vector3(
+        settings.positionX,
+        settings.positionY,
+        settings.positionZ
+      )
+    );
   }, [settings.positionX, settings.positionY, settings.positionZ]);
 
   useEffect(() => {
-    gameController.updateCamera.lookAt([
-      settings.lookAtX,
-      settings.lookAtY,
-      settings.lookAtZ,
-    ]);
+    gameController.updateCamera.lookAt(
+      new THREE.Vector3(settings.lookAtX, settings.lookAtY, settings.lookAtZ)
+    );
   }, [settings.lookAtX, settings.lookAtY, settings.lookAtZ]);
 
   return (
