@@ -12,12 +12,7 @@ import {
   StateUpdateCallbacks,
 } from "./types";
 import useAppStore from "./appStore";
-import {
-  renderContainer,
-  renderFloorGrid,
-  renderWallGridLongLines,
-  renderWallGridShortLines,
-} from "./rendering/shaft";
+import Shaft from "./rendering/shaft";
 
 import GameRenderer, {
   getCurrentCubes,
@@ -33,14 +28,16 @@ import { disposeObject } from "./utils";
 
 const setup = (context: Context) => {
   const { renderer, fallenCubes, settings, callbacks } = context;
+  const shaft = new Shaft(settings, renderer.getScene());
 
   renderer.setup(settings, callbacks);
   fallenCubes.setup(settings);
+  shaft.setup();
 
-  renderContainer(renderer, settings);
-  renderFloorGrid(renderer, settings);
-  renderWallGridLongLines(renderer, settings);
-  renderWallGridShortLines(renderer, settings);
+  shaft.renderContainer();
+  shaft.renderFloorGrid();
+  shaft.renderWallGridLongLines();
+  shaft.renderWallGridShortLines();
 };
 
 const onKeyPress = (context: Context, key: string) => {

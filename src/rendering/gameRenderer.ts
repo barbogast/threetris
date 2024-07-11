@@ -9,10 +9,8 @@ import { StateUpdateCallbacks } from "../types";
 import { filterEdges, getCubeGeometry } from "../shape";
 import { SETTINGS_WIDTH } from "../config";
 
-const SHAFT_LINES_ID = "shaft-lines";
 const CURRENT_PIECE_ID = "current-piece";
 
-const shaftMaterial = new THREE.LineBasicMaterial({ color: "0x00ff00" });
 const currentPieceMatieral = new THREE.LineBasicMaterial({ color: 0x00ff00 });
 const shadowGeometry = new THREE.SphereGeometry(0.1);
 const shadowMaterial = new THREE.MeshBasicMaterial({ visible: false });
@@ -38,10 +36,6 @@ class GameRenderer {
     this.#scene.clear();
 
     this.#callbacks = callbacks;
-
-    const group1 = new THREE.Group();
-    group1.name = SHAFT_LINES_ID;
-    this.#scene.add(group1);
 
     this.#camera = new THREE.PerspectiveCamera(settings.fov, settings.aspect);
     this.#camera.zoom = settings.zoom;
@@ -98,27 +92,6 @@ class GameRenderer {
 
   updateCameraLookAt(lookAt: THREE.Vector3) {
     this.#camera!.lookAt(lookAt.x, lookAt.y, lookAt.z);
-  }
-
-  renderShaftCube(dimension: THREE.Vector3, position: THREE.Vector3) {
-    const cubeGeometry = new THREE.BoxGeometry(...dimension);
-    const edges = new THREE.EdgesGeometry(cubeGeometry);
-    const cube = new THREE.LineSegments(edges, shaftMaterial);
-    cube.position.copy(position);
-    cube.name = "container";
-    this.#scene.add(cube);
-  }
-
-  renderShaftLines(name: string, vertices: VectorArray[]) {
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute(
-      "position",
-      new THREE.BufferAttribute(new Float32Array(vertices.flat()), 3)
-    );
-
-    const lines = new THREE.LineSegments(geometry, shaftMaterial);
-    lines.name = name;
-    this.#scene.getObjectByName(SHAFT_LINES_ID)!.add(lines);
   }
 
   renderCurrentPiece(offsets: THREE.Vector3[]) {
