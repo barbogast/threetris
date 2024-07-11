@@ -8,7 +8,7 @@ import { Axis, Direction, Edge, Settings, Vertex } from "../types";
 import { StateUpdateCallbacks } from "../types";
 import { filterEdges, getCubeGeometry } from "../shape";
 import { SETTINGS_WIDTH } from "../config";
-import FallenCubes from "../state/fallenCubes";
+import FallenCubes from "./fallenCubes";
 
 type CurrentPiece = THREE.LineSegments<
   THREE.BufferGeometry<THREE.NormalBufferAttributes>,
