@@ -194,13 +194,10 @@ export const getCurrentCubes = (obj: THREE.Object3D) => {
     child.getWorldPosition(v);
 
     // Move the point back to the edge of the cube so that we are aligned with the grid
-    const fixedPoint = [
-      Math.round(v.x - 0.5),
-      Math.round(v.y - 0.5),
-      Math.round(v.z - 0.5),
-    ] as Vertex;
+    v.subScalar(0.5);
 
-    return fixedPoint;
+    v.round();
+    return v;
   });
 };
 
@@ -221,16 +218,16 @@ export const rotate = (
 };
 
 export const willBeOutsideOfShaft = (
-  pieceCubes: Vertex[],
+  pieceCubes: THREE.Vector3[],
   settings: Settings
 ) => {
   const { shaftSizeX, shaftSizeZ } = settings;
   return pieceCubes.some(
     (cube) =>
-      cube[0] < 0 ||
-      cube[0] >= shaftSizeX ||
-      cube[1] < 0 ||
-      cube[2] < 0 ||
-      cube[2] >= shaftSizeZ
+      cube.x < 0 ||
+      cube.x >= shaftSizeX ||
+      cube.y < 0 ||
+      cube.z < 0 ||
+      cube.z >= shaftSizeZ
   );
 };

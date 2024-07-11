@@ -10,7 +10,6 @@ import {
   GameController,
   Settings,
   StateUpdateCallbacks,
-  Vertex,
 } from "./types";
 import useAppStore from "./appStore";
 import {
@@ -177,7 +176,10 @@ const letCurrentPieceFallDown = (context: Context) => {
   }
 };
 
-const handlePieceReachedFloor = (context: Context, currentCubes: Vertex[]) => {
+const handlePieceReachedFloor = (
+  context: Context,
+  currentCubes: THREE.Vector3[]
+) => {
   const { fallenCubes, callbacks } = context;
 
   fallenCubes.addPiece(currentCubes);

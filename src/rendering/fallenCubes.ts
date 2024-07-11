@@ -51,7 +51,7 @@ class FallenCubes {
     }
   }
 
-  addPiece(cubes: Vertex[]) {
+  addPiece(cubes: THREE.Vector3[]) {
     for (const [x, y, z] of cubes) {
       const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
       const cubeMaterial = new THREE.MeshBasicMaterial({ color: COLORS[y] });
@@ -78,11 +78,11 @@ class FallenCubes {
     );
   }
 
-  pieceCollidesWithFallenCube = (pieceCubes: Vertex[]) => {
+  pieceCollidesWithFallenCube = (pieceCubes: THREE.Vector3[]) => {
     return pieceCubes.some((pieceCube) => {
-      return this.#getCubesOfLayer(pieceCube[1]).some(
+      return this.#getCubesOfLayer(pieceCube.y).some(
         (fallenCube) =>
-          fallenCube[0] === pieceCube[0] && fallenCube[2] === pieceCube[2]
+          fallenCube[0] === pieceCube.x && fallenCube[2] === pieceCube.z
       );
     });
   };
