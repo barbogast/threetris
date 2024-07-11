@@ -19,7 +19,7 @@ import { getRandomShape } from "./shapeDefinitions";
 import { SETTINGS_WIDTH } from "./config";
 import GameAnimator from "./rendering/gameAnimator";
 import Scheduler from "./scheduler";
-import FallenCubes from "./rendering/fallenCubes";
+import * as fallenCubes from "./rendering/fallenCubes";
 import * as currentPiece from "./rendering/currentPiece";
 import { disposeObject } from "./utils";
 import {
@@ -30,7 +30,7 @@ import {
 import Camera from "./rendering/camera";
 
 const setup = (context: Context) => {
-  const { renderer, fallenCubes, settings, callbacks, camera } = context;
+  const { renderer, settings, callbacks, camera } = context;
   const shaft = new Shaft(settings, renderer.getScene());
 
   camera.setup();
@@ -39,7 +39,7 @@ const setup = (context: Context) => {
   if (settings.enableOrbitalControl)
     camera.enableOrbitalControl(renderer.getDomElement());
 
-  fallenCubes.setup(settings);
+  fallenCubes.setup(context);
   shaft.setup();
 
   shaft.renderContainer();
@@ -50,7 +50,7 @@ const setup = (context: Context) => {
 
 const onKeyPress = (context: Context, key: string) => {
   console.log(`keyPress "${key}"`);
-  const { animator, settings, schedulers, fallenCubes } = context;
+  const { animator, settings, schedulers } = context;
   const currentObject = currentPiece.getThreeObject(context);
 
   if (key === " ") {
@@ -58,7 +58,10 @@ const onKeyPress = (context: Context, key: string) => {
 
     while (
       !willBeOutsideOfShaft(getCurrentCubes(newPiece), settings) &&
-      !fallenCubes.pieceCollidesWithFallenCube(getCurrentCubes(newPiece))
+      !fallenCubes.pieceCollidesWithFallenCube(
+        context,
+        getCurrentCubes(newPiece)
+      )
     ) {
       newPiece.position.y -= 1;
     }
@@ -137,7 +140,10 @@ const onKeyPress = (context: Context, key: string) => {
 
   // Check of collision with fallen cubes and shaft walls
   if (
-    !fallenCubes.pieceCollidesWithFallenCube(getCurrentCubes(updatedPiece)) &&
+    !fallenCubes.pieceCollidesWithFallenCube(
+      context,
+      getCurrentCubes(updatedPiece)
+    ) &&
     !willBeOutsideOfShaft(getCurrentCubes(updatedPiece), settings) &&
     animationTrack
   ) {
@@ -166,13 +172,13 @@ const addPiece = (context: Context) => {
 };
 
 const letCurrentPieceFallDown = (context: Context) => {
-  const { animator, settings, fallenCubes } = context;
+  const { animator, settings } = context;
 
   const newPiece = currentPiece.getThreeObject(context).clone();
   newPiece.position.y -= 1;
   const currentCubes = getCurrentCubes(newPiece);
   if (
-    fallenCubes.pieceCollidesWithFallenCube(currentCubes) ||
+    fallenCubes.pieceCollidesWithFallenCube(context, currentCubes) ||
     willBeOutsideOfShaft(currentCubes, settings)
   ) {
     handlePieceReachedFloor(
@@ -188,16 +194,16 @@ const handlePieceReachedFloor = (
   context: Context,
   currentCubes: THREE.Vector3[]
 ) => {
-  const { fallenCubes, callbacks } = context;
+  const { callbacks } = context;
 
-  fallenCubes.addPiece(currentCubes);
+  fallenCubes.addPiece(context, currentCubes);
 
   disposeObject(currentPiece.getThreeObject(context));
   addPiece(context);
 
-  const fullLevels = fallenCubes.findFullLevels();
+  const fullLevels = fallenCubes.findFullLevels(context);
   for (const level of fullLevels) {
-    fallenCubes.removeLevel(level);
+    fallenCubes.removeLevel(context, level);
     callbacks.removeRow();
   }
 };
@@ -210,7 +216,6 @@ const main = (
   callbacks: StateUpdateCallbacks
 ): GameController => {
   const animator = new GameAnimator(settings.animationDuration);
-  const fallenCubes = new FallenCubes(renderer.getScene());
   const camera = new Camera(settings);
 
   const fallingScheduler = new Scheduler(settings.fallingSpeed, () =>
@@ -224,7 +229,6 @@ const main = (
     callbacks,
     renderer,
     camera,
-    fallenCubes,
     animator,
     settings,
     schedulers: {

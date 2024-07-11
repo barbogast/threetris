@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import FallenCubes from "./rendering/fallenCubes";
 import GameAnimator from "./rendering/gameAnimator";
 import GameRenderer from "./rendering/gameRenderer";
 import Scheduler from "./scheduler";
@@ -52,7 +51,6 @@ export type Context = {
   scene: THREE.Scene;
   callbacks: StateUpdateCallbacks;
   renderer: GameRenderer;
-  fallenCubes: FallenCubes;
   animator: GameAnimator;
   camera: Camera;
   settings: Settings;
