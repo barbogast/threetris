@@ -25,6 +25,7 @@ class GameRenderer {
   #renderer: THREE.WebGLRenderer;
   #camera?: THREE.PerspectiveCamera;
   fallenCubes: FallenCubes;
+  #settings?: Settings;
 
   constructor() {
     this.#scene = new THREE.Scene();
@@ -33,6 +34,7 @@ class GameRenderer {
   }
 
   setup(settings: Settings, callbacks: StateUpdateCallbacks) {
+    this.#settings = settings;
     this.#scene.clear();
 
     this.#callbacks = callbacks;
@@ -124,7 +126,7 @@ class GameRenderer {
     this.#scene.getObjectByName(SHAFT_LINES_ID)!.add(lines);
   }
 
-  renderCurrentPiece(offsets: Vertex[], position: Vertex) {
+  renderCurrentPiece(offsets: Vertex[]) {
     const vertices: Vertex[] = [];
     const allEdges: Edge[] = [];
     for (const offset of offsets) {
@@ -144,7 +146,14 @@ class GameRenderer {
 
     const material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
     const lines = new THREE.LineSegments(geometry, material);
-    lines.position.set(...position);
+
+    const { shaftSizeX, shaftSizeY, shaftSizeZ } = this.#settings!;
+    lines.position.set(
+      Math.floor(shaftSizeX / 2),
+      // Move the piece to the top of the shaft but push it down if it is too high
+      shaftSizeY - 1 - Math.max(...offsets.map((o) => o[1])),
+      Math.floor(shaftSizeZ / 2)
+    );
 
     lines.name = CURRENT_PIECE_ID;
     lines.renderOrder = 1;
@@ -196,7 +205,7 @@ export default GameRenderer;
 export const getCurrentCubes = (obj: THREE.Object3D) => {
   return obj.children.map((child) => {
     const v = new THREE.Vector3();
-    child.getWorldPosition(v).toArray();
+    child.getWorldPosition(v);
 
     // Move the point back to the edge of the cube so that we are aligned with the grid
     const fixedPoint = [

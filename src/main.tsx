@@ -20,11 +20,7 @@ import {
   renderWallGridShortLines,
 } from "./rendering/shaft";
 
-import {
-  willBeOutsideOfShaft,
-  collidesWithFallenCube,
-  collidesWithFloor,
-} from "./state/gameState";
+import { willBeOutsideOfShaft } from "./state/gameState";
 import GameRenderer, {
   getCurrentCubes,
   rotate,
@@ -54,11 +50,10 @@ const onKeyPress = (context: Context, key: string) => {
     let newPiece = renderer.getCurrentPiece().clone();
 
     while (
-      !collidesWithFallenCube(
-        getCurrentCubes(newPiece),
-        renderer.fallenCubes
-      ) &&
-      !willBeOutsideOfShaft(getCurrentCubes(newPiece), settings)
+      !willBeOutsideOfShaft(getCurrentCubes(newPiece), settings) &&
+      !renderer.fallenCubes.pieceCollidesWithFallenCube(
+        getCurrentCubes(newPiece)
+      )
     ) {
       newPiece.position.y -= 1;
     }
@@ -136,9 +131,8 @@ const onKeyPress = (context: Context, key: string) => {
 
   // Check of collision with fallen cubes and shaft walls
   if (
-    !collidesWithFallenCube(
-      getCurrentCubes(updatedPiece),
-      renderer.fallenCubes
+    !renderer.fallenCubes.pieceCollidesWithFallenCube(
+      getCurrentCubes(updatedPiece)
     ) &&
     !willBeOutsideOfShaft(getCurrentCubes(updatedPiece), settings) &&
     animationTrack
@@ -172,24 +166,19 @@ const addPiece = (context: Context) => {
 
   const offsets = parseShapeDefinition(shapeDefinitions[shape].shape);
 
-  const position: Vertex = [
-    Math.floor(settings.shaftSizeX / 2),
-    settings.shaftSizeY - 1,
-    Math.floor(settings.shaftSizeZ / 2),
-  ];
-  const mesh = renderer.renderCurrentPiece(offsets, position);
+  const mesh = renderer.renderCurrentPiece(offsets);
   animator.setTarget(mesh);
 };
 
 const letCurrentPieceFallDown = (context: Context) => {
-  const { animator, renderer } = context;
+  const { animator, renderer, settings } = context;
 
   const newPiece = renderer.getCurrentPiece().clone();
   newPiece.position.y -= 1;
   const currentCubes = getCurrentCubes(newPiece);
   if (
-    collidesWithFallenCube(currentCubes, renderer.fallenCubes) ||
-    collidesWithFloor(currentCubes)
+    renderer.fallenCubes.pieceCollidesWithFallenCube(currentCubes) ||
+    willBeOutsideOfShaft(currentCubes, settings)
   ) {
     handlePieceReachedFloor(
       context,
@@ -201,13 +190,13 @@ const letCurrentPieceFallDown = (context: Context) => {
 };
 
 const handlePieceReachedFloor = (context: Context, currentCubes: Vertex[]) => {
-  const { renderer: gameRenderer, settings, callbacks } = context;
+  const { renderer: gameRenderer, callbacks } = context;
 
   gameRenderer.fallenCubes.addPiece(currentCubes);
 
   addPiece(context);
 
-  const fullLevels = renderer.fallenCubes.findFullLevels(settings);
+  const fullLevels = renderer.fallenCubes.findFullLevels();
   for (const level of fullLevels) {
     renderer.fallenCubes.removeLevel(level);
     callbacks.removeRow();

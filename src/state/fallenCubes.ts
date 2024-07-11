@@ -39,7 +39,6 @@ class FallenCubes {
     const layer = new THREE.Object3D();
     layer.position.y = y;
     group.add(layer);
-    console.log("Added layer", y);
   }
 
   setup(settings: Settings) {
@@ -68,11 +67,6 @@ class FallenCubes {
     }
   }
 
-  #isLevelFull(settings: Settings, y: number) {
-    const { shaftSizeX, shaftSizeZ } = settings;
-    return this.#getLayer(y)?.children.length === shaftSizeX * shaftSizeZ;
-  }
-
   getCubes() {
     return this.#getAllLayers()
       .map((layer) =>
@@ -88,11 +82,31 @@ class FallenCubes {
       .flat();
   }
 
-  findFullLevels(settings: Settings) {
-    const { shaftSizeY } = settings;
+  #getCubesOfLayer(y: number) {
+    return this.#getLayer(y).children.map(
+      (child) =>
+        [
+          child.position.x - 0.5,
+          child.position.y - 0.5 + y,
+          child.position.z - 0.5,
+        ] as Vertex
+    );
+  }
+
+  pieceCollidesWithFallenCube = (pieceCubes: Vertex[]) => {
+    return pieceCubes.some((pieceCube) => {
+      return this.#getCubesOfLayer(pieceCube[1]).some(
+        (fallenCube) =>
+          fallenCube[0] === pieceCube[0] && fallenCube[2] === pieceCube[2]
+      );
+    });
+  };
+
+  findFullLevels() {
+    const { shaftSizeY, shaftSizeX, shaftSizeZ } = this.#settings!;
     const fullLevels = [];
     for (let y = 0; y < shaftSizeY; y++) {
-      if (this.#isLevelFull(settings, y)) {
+      if (this.#getLayer(y).children.length === shaftSizeX * shaftSizeZ) {
         fullLevels.push(y);
       }
     }
@@ -107,10 +121,11 @@ class FallenCubes {
     this.#getAllLayers().map((layer) => {
       if (layer.position.y > y) {
         layer.position.y = layer.position.y - 1;
+        const color = new THREE.Color(COLORS[layer.position.y]);
         layer.children.forEach((child) => {
           // Recalulate the color of each cube
           ((child as THREE.Mesh).material as THREE.MeshBasicMaterial).color =
-            new THREE.Color(COLORS[layer.position.y]);
+            color;
         });
       }
     });
