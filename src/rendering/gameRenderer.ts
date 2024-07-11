@@ -125,11 +125,11 @@ class GameRenderer {
     this.#scene.getObjectByName(SHAFT_LINES_ID)!.add(lines);
   }
 
-  renderCurrentPiece(offsets: Vertex[]) {
+  renderCurrentPiece(offsets: THREE.Vector3[]) {
     const vertices: Vertex[] = [];
     const allEdges: Edge[] = [];
     for (const offset of offsets) {
-      getCubeGeometry(vertices, allEdges, 1, offset[0], offset[1], offset[2]);
+      getCubeGeometry(vertices, allEdges, 1, offset.x, offset.y, offset.z);
     }
 
     const filteredEdges = filterEdges(vertices, allEdges);
@@ -150,7 +150,7 @@ class GameRenderer {
     lines.position.set(
       Math.floor(shaftSizeX / 2),
       // Move the piece to the top of the shaft but push it down if it is too high
-      shaftSizeY - 1 - Math.max(...offsets.map((o) => o[1])),
+      shaftSizeY - 1 - Math.max(...offsets.map((o) => o.y)),
       Math.floor(shaftSizeZ / 2)
     );
 
@@ -165,7 +165,7 @@ class GameRenderer {
       const point = new THREE.Mesh(pointGeometry, pointMaterial);
 
       // Move the point to the center of the cube, so that it stays in place when the cube is rotated
-      point.position.set(offset[0] + 0.5, offset[1] + 0.5, offset[2] + 0.5);
+      point.position.copy(offset.clone().addScalar(0.5));
       lines.add(point);
     }
 

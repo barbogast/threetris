@@ -2,10 +2,11 @@
 //    1. assembling the vertices and edges which will later be passed to THREE.BufferGeometry()
 //    2. filtering out the edges that are shared by 2 cubes
 
-import { Edge, PieceOffset, Vertex } from "./types";
+import * as THREE from "three";
+import { Edge, Vertex } from "./types";
 
 export const parseShapeDefinition = (shapes: string[]) => {
-  const pieceOffsets: PieceOffset[] = [];
+  const pieceOffsets: THREE.Vector3[] = [];
 
   for (const [level, shape] of shapes.entries()) {
     // Remove leading and trailing newlines. Note that we cannot use trim() here, as it would also trailing spaces
@@ -19,20 +20,20 @@ export const parseShapeDefinition = (shapes: string[]) => {
     for (const [lineNumber, line] of trimmed.split("\n").entries()) {
       for (let i = 0; i < line.length; i++) {
         if (line[i] === "▢") {
-          pieceOffsets.push([i, lineNumber, level]);
+          pieceOffsets.push(new THREE.Vector3(i, lineNumber, level));
         }
       }
     }
   }
 
   // Center pieces around 0,0,0 so that they get rotated around their center
-  const maxX = Math.max(...pieceOffsets.map((offset) => offset[0])) + 1;
-  const maxY = Math.max(...pieceOffsets.map((offset) => offset[1])) + 1;
-  const maxZ = Math.max(...pieceOffsets.map((offset) => offset[2])) + 1;
+  const maxX = Math.max(...pieceOffsets.map((offset) => offset.x)) + 1;
+  const maxY = Math.max(...pieceOffsets.map((offset) => offset.y)) + 1;
+  const maxZ = Math.max(...pieceOffsets.map((offset) => offset.z)) + 1;
   for (const offset of pieceOffsets) {
-    offset[0] -= Math.floor(maxX / 2);
-    offset[1] -= Math.floor(maxY / 2);
-    offset[2] -= Math.floor(maxZ / 2);
+    offset.x -= Math.floor(maxX / 2);
+    offset.y -= Math.floor(maxY / 2);
+    offset.z -= Math.floor(maxZ / 2);
   }
 
   return pieceOffsets;
