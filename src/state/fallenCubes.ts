@@ -67,21 +67,6 @@ class FallenCubes {
     }
   }
 
-  getCubes() {
-    return this.#getAllLayers()
-      .map((layer) =>
-        layer.children.map(
-          (child) =>
-            [
-              child.position.x - 0.5,
-              child.position.y - 0.5 + layer.position.y,
-              child.position.z - 0.5,
-            ] as Vertex
-        )
-      )
-      .flat();
-  }
-
   #getCubesOfLayer(y: number) {
     return this.#getLayer(y).children.map(
       (child) =>
