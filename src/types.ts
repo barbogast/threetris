@@ -3,6 +3,7 @@ import FallenCubes from "./rendering/fallenCubes";
 import GameAnimator from "./rendering/gameAnimator";
 import GameRenderer from "./rendering/gameRenderer";
 import Scheduler from "./scheduler";
+import CurrentPiece from "./rendering/currentPiece";
 
 export type BlockSet = "flat" | "basic" | "extended";
 
@@ -48,6 +49,7 @@ export type StateUpdateCallbacks = {
 };
 
 export type Context = {
+  currentPiece: CurrentPiece;
   callbacks: StateUpdateCallbacks;
   renderer: GameRenderer;
   fallenCubes: FallenCubes;
