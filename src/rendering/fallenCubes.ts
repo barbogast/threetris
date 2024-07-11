@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { Settings } from "../types";
+import { disposeObject } from "../utils";
 
 const FALLEN_CUBES_ID = "fallen-cubes";
 
@@ -13,6 +14,9 @@ const COLORS = [
   "white",
   "darkblue",
 ];
+const MATERIALS = COLORS.map((color) => new THREE.MeshBasicMaterial({ color }));
+
+const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
 
 class FallenCubes {
   #scene: THREE.Scene;
@@ -54,13 +58,11 @@ class FallenCubes {
 
   addPiece(cubes: THREE.Vector3[]) {
     for (const [x, y, z] of cubes) {
-      const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
       const cubeMaterial = new THREE.MeshBasicMaterial({ color: COLORS[y] });
       const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 
       var edges = new THREE.EdgesGeometry(cubeGeometry);
-      var lineMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
-      var wireframe = new THREE.LineSegments(edges, lineMaterial);
+      var wireframe = new THREE.LineSegments(edges, MATERIALS[y]);
       cube.add(wireframe);
 
       cube.position.set(x + 0.5, 0.5, z + 0.5);
@@ -106,11 +108,9 @@ class FallenCubes {
     this.#getAllLayers().map((layer) => {
       if (layer.position.y > y) {
         layer.position.y = layer.position.y - 1;
-        const color = new THREE.Color(COLORS[layer.position.y]);
         layer.children.forEach((child) => {
           // Recalulate the color of each cube
-          ((child as THREE.Mesh).material as THREE.MeshBasicMaterial).color =
-            color;
+          (child as THREE.Mesh).material = MATERIALS[layer.position.y];
         });
       }
     });

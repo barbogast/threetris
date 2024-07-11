@@ -12,6 +12,11 @@ import { SETTINGS_WIDTH } from "../config";
 const SHAFT_LINES_ID = "shaft-lines";
 const CURRENT_PIECE_ID = "current-piece";
 
+const shaftMaterial = new THREE.LineBasicMaterial({ color: "0x00ff00" });
+const currentPieceMatieral = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+const shadowGeometry = new THREE.SphereGeometry(0.1);
+const shadowMaterial = new THREE.MeshBasicMaterial({ visible: false });
+
 class GameRenderer {
   #scene: THREE.Scene;
   #callbacks?: StateUpdateCallbacks;
@@ -97,9 +102,8 @@ class GameRenderer {
 
   renderShaftCube(dimension: THREE.Vector3, position: THREE.Vector3) {
     const cubeGeometry = new THREE.BoxGeometry(...dimension);
-    const cubeMaterial = new THREE.LineBasicMaterial({ color: "0x00ff00" });
     const edges = new THREE.EdgesGeometry(cubeGeometry);
-    const cube = new THREE.LineSegments(edges, cubeMaterial);
+    const cube = new THREE.LineSegments(edges, shaftMaterial);
     cube.position.copy(position);
     cube.name = "container";
     this.#scene.add(cube);
@@ -112,9 +116,7 @@ class GameRenderer {
       new THREE.BufferAttribute(new Float32Array(vertices.flat()), 3)
     );
 
-    const material = new THREE.LineBasicMaterial({ color: "0x00ff00" });
-
-    const lines = new THREE.LineSegments(geometry, material);
+    const lines = new THREE.LineSegments(geometry, shaftMaterial);
     lines.name = name;
     this.#scene.getObjectByName(SHAFT_LINES_ID)!.add(lines);
   }
@@ -137,8 +139,7 @@ class GameRenderer {
     );
     geometry.setIndex(filteredEdges.flat());
 
-    const material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
-    const lines = new THREE.LineSegments(geometry, material);
+    const lines = new THREE.LineSegments(geometry, currentPieceMatieral);
 
     const { shaftSizeX, shaftSizeY, shaftSizeZ } = this.#settings!;
     lines.position.set(
@@ -154,9 +155,7 @@ class GameRenderer {
     // Add invisible objects and attach them as children to the mesh.
     // This allows us to determine the position of the individual cubes after rotation.
     for (const offset of offsets) {
-      const pointGeometry = new THREE.SphereGeometry(0.1);
-      const pointMaterial = new THREE.MeshBasicMaterial({ visible: false });
-      const point = new THREE.Mesh(pointGeometry, pointMaterial);
+      const point = new THREE.Mesh(shadowGeometry, shadowMaterial);
       point.name = `shadow-cube|${offset.x}/${offset.y}/${offset.z}`;
 
       // Move the point to the center of the cube, so that it stays in place when the cube is rotated
