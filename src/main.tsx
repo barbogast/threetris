@@ -40,12 +40,12 @@ const setup = (context: Context) => {
     camera.enableOrbitalControl(renderer.getDomElement());
 
   fallenCubes.setup(context);
-  shaft.setup();
+  shaft.setup(context);
 
-  shaft.renderContainer();
-  shaft.renderFloorGrid();
-  shaft.renderWallGridLongLines();
-  shaft.renderWallGridShortLines();
+  shaft.renderContainer(context);
+  shaft.renderFloorGrid(context);
+  shaft.renderWallGridLongLines(context);
+  shaft.renderWallGridShortLines(context);
 };
 
 const onKeyPress = (context: Context, key: string) => {
