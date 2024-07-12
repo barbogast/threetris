@@ -51,10 +51,10 @@ const onKeyPress = (context: Context, key: string) => {
     let newPiece = currentObject.clone();
 
     while (
-      !currentPiece.willBeOutsideOfShaft(
+      !currentPiece.getShaftCollision(
         currentPiece.getCurrentCubes(newPiece),
         settings
-      ) &&
+      ).isCollision &&
       !fallenCubes.pieceCollidesWithFallenCube(
         context,
         currentPiece.getCurrentCubes(newPiece)
@@ -131,14 +131,80 @@ const onKeyPress = (context: Context, key: string) => {
 
   // Check of collision with fallen cubes and shaft walls
   const updatedCubes = currentPiece.getCurrentCubes(updatedPiece);
+  const shaftCollision = currentPiece.getShaftCollision(updatedCubes, settings);
   if (
+    !shaftCollision.isCollision &&
     !fallenCubes.pieceCollidesWithFallenCube(context, updatedCubes) &&
-    !currentPiece.willBeOutsideOfShaft(updatedCubes, settings) &&
     animationTrack
   ) {
     animator.playAnimation(animationTrack);
+  } else if (rotation && shaftCollision.isCollision && shaftCollision.moveTo) {
+    handleShaftCollision(
+      context,
+      animationTrack!,
+      updatedPiece,
+      shaftCollision
+    );
   }
   disposeObject(updatedPiece);
+};
+
+const handleShaftCollision = (
+  context: Context,
+  rotationTrack: THREE.KeyframeTrack,
+  updatedPiece: THREE.Object3D,
+  originalShaftCollision: currentPiece.CollisionResult
+) => {
+  // The user tried to rotate the piece and collided with a wall or the ceiling. Let's
+  // try to move the piece to the opposite direction. Until we hit the opposite wall or
+  // or another fallen piece
+  const { animator, settings } = context;
+
+  // Type guard
+  if (!originalShaftCollision.isCollision || !originalShaftCollision.moveTo)
+    return;
+
+  let counter = 0; // Guard against infinite loops
+
+  // We might need to move the piece multiple blocks
+  const totalMove = new THREE.Vector3();
+
+  while (true) {
+    // Let's try to move the piece away from the wall
+    updatedPiece.position.add(originalShaftCollision.moveTo);
+    totalMove.add(originalShaftCollision.moveTo);
+    const movedCubes = currentPiece.getCurrentCubes(updatedPiece);
+
+    const newShaftCollision = currentPiece.getShaftCollision(
+      movedCubes,
+      settings
+    );
+
+    if (
+      newShaftCollision.isCollision &&
+      newShaftCollision.moveTo &&
+      !originalShaftCollision.moveTo.equals(newShaftCollision.moveTo)
+    ) {
+      return; // Piece hit the opposite wall, we cannot rotate
+    }
+
+    if (fallenCubes.pieceCollidesWithFallenCube(context, movedCubes)) {
+      return; // Now the piece collides with another piece. Looks like we cannot rotate
+    }
+
+    if (!newShaftCollision.isCollision) {
+      // No collision, let's rotate and move in parallel
+      const track = animator.getMoveTrack(totalMove);
+      animator.playAnimation(track);
+      animator.playAnimation(rotationTrack!);
+      return;
+    }
+
+    counter += 1;
+    if (counter > 100) {
+      throw new Error("Infinite loop");
+    }
+  }
 };
 
 const addPiece = (context: Context) => {
@@ -168,7 +234,7 @@ const letCurrentPieceFallDown = (context: Context) => {
   const currentCubes = currentPiece.getCurrentCubes(newPiece);
   if (
     fallenCubes.pieceCollidesWithFallenCube(context, currentCubes) ||
-    currentPiece.willBeOutsideOfShaft(currentCubes, settings)
+    currentPiece.getShaftCollision(currentCubes, settings).isCollision
   ) {
     handlePieceReachedFloor(
       context,

@@ -96,17 +96,35 @@ export const rotate = (
   );
 };
 
-export const willBeOutsideOfShaft = (
+// If moveTo is set, it is a vector pointing in the opposite direction of
+// the wall that the piece is colliding with. moveTo will be undefined if
+// the piece hits the bottom of the shaft.
+export type CollisionResult =
+  | { isCollision: false }
+  | { isCollision: true; moveTo?: THREE.Vector3 };
+
+export const getShaftCollision = (
   pieceCubes: THREE.Vector3[],
   settings: Settings
-) => {
-  const { shaftSizeX, shaftSizeZ } = settings;
-  return pieceCubes.some(
-    (cube) =>
-      cube.x < 0 ||
-      cube.x >= shaftSizeX ||
-      cube.y < 0 ||
-      cube.z < 0 ||
-      cube.z >= shaftSizeZ
-  );
+): CollisionResult => {
+  const { shaftSizeX, shaftSizeY, shaftSizeZ } = settings;
+  for (const cube of pieceCubes) {
+    if (cube.x < 0)
+      return { isCollision: true, moveTo: new THREE.Vector3(1, 0, 0) };
+
+    if (cube.x >= shaftSizeX)
+      return { isCollision: true, moveTo: new THREE.Vector3(-1, 0, 0) };
+
+    if (cube.y < 0) return { isCollision: true };
+
+    if (cube.y >= shaftSizeY)
+      return { isCollision: true, moveTo: new THREE.Vector3(0, -1, 0) };
+
+    if (cube.z < 0)
+      return { isCollision: true, moveTo: new THREE.Vector3(0, 0, 1) };
+
+    if (cube.z >= shaftSizeZ)
+      return { isCollision: true, moveTo: new THREE.Vector3(0, 0, -1) };
+  }
+  return { isCollision: false };
 };
