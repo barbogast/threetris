@@ -22,11 +22,6 @@ import Scheduler from "./scheduler";
 import * as fallenCubes from "./rendering/fallenCubes";
 import * as currentPiece from "./rendering/currentPiece";
 import { disposeObject } from "./utils";
-import {
-  getCurrentCubes,
-  rotate,
-  willBeOutsideOfShaft,
-} from "./rendering/currentPiece";
 import Camera from "./rendering/camera";
 
 const setup = (context: Context) => {
@@ -56,10 +51,13 @@ const onKeyPress = (context: Context, key: string) => {
     let newPiece = currentObject.clone();
 
     while (
-      !willBeOutsideOfShaft(getCurrentCubes(newPiece), settings) &&
+      !currentPiece.willBeOutsideOfShaft(
+        currentPiece.getCurrentCubes(newPiece),
+        settings
+      ) &&
       !fallenCubes.pieceCollidesWithFallenCube(
         context,
-        getCurrentCubes(newPiece)
+        currentPiece.getCurrentCubes(newPiece)
       )
     ) {
       newPiece.position.y -= 1;
@@ -83,7 +81,10 @@ const onKeyPress = (context: Context, key: string) => {
       );
       animator.playAnimation(animationTrack);
       animator.onEventFinished(() => {
-        handlePieceReachedFloor(context, getCurrentCubes(newPiece));
+        handlePieceReachedFloor(
+          context,
+          currentPiece.getCurrentCubes(newPiece)
+        );
         !settings.paused && schedulers.falling.start();
         disposeObject(newPiece);
       });
@@ -124,15 +125,15 @@ const onKeyPress = (context: Context, key: string) => {
   const rotation = rotationMap[key];
   if (rotation) {
     const { axis, direction } = rotationMap[key];
-    rotate(updatedPiece, axis, direction);
+    currentPiece.rotate(updatedPiece, axis, direction);
     animationTrack = animator.getRotateTrackQuaternion(axis, direction);
   }
 
   // Check of collision with fallen cubes and shaft walls
-  const updatedCubes = getCurrentCubes(updatedPiece);
+  const updatedCubes = currentPiece.getCurrentCubes(updatedPiece);
   if (
     !fallenCubes.pieceCollidesWithFallenCube(context, updatedCubes) &&
-    !willBeOutsideOfShaft(updatedCubes, settings) &&
+    !currentPiece.willBeOutsideOfShaft(updatedCubes, settings) &&
     animationTrack
   ) {
     animator.playAnimation(animationTrack);
@@ -164,14 +165,14 @@ const letCurrentPieceFallDown = (context: Context) => {
 
   const newPiece = currentPiece.getThreeObject(context).clone();
   newPiece.position.y -= 1;
-  const currentCubes = getCurrentCubes(newPiece);
+  const currentCubes = currentPiece.getCurrentCubes(newPiece);
   if (
     fallenCubes.pieceCollidesWithFallenCube(context, currentCubes) ||
-    willBeOutsideOfShaft(currentCubes, settings)
+    currentPiece.willBeOutsideOfShaft(currentCubes, settings)
   ) {
     handlePieceReachedFloor(
       context,
-      getCurrentCubes(currentPiece.getThreeObject(context))
+      currentPiece.getCurrentCubes(currentPiece.getThreeObject(context))
     );
   } else {
     animator.playAnimation(animator.getMoveTrack(new THREE.Vector3(0, -1, 0)));
