@@ -1,25 +1,18 @@
 import * as THREE from "three";
 
-import { StateUpdateCallbacks } from "../types";
+import { Context, StateUpdateCallbacks } from "../types";
 import { SETTINGS_WIDTH } from "../config";
 
 class GameRenderer {
-  #scene: THREE.Scene;
   #callbacks?: StateUpdateCallbacks;
   #renderer: THREE.WebGLRenderer;
 
   constructor() {
-    this.#scene = new THREE.Scene();
     this.#renderer = new THREE.WebGLRenderer();
   }
 
-  getScene() {
-    return this.#scene;
-  }
-
-  setup(callbacks: StateUpdateCallbacks) {
-    this.#scene.clear();
-
+  setup(context: Context) {
+    const { callbacks } = context;
     this.#callbacks = callbacks;
 
     this.#renderer.setSize(
@@ -34,8 +27,9 @@ class GameRenderer {
     return this.#renderer.domElement;
   }
 
-  renderScene(camera: THREE.Camera) {
-    this.#renderer.render(this.#scene, camera);
+  renderScene(context: Context) {
+    const { scene, camera } = context;
+    this.#renderer.render(scene, camera.getCamera());
     this.#callbacks!.rendererInfo({
       geometries: this.#renderer.info.memory.geometries,
     });

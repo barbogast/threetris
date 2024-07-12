@@ -12,7 +12,7 @@ import {
   StateUpdateCallbacks,
 } from "./types";
 import useAppStore from "./appStore";
-import Shaft from "./rendering/shaft";
+import * as shaft from "./rendering/shaft";
 
 import GameRenderer from "./rendering/gameRenderer";
 import { getRandomShape } from "./shapeDefinitions";
@@ -30,11 +30,10 @@ import {
 import Camera from "./rendering/camera";
 
 const setup = (context: Context) => {
-  const { renderer, settings, callbacks, camera } = context;
-  const shaft = new Shaft(settings, renderer.getScene());
+  const { renderer, settings, camera } = context;
 
   camera.setup();
-  renderer.setup(callbacks);
+  renderer.setup(context);
 
   if (settings.enableOrbitalControl)
     camera.enableOrbitalControl(renderer.getDomElement());
@@ -215,6 +214,7 @@ const main = (
   settings: Settings,
   callbacks: StateUpdateCallbacks
 ): GameController => {
+  const scene = new THREE.Scene();
   const animator = new GameAnimator(settings.animationDuration);
   const camera = new Camera(settings);
 
@@ -225,7 +225,7 @@ const main = (
   if (settings.paused) fallingScheduler.stop();
 
   const context: Context = {
-    scene: renderer.getScene(),
+    scene,
     callbacks,
     renderer,
     camera,
@@ -251,7 +251,7 @@ const main = (
   const mainLoop = () => {
     fallingScheduler.tick();
     animator.update();
-    renderer.renderScene(camera.getCamera());
+    renderer.renderScene(context);
     if (!stop) requestAnimationFrame(mainLoop);
   };
 
