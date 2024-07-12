@@ -20,7 +20,7 @@ export const parseShapeDefinition = (shapes: string[]) => {
     for (const [lineNumber, line] of trimmed.split("\n").entries()) {
       for (let i = 0; i < line.length; i++) {
         if (line[i] === "▢") {
-          pieceOffsets.push(new THREE.Vector3(i, lineNumber, level));
+          pieceOffsets.push(new THREE.Vector3(i, level, lineNumber));
         }
       }
     }
