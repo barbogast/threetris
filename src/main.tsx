@@ -66,7 +66,10 @@ const onKeyPress = (context: Context, key: string) => {
     // The last position resulted in a collision, go one block back up
     newPiece.position.y += 1;
 
-    if (newPiece.position.y + 1 !== currentObject.position.y) {
+    if (newPiece.position.y === currentObject.position.y) {
+      handlePieceReachedFloor(context, currentPiece.getCurrentCubes(newPiece));
+      schedulers.falling.start();
+    } else {
       // Stop falling down during the animation.
       // Otherwise we might end up with 2 pieces at the same time,
       // or have the piece reach the floor during the animation
