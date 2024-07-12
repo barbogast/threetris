@@ -44,76 +44,16 @@ const setup = (context: Context) => {
 
 const onKeyPress = (context: Context, key: string) => {
   console.log(`keyPress "${key}"`);
-  const { animator, settings } = context;
-  const currentObject = currentPiece.getThreeObject(context);
-
   if (key === " ") {
-    handleSpacebar(context);
-    return;
+    onSpacebar(context);
+  } else if (key.startsWith("Arrow")) {
+    onArrowKey(context, key);
+  } else if (["q", "a", "w", "s", "e", "d"].includes(key)) {
+    onRotationKey(context, key);
   }
-
-  const updatedPiece = currentObject.clone();
-  let animationTrack: THREE.KeyframeTrack | undefined = undefined;
-
-  const moveMap: Record<string, THREE.Vector3> = {
-    ArrowLeft: new THREE.Vector3(-1, 0, 0),
-    ArrowUp: new THREE.Vector3(0, 0, -1),
-    ArrowDown: new THREE.Vector3(0, 0, 1),
-    ArrowRight: new THREE.Vector3(1, 0, 0),
-  };
-  const move = moveMap[key];
-  if (move) {
-    updatedPiece.position.add(move);
-    animationTrack = animator.getMoveTrack(move);
-  }
-
-  // Rotating a piece requires to update the offsets in the game state and
-  // to set up the animation which visually rotates the piece by rotating the
-  // three.js object.
-  // Note that offsets in the game state need to be adjusted after the rotation, so that
-  // the logical position matches the visual position. Not sure why, somewhow the rotation
-  // in the game state and the rotation in the three.js object are not in sync.
-  const rotationMap: Record<string, { axis: Axis; direction: 1 | -1 }> = {
-    q: { axis: "x", direction: 1 },
-    a: { axis: "x", direction: -1 },
-    w: { axis: "z", direction: -1 },
-    s: { axis: "z", direction: 1 },
-    e: { axis: "y", direction: 1 },
-    d: { axis: "y", direction: -1 },
-  };
-
-  const rotation = rotationMap[key];
-  if (rotation) {
-    const { axis, direction } = rotationMap[key];
-    currentPiece.rotate(updatedPiece, axis, direction);
-    animationTrack = animator.getRotateTrackQuaternion(axis, direction);
-  }
-
-  // Check of collision with fallen cubes and shaft walls
-  const updatedCubes = currentPiece.getCurrentCubes(updatedPiece);
-  const shaftCollision = currentPiece.getShaftCollision(updatedCubes, settings);
-  if (
-    !shaftCollision.isCollision &&
-    !fallenCubes.pieceCollidesWithFallenCube(context, updatedCubes) &&
-    animationTrack
-  ) {
-    animator.playAnimation(animationTrack);
-  } else if (rotation && shaftCollision.isCollision && shaftCollision.moveTo) {
-    const moveTrack = handleShaftCollision(
-      context,
-      updatedPiece,
-      shaftCollision
-    );
-    if (moveTrack) {
-      // Let's rotate and move in parallel
-      animator.playAnimation(moveTrack);
-      animator.playAnimation(animationTrack!);
-    }
-  }
-  disposeObject(updatedPiece);
 };
 
-const handleSpacebar = (context: Context) => {
+const onSpacebar = (context: Context) => {
   const { animator, settings, schedulers } = context;
   const currentObject = currentPiece.getThreeObject(context);
 
@@ -158,6 +98,82 @@ const handleSpacebar = (context: Context) => {
       disposeObject(newPiece);
     });
   }
+};
+
+const onArrowKey = (context: Context, key: string) => {
+  const { animator, settings } = context;
+  const currentObject = currentPiece.getThreeObject(context);
+  const updatedPiece = currentObject.clone();
+
+  const moveMap: Record<string, THREE.Vector3> = {
+    ArrowLeft: new THREE.Vector3(-1, 0, 0),
+    ArrowUp: new THREE.Vector3(0, 0, -1),
+    ArrowDown: new THREE.Vector3(0, 0, 1),
+    ArrowRight: new THREE.Vector3(1, 0, 0),
+  };
+  const move = moveMap[key];
+  if (!move) return;
+
+  updatedPiece.position.add(move);
+  const animationTrack = animator.getMoveTrack(move);
+  const updatedCubes = currentPiece.getCurrentCubes(updatedPiece);
+  if (
+    !currentPiece.getShaftCollision(updatedCubes, settings).isCollision &&
+    !fallenCubes.pieceCollidesWithFallenCube(context, updatedCubes)
+  ) {
+    animator.playAnimation(animationTrack);
+  }
+  disposeObject(updatedPiece);
+};
+
+const onRotationKey = (context: Context, key: string) => {
+  const { animator, settings } = context;
+  // Rotating a piece requires to update the offsets in the game state and
+  // to set up the animation which visually rotates the piece by rotating the
+  // three.js object.
+  // Note that offsets in the game state need to be adjusted after the rotation, so that
+  // the logical position matches the visual position. Not sure why, somewhow the rotation
+  // in the game state and the rotation in the three.js object are not in sync.
+  const rotationMap: Record<string, { axis: Axis; direction: 1 | -1 }> = {
+    q: { axis: "x", direction: 1 },
+    a: { axis: "x", direction: -1 },
+    w: { axis: "z", direction: -1 },
+    s: { axis: "z", direction: 1 },
+    e: { axis: "y", direction: 1 },
+    d: { axis: "y", direction: -1 },
+  };
+
+  const rotation = rotationMap[key];
+  if (!rotation) return;
+
+  const currentObject = currentPiece.getThreeObject(context);
+  const updatedPiece = currentObject.clone();
+  const { axis, direction } = rotationMap[key];
+  currentPiece.rotate(updatedPiece, axis, direction);
+  const animationTrack = animator.getRotateTrackQuaternion(axis, direction);
+
+  // Check of collision with fallen cubes and shaft walls
+  const updatedCubes = currentPiece.getCurrentCubes(updatedPiece);
+  const shaftCollision = currentPiece.getShaftCollision(updatedCubes, settings);
+  if (
+    !shaftCollision.isCollision &&
+    !fallenCubes.pieceCollidesWithFallenCube(context, updatedCubes) &&
+    animationTrack
+  ) {
+    animator.playAnimation(animationTrack);
+  } else if (rotation && shaftCollision.isCollision && shaftCollision.moveTo) {
+    const moveTrack = handleShaftCollision(
+      context,
+      updatedPiece,
+      shaftCollision
+    );
+    if (moveTrack) {
+      // Let's rotate and move in parallel
+      animator.playAnimation(moveTrack);
+      animator.playAnimation(animationTrack!);
+    }
+  }
+  disposeObject(updatedPiece);
 };
 
 const handleShaftCollision = (
