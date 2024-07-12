@@ -325,6 +325,7 @@ const main = (
     },
     updateSettings: (s: Settings) => {
       settings = s;
+      context.settings = s;
       animator.duration = settings.animationDuration;
       fallingScheduler.updateInterval(settings.fallingSpeed);
     },
@@ -371,7 +372,7 @@ const App = () => {
   // Some settings can be updated while the game is running.
   useEffect(() => {
     gameController.current!.updateSettings(settings);
-  }, [settings.fallingSpeed, settings.animationDuration]);
+  }, [settings.fallingSpeed, settings.animationDuration, settings.blockSet]);
 
   return (
     <div style={{ display: "flex", flexDirection: "row" }}>
