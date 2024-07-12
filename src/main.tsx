@@ -50,6 +50,8 @@ const onKeyPress = (context: Context, key: string) => {
     onArrowKey(context, key);
   } else if (["q", "a", "w", "s", "e", "d"].includes(key)) {
     onRotationKey(context, key);
+  } else {
+    return true;
   }
 };
 
@@ -320,8 +322,10 @@ const main = (
   addPiece(context);
 
   const keyPress = (e: KeyboardEvent) => {
-    e.preventDefault();
-    onKeyPress(context, e.key);
+    const unhandled = onKeyPress(context, e.key);
+    if (!unhandled) {
+      e.preventDefault();
+    }
   };
   addEventListener("keydown", keyPress);
 
