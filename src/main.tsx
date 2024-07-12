@@ -77,11 +77,10 @@ const onKeyPress = (context: Context, key: string) => {
       // remainder of the last interval of the previous piece
       schedulers.falling.stop();
 
-      const animationTrack = animator.getMoveTrack([
-        0,
-        -(currentObject.position.y - newPiece.position.y),
-        0,
-      ]);
+      const moveDownY = -(currentObject.position.y - newPiece.position.y);
+      const animationTrack = animator.getMoveTrack(
+        new THREE.Vector3(0, moveDownY, 0)
+      );
       animator.playAnimation(animationTrack);
       animator.onEventFinished(() => {
         handlePieceReachedFloor(context, getCurrentCubes(newPiece));
@@ -95,24 +94,16 @@ const onKeyPress = (context: Context, key: string) => {
   const updatedPiece = currentObject.clone();
   let animationTrack: THREE.KeyframeTrack | undefined = undefined;
 
-  // Moving a piece requires to update the position in the game state and
-  // to set up the animation which visually moves the piece by moving the
-  // three.js object.
-  if (key === "ArrowLeft") {
-    animationTrack = animator.getMoveTrack([-1, 0, 0]);
-    updatedPiece.position.x -= 1;
-  }
-  if (key === "ArrowUp") {
-    animationTrack = animator.getMoveTrack([0, 0, -1]);
-    updatedPiece.position.z -= 1;
-  }
-  if (key === "ArrowDown") {
-    animationTrack = animator.getMoveTrack([0, 0, 1]);
-    updatedPiece.position.z += 1;
-  }
-  if (key === "ArrowRight") {
-    animationTrack = animator.getMoveTrack([1, 0, 0]);
-    updatedPiece.position.x += 1;
+  const moveMap: Record<string, THREE.Vector3> = {
+    ArrowLeft: new THREE.Vector3(-1, 0, 0),
+    ArrowUp: new THREE.Vector3(0, 0, -1),
+    ArrowDown: new THREE.Vector3(0, 0, 1),
+    ArrowRight: new THREE.Vector3(1, 0, 0),
+  };
+  const move = moveMap[key];
+  if (move) {
+    updatedPiece.position.add(move);
+    animationTrack = animator.getMoveTrack(move);
   }
 
   // Rotating a piece requires to update the offsets in the game state and
@@ -130,20 +121,18 @@ const onKeyPress = (context: Context, key: string) => {
     d: { axis: "y", direction: -1 },
   };
 
-  const config = rotationMap[key];
-  if (config) {
+  const rotation = rotationMap[key];
+  if (rotation) {
     const { axis, direction } = rotationMap[key];
     rotate(updatedPiece, axis, direction);
     animationTrack = animator.getRotateTrackQuaternion(axis, direction);
   }
 
   // Check of collision with fallen cubes and shaft walls
+  const updatedCubes = getCurrentCubes(updatedPiece);
   if (
-    !fallenCubes.pieceCollidesWithFallenCube(
-      context,
-      getCurrentCubes(updatedPiece)
-    ) &&
-    !willBeOutsideOfShaft(getCurrentCubes(updatedPiece), settings) &&
+    !fallenCubes.pieceCollidesWithFallenCube(context, updatedCubes) &&
+    !willBeOutsideOfShaft(updatedCubes, settings) &&
     animationTrack
   ) {
     animator.playAnimation(animationTrack);
@@ -185,7 +174,7 @@ const letCurrentPieceFallDown = (context: Context) => {
       getCurrentCubes(currentPiece.getThreeObject(context))
     );
   } else {
-    animator.playAnimation(animator.getMoveTrack([0, -1, 0]));
+    animator.playAnimation(animator.getMoveTrack(new THREE.Vector3(0, -1, 0)));
   }
 };
 

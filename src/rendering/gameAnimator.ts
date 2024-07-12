@@ -40,7 +40,7 @@ class GameAnimator {
     this.#eventFinishedCallback = callback;
   }
 
-  getMoveTrack(offset: VectorArray) {
+  getMoveTrack(offset: THREE.Vector3) {
     return new THREE.VectorKeyframeTrack(
       ".position",
       [0, this.duration], // time
