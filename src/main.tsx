@@ -44,54 +44,11 @@ const setup = (context: Context) => {
 
 const onKeyPress = (context: Context, key: string) => {
   console.log(`keyPress "${key}"`);
-  const { animator, settings, schedulers } = context;
+  const { animator, settings } = context;
   const currentObject = currentPiece.getThreeObject(context);
 
   if (key === " ") {
-    let newPiece = currentObject.clone();
-
-    while (
-      !currentPiece.getShaftCollision(
-        currentPiece.getCurrentCubes(newPiece),
-        settings
-      ).isCollision &&
-      !fallenCubes.pieceCollidesWithFallenCube(
-        context,
-        currentPiece.getCurrentCubes(newPiece)
-      )
-    ) {
-      newPiece.position.y -= 1;
-    }
-
-    // The last position resulted in a collision, go one block back up
-    newPiece.position.y += 1;
-
-    if (newPiece.position.y === currentObject.position.y) {
-      handlePieceReachedFloor(context, currentPiece.getCurrentCubes(newPiece));
-      schedulers.falling.start();
-    } else {
-      // Stop falling down during the animation.
-      // Otherwise we might end up with 2 pieces at the same time,
-      // or have the piece reach the floor during the animation
-      // Also, we need to reset the timer so that the new piece gets
-      // the full interval before it starts falling down (instead of the
-      // remainder of the last interval of the previous piece
-      schedulers.falling.stop();
-
-      const moveDownY = -(currentObject.position.y - newPiece.position.y);
-      const animationTrack = animator.getMoveTrack(
-        new THREE.Vector3(0, moveDownY, 0)
-      );
-      animator.playAnimation(animationTrack);
-      animator.onEventFinished(() => {
-        handlePieceReachedFloor(
-          context,
-          currentPiece.getCurrentCubes(newPiece)
-        );
-        !settings.paused && schedulers.falling.start();
-        disposeObject(newPiece);
-      });
-    }
+    handleSpacebar(context);
     return;
   }
 
@@ -154,6 +111,53 @@ const onKeyPress = (context: Context, key: string) => {
     }
   }
   disposeObject(updatedPiece);
+};
+
+const handleSpacebar = (context: Context) => {
+  const { animator, settings, schedulers } = context;
+  const currentObject = currentPiece.getThreeObject(context);
+
+  let newPiece = currentObject.clone();
+
+  while (
+    !currentPiece.getShaftCollision(
+      currentPiece.getCurrentCubes(newPiece),
+      settings
+    ).isCollision &&
+    !fallenCubes.pieceCollidesWithFallenCube(
+      context,
+      currentPiece.getCurrentCubes(newPiece)
+    )
+  ) {
+    newPiece.position.y -= 1;
+  }
+
+  // The last position resulted in a collision, go one block back up
+  newPiece.position.y += 1;
+
+  if (newPiece.position.y === currentObject.position.y) {
+    handlePieceReachedFloor(context, currentPiece.getCurrentCubes(newPiece));
+    schedulers.falling.start();
+  } else {
+    // Stop falling down during the animation.
+    // Otherwise we might end up with 2 pieces at the same time,
+    // or have the piece reach the floor during the animation
+    // Also, we need to reset the timer so that the new piece gets
+    // the full interval before it starts falling down (instead of the
+    // remainder of the last interval of the previous piece
+    schedulers.falling.stop();
+
+    const moveDownY = -(currentObject.position.y - newPiece.position.y);
+    const animationTrack = animator.getMoveTrack(
+      new THREE.Vector3(0, moveDownY, 0)
+    );
+    animator.playAnimation(animationTrack);
+    animator.onEventFinished(() => {
+      handlePieceReachedFloor(context, currentPiece.getCurrentCubes(newPiece));
+      !settings.paused && schedulers.falling.start();
+      disposeObject(newPiece);
+    });
+  }
 };
 
 const handleShaftCollision = (
