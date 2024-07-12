@@ -139,19 +139,22 @@ const onKeyPress = (context: Context, key: string) => {
   ) {
     animator.playAnimation(animationTrack);
   } else if (rotation && shaftCollision.isCollision && shaftCollision.moveTo) {
-    handleShaftCollision(
+    const moveTrack = handleShaftCollision(
       context,
-      animationTrack!,
       updatedPiece,
       shaftCollision
     );
+    if (moveTrack) {
+      // Let's rotate and move in parallel
+      animator.playAnimation(moveTrack);
+      animator.playAnimation(animationTrack!);
+    }
   }
   disposeObject(updatedPiece);
 };
 
 const handleShaftCollision = (
   context: Context,
-  rotationTrack: THREE.KeyframeTrack,
   updatedPiece: THREE.Object3D,
   originalShaftCollision: currentPiece.CollisionResult
 ) => {
@@ -193,11 +196,8 @@ const handleShaftCollision = (
     }
 
     if (!newShaftCollision.isCollision) {
-      // No collision, let's rotate and move in parallel
-      const track = animator.getMoveTrack(totalMove);
-      animator.playAnimation(track);
-      animator.playAnimation(rotationTrack!);
-      return;
+      // No collision
+      return animator.getMoveTrack(totalMove);
     }
 
     counter += 1;
