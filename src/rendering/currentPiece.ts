@@ -3,14 +3,7 @@ import * as THREE from "three";
 // import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
 // import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 
-import {
-  Axis,
-  Context,
-  Direction,
-  Edge,
-  Settings,
-  VectorArray,
-} from "../types";
+import { Axis, Context, Direction, Edge, Settings } from "../types";
 import { filterEdges, getCubeGeometry } from "../shape";
 
 const CURRENT_PIECE_ID = "current-piece";
@@ -23,7 +16,7 @@ export const renderCurrentPiece = (
   { scene, settings }: Context,
   offsets: THREE.Vector3[]
 ) => {
-  const vectors: VectorArray[] = [];
+  const vectors: THREE.Vector3Tuple[] = [];
   const allEdges: Edge[] = [];
   for (const offset of offsets) {
     getCubeGeometry(vectors, allEdges, 1, offset.x, offset.y, offset.z);

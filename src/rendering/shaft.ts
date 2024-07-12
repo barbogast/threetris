@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Context, VectorArray } from "../types";
+import { Context } from "../types";
 
 const SHAFT_LINES_ID = "shaft-lines";
 
@@ -29,7 +29,7 @@ const renderShaftCube = (
 const renderShaftLines = (
   context: Context,
   name: string,
-  vertices: VectorArray[]
+  vertices: THREE.Vector3Tuple[]
 ) => {
   const { scene } = context;
   const geometry = new THREE.BufferGeometry();
@@ -61,7 +61,7 @@ export const renderContainer = (context: Context) => {
 export const renderWallGridLongLines = (context: Context) => {
   const { settings } = context;
   const { shaftSizeX: x, shaftSizeY: y, shaftSizeZ: z } = settings;
-  const vectors: VectorArray[] = [];
+  const vectors: THREE.Vector3Tuple[] = [];
 
   for (let i = 1; i < z; i++) {
     // Left wall
@@ -89,7 +89,7 @@ export const renderWallGridLongLines = (context: Context) => {
 export const renderWallGridShortLines = (context: Context) => {
   const { settings } = context;
   const { shaftSizeX: x, shaftSizeY: y, shaftSizeZ: z } = settings;
-  const vectors: VectorArray[] = [];
+  const vectors: THREE.Vector3Tuple[] = [];
 
   for (let i = 1; i < y; i++) {
     // Left wall
@@ -115,7 +115,7 @@ export const renderWallGridShortLines = (context: Context) => {
 export const renderFloorGrid = (context: Context) => {
   const { settings } = context;
   const { shaftSizeX: x, shaftSizeZ: z } = settings;
-  const vectors: VectorArray[] = [];
+  const vectors: THREE.Vector3Tuple[] = [];
 
   for (let i = 0 + 1; i < z; i++) {
     // Horizontal

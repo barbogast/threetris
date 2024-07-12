@@ -35,7 +35,6 @@ export type AppState = {
   settings: Settings;
 };
 
-export type VectorArray = [number, number, number];
 export type Edge = [number, number];
 export type Axis = "x" | "y" | "z";
 export type Direction = 1 | -1;

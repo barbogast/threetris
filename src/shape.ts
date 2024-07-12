@@ -3,7 +3,7 @@
 //    2. filtering out the edges that are shared by 2 cubes
 
 import * as THREE from "three";
-import { Edge, VectorArray } from "./types";
+import { Edge } from "./types";
 
 export const parseShapeDefinition = (shapes: string[]) => {
   const pieceOffsets: THREE.Vector3[] = [];
@@ -47,7 +47,7 @@ export const parseShapeDefinition = (shapes: string[]) => {
 // the first cube, the second edge the vertex of the second cube, and so on.
 
 export const getCubeGeometry = (
-  vertices: VectorArray[],
+  vertices: THREE.Vector3Tuple[],
   edges: Edge[],
   size: number,
   offsetX: number,
@@ -58,7 +58,7 @@ export const getCubeGeometry = (
 
   // Define the vertices of the cube
   // prettier-ignore
-  const newVectors: VectorArray[] = [
+  const newVectors: THREE.Vector3Tuple[] = [
     [0, 0, 0 ], // 0
     [s, 0, 0 ], // 1
     [s, s, 0 ], // 2
@@ -89,7 +89,7 @@ export const getCubeGeometry = (
   vertices.push(...newVectors);
 };
 
-const getKeyForVector = (vector: VectorArray) =>
+const getKeyForVector = (vector: THREE.Vector3Tuple) =>
   `${vector[0]} | ${vector[1]} | ${vector[2]}`;
 
 const getKeyForEdge = (s: [number, number]) => `${s[0]}|${s[1]}`;
@@ -99,7 +99,7 @@ type TouchedCubeCount = Record<
   { count: number; edges: [number, number][] }
 >;
 
-export const filterEdges = (vertices: VectorArray[], edges: Edge[]) => {
+export const filterEdges = (vertices: THREE.Vector3Tuple[], edges: Edge[]) => {
   // To detect duplicate edges we need to derive the actual coordinates of both vertices for each edge. We use
   // these stringified coordinates to group and count the edges.
   const touchedCubeCount: TouchedCubeCount = {};

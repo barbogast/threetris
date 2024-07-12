@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { VectorArray } from "../types";
 import { getAxisAndAngelFromQuaternion } from "../utils";
 
 const roundTo90Degrees = (q: THREE.Quaternion) => {

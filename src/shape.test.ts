@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
+import * as THREE from "three";
 import { filterEdges, getCubeGeometry, parseShapeDefinition } from "./shape";
-import { VectorArray, Edge } from "./types";
+import { Edge } from "./types";
 
 describe("test parseShapeDefinition()", () => {
   test("parses simple shape correctly", () => {
@@ -61,7 +62,7 @@ describe("test parseShapeDefinition()", () => {
 
 describe("test getCubeGeometry", () => {
   test("make sure a cube has the right vertices / edges", () => {
-    const vertices: VectorArray[] = [];
+    const vertices: THREE.Vector3Tuple[] = [];
     const edges: Edge[] = [];
     getCubeGeometry(vertices, edges, 1, 0, 0, 0);
 
@@ -88,7 +89,7 @@ describe("test getCubeGeometry", () => {
   });
 
   test("make sure a cub e with an offset has the right vertices / edges", () => {
-    const vertices: VectorArray[] = [];
+    const vertices: THREE.Vector3Tuple[] = [];
     const edges: Edge[] = [];
     getCubeGeometry(vertices, edges, 1, 1, 2, 3);
 
@@ -121,7 +122,7 @@ describe("test getCubeGeometry", () => {
   });
 
   test("make sure a cube with a size has the right vertices / edges", () => {
-    const vertices: VectorArray[] = [];
+    const vertices: THREE.Vector3Tuple[] = [];
     const edges: Edge[] = [];
     getCubeGeometry(vertices, edges, 0.1, 0, 0, 0);
 
@@ -148,7 +149,7 @@ describe("test getCubeGeometry", () => {
 
 describe("test filterEdges", () => {
   test("make sure actual duplicate edges are filtered correctly", () => {
-    const vertices: VectorArray[] = [
+    const vertices: THREE.Vector3Tuple[] = [
       [0, 0, 0],
       [1, 1, 1],
       [2, 2, 2],
@@ -169,7 +170,7 @@ describe("test filterEdges", () => {
 
   test("make sure edges pointing to the same vertices are filtered correctly", () => {
     // 2 vertices appear twice as it is shared between 2 shapes
-    const vertices: VectorArray[] = [
+    const vertices: THREE.Vector3Tuple[] = [
       // shape 1
       [0, 0, 0], // 0
       [1, 1, 1], // 1
