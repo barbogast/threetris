@@ -23,6 +23,7 @@ import * as fallenCubes from "./rendering/fallenCubes";
 import * as currentPiece from "./rendering/currentPiece";
 import { disposeObject } from "./utils";
 import Camera from "./rendering/camera";
+import AsyncFunctionQueue, { OnFinish } from "./AsyncFunctionQueue";
 
 const setup = (context: Context) => {
   const { renderer, settings, camera } = context;
@@ -44,18 +45,20 @@ const setup = (context: Context) => {
 
 const onKeyPress = (context: Context, key: string) => {
   console.log(`keyPress "${key}"`);
+
+  const { eventQueue } = context;
   if (key === " ") {
-    onSpacebar(context);
+    eventQueue.queueFunc((done) => onSpacebar(context, done));
   } else if (key.startsWith("Arrow")) {
-    onArrowKey(context, key);
+    eventQueue.queueFunc((done) => onArrowKey(context, key, done));
   } else if (["q", "a", "w", "s", "e", "d"].includes(key)) {
-    onRotationKey(context, key);
+    eventQueue.queueFunc((done) => onRotationKey(context, key, done));
   } else {
     return true;
   }
 };
 
-const onSpacebar = (context: Context) => {
+const onSpacebar = (context: Context, done: OnFinish) => {
   const { animator, settings, schedulers } = context;
   const currentObject = currentPiece.getThreeObject(context);
 
@@ -80,6 +83,7 @@ const onSpacebar = (context: Context) => {
   if (newPiece.position.y === currentObject.position.y) {
     handlePieceReachedFloor(context, currentPiece.getCurrentCubes(newPiece));
     schedulers.falling.start();
+    done();
   } else {
     // Stop falling down during the animation.
     // Otherwise we might end up with 2 pieces at the same time,
@@ -98,11 +102,13 @@ const onSpacebar = (context: Context) => {
       handlePieceReachedFloor(context, currentPiece.getCurrentCubes(newPiece));
       !settings.paused && schedulers.falling.start();
       disposeObject(newPiece);
+      done();
     });
   }
 };
 
-const onArrowKey = (context: Context, key: string) => {
+const onArrowKey = (context: Context, key: string, done: OnFinish) => {
+  console.log("onArrowKey", key);
   const { animator, settings } = context;
   const currentObject = currentPiece.getThreeObject(context);
   const updatedPiece = currentObject.clone();
@@ -114,7 +120,7 @@ const onArrowKey = (context: Context, key: string) => {
     ArrowRight: new THREE.Vector3(1, 0, 0),
   };
   const move = moveMap[key];
-  if (!move) return;
+  if (!move) return done();
 
   updatedPiece.position.add(move);
   const animationTrack = animator.getMoveTrack(move);
@@ -124,11 +130,15 @@ const onArrowKey = (context: Context, key: string) => {
     !fallenCubes.pieceCollidesWithFallenCube(context, updatedCubes)
   ) {
     animator.playAnimation(animationTrack);
+    animator.onEventFinished(done);
+  } else {
+    done();
   }
   disposeObject(updatedPiece);
 };
 
-const onRotationKey = (context: Context, key: string) => {
+const onRotationKey = (context: Context, key: string, done: OnFinish) => {
+  console.log("onRotationKey", key);
   const { animator, settings } = context;
   // Rotating a piece requires to update the offsets in the game state and
   // to set up the animation which visually rotates the piece by rotating the
@@ -146,7 +156,7 @@ const onRotationKey = (context: Context, key: string) => {
   };
 
   const rotation = rotationMap[key];
-  if (!rotation) return;
+  if (!rotation) return done();
 
   const currentObject = currentPiece.getThreeObject(context);
   const updatedPiece = currentObject.clone();
@@ -163,6 +173,7 @@ const onRotationKey = (context: Context, key: string) => {
     animationTrack
   ) {
     animator.playAnimation(animationTrack);
+    animator.onEventFinished(done);
   } else if (rotation && shaftCollision.isCollision && shaftCollision.moveTo) {
     const moveTrack = handleShaftCollision(
       context,
@@ -173,7 +184,12 @@ const onRotationKey = (context: Context, key: string) => {
       // Let's rotate and move in parallel
       animator.playAnimation(moveTrack);
       animator.playAnimation(animationTrack!);
+      animator.onEventFinished(done);
+    } else {
+      done();
     }
+  } else {
+    done();
   }
   disposeObject(updatedPiece);
 };
@@ -298,6 +314,7 @@ const main = (
   const scene = new THREE.Scene();
   const animator = new GameAnimator(settings.animationDuration);
   const camera = new Camera(settings);
+  const eventQueue = new AsyncFunctionQueue();
 
   const fallingScheduler = new Scheduler(settings.fallingSpeed, () =>
     letCurrentPieceFallDown(context)
@@ -312,6 +329,7 @@ const main = (
     camera,
     animator,
     settings,
+    eventQueue,
     schedulers: {
       falling: fallingScheduler,
     },

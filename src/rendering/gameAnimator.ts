@@ -29,8 +29,9 @@ class GameAnimator {
     this.#mixer = new THREE.AnimationMixer(mesh);
     this.#mixer.addEventListener("finished", () => {
       if (this.#eventFinishedCallback) {
-        this.#eventFinishedCallback();
+        const callback = this.#eventFinishedCallback;
         this.#eventFinishedCallback = undefined;
+        setTimeout(callback);
       }
     });
   }

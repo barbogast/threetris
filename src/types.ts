@@ -3,6 +3,7 @@ import GameAnimator from "./rendering/gameAnimator";
 import GameRenderer from "./rendering/gameRenderer";
 import Scheduler from "./scheduler";
 import Camera from "./rendering/camera";
+import AsyncFunctionQueue from "./AsyncFunctionQueue";
 
 export type BlockSet = "flat" | "basic" | "extended";
 
@@ -53,6 +54,7 @@ export type Context = {
   animator: GameAnimator;
   camera: Camera;
   settings: Settings;
+  eventQueue: AsyncFunctionQueue;
   schedulers: {
     falling: Scheduler;
   };
