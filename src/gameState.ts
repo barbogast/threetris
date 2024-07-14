@@ -1,54 +1,50 @@
-export type GameState = "stopped" | "running" | "paused";
-
-export type GameStateCallback = (data: {
-  state: GameState;
+export type GameState = {
+  state: "stopped" | "running" | "paused";
   isGameOver: boolean;
-}) => void;
+};
+
+export type GameStateCallback = (state: GameState) => void;
 
 class GameStateManager {
   #state: GameState;
   #callback: GameStateCallback;
-  #isGameOver: boolean;
 
   constructor(callback: GameStateCallback) {
-    this.#state = "stopped";
+    this.#state = { state: "stopped", isGameOver: false };
     this.#callback = callback;
-    this.#isGameOver = false;
   }
 
   #changeState(state: GameState) {
     this.#state = state;
-    this.#callback({ state, isGameOver: this.#isGameOver });
+    this.#callback(this.#state);
   }
 
   start() {
-    this.#changeState("running");
-    this.#isGameOver = false;
+    this.#changeState({ state: "running", isGameOver: false });
   }
 
   pause() {
-    this.#changeState("paused");
+    this.#changeState({ state: "paused", isGameOver: false });
   }
 
   stop(isGameOver: boolean) {
-    this.#isGameOver = isGameOver;
-    this.#changeState("stopped");
+    this.#changeState({ state: "stopped", isGameOver });
   }
 
   isRunning() {
-    return this.#state === "running";
+    return this.#state.state === "running";
   }
 
   isStopped() {
-    return this.#state === "stopped";
+    return this.#state.state === "stopped";
   }
 
   isPaused() {
-    return this.#state === "paused";
+    return this.#state.state === "paused";
   }
 
   isGameOver() {
-    return this.#isGameOver;
+    return this.#state.isGameOver;
   }
 }
 

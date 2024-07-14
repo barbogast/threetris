@@ -406,10 +406,10 @@ const App = () => {
   const [removedRows, setRemovedRows] = React.useState<number>(0);
   const settings = useAppStore().settings;
 
-  const [gameState, setGameState] = React.useState<{
-    state: GameState;
-    isGameOver: boolean;
-  }>({ state: "stopped", isGameOver: false });
+  const [gameState, setGameState] = React.useState<GameState>({
+    state: "stopped",
+    isGameOver: false,
+  });
 
   const callbacks: StateUpdateCallbacks = {
     currentPiece: () => {},
