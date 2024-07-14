@@ -4,7 +4,7 @@ import GameRenderer from "./rendering/gameRenderer";
 import Scheduler from "./scheduler";
 import Camera from "./rendering/camera";
 import AsyncFunctionQueue from "./AsyncFunctionQueue";
-import { GameState, GameStateCallback } from "./gameState";
+import GameStateManager, { GameState, GameStateCallback } from "./gameState";
 
 export type BlockSet = "flat" | "basic" | "extended";
 
@@ -45,13 +45,13 @@ export type StateUpdateCallbacks = {
   currentPiece: () => void;
   fallenCubes: (fallenCubes: [number, number, number][]) => void;
   rendererInfo: (info: { geometries: number }) => void;
-  removeRow: () => void;
   updateGameState: GameStateCallback;
 };
 
 export type Context = {
   scene: THREE.Scene;
   callbacks: StateUpdateCallbacks;
+  gameState: GameStateManager;
   renderer: GameRenderer;
   animator: GameAnimator;
   camera: Camera;

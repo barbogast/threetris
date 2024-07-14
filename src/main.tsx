@@ -296,7 +296,7 @@ const handlePieceReachedFloor = (
   context: Context,
   currentCubes: THREE.Vector3[]
 ) => {
-  const { callbacks } = context;
+  const { gameState } = context;
 
   fallenCubes.addPiece(context, currentCubes);
 
@@ -306,7 +306,7 @@ const handlePieceReachedFloor = (
   const fullLevels = fallenCubes.findFullLevels(context);
   for (const level of fullLevels) {
     fallenCubes.removeLevel(context, level);
-    callbacks.removeRow();
+    gameState.removeRow();
   }
 };
 
@@ -330,6 +330,7 @@ const main = (
   const context: Context = {
     scene,
     callbacks,
+    gameState,
     renderer,
     camera,
     animator,
@@ -403,20 +404,19 @@ const App = () => {
     [number, number, number][]
   >([]);
   const [geometries, setGeometries] = React.useState<number>(0);
-  const [removedRows, setRemovedRows] = React.useState<number>(0);
   const settings = useAppStore().settings;
 
   const [gameState, setGameState] = React.useState<GameState>({
     state: "stopped",
     isGameOver: false,
+    removedRows: 0,
   });
 
   const callbacks: StateUpdateCallbacks = {
     currentPiece: () => {},
     fallenCubes: setFallenCubes,
     rendererInfo: (rendererInfo) => setGeometries(rendererInfo.geometries),
-    removeRow: () => setRemovedRows((prev) => prev + 1),
-    updateGameState: setGameState,
+    updateGameState: (state) => setGameState({ ...state }),
   };
 
   const gameController = useRef<GameController>();
@@ -451,7 +451,7 @@ const App = () => {
         <br />
         {gameState.state}
         <br />
-        Removed rows: {removedRows}
+        Removed rows: {gameState.removedRows}
         <br />
         <br />
         Geometries: {geometries}
