@@ -4,6 +4,7 @@ import GameRenderer from "./rendering/gameRenderer";
 import Scheduler from "./scheduler";
 import Camera from "./rendering/camera";
 import AsyncFunctionQueue from "./AsyncFunctionQueue";
+import { GameState, GameStateCallback } from "./gameState";
 
 export type BlockSet = "flat" | "basic" | "extended";
 
@@ -45,6 +46,7 @@ export type StateUpdateCallbacks = {
   fallenCubes: (fallenCubes: [number, number, number][]) => void;
   rendererInfo: (info: { geometries: number }) => void;
   removeRow: () => void;
+  updateGameState: GameStateCallback;
 };
 
 export type Context = {
@@ -58,11 +60,14 @@ export type Context = {
   schedulers: {
     falling: Scheduler;
   };
+  onGameOver: () => void;
 };
 
 export type GameController = {
-  stop: () => void;
-  togglePause: () => void;
+  start: () => void;
+  stop: (isGameOver: boolean) => void;
+  pause: () => void;
+  resume: () => void;
   updateSettings: (s: Settings) => void;
   updateCamera: {
     fov: (fov: number) => void;

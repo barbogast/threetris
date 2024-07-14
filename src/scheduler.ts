@@ -11,7 +11,7 @@ class Scheduler {
     this.#clock = new THREE.Clock();
     this.#interval = interval;
     this.#callback = callback;
-    this.#stopped = false;
+    this.#stopped = true;
     this.#elapsed = 0;
   }
 

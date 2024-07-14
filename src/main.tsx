@@ -24,6 +24,7 @@ import * as currentPiece from "./rendering/currentPiece";
 import { disposeObject } from "./utils";
 import Camera from "./rendering/camera";
 import AsyncFunctionQueue, { OnFinish } from "./AsyncFunctionQueue";
+import GameStateManager, { GameState } from "./gameState";
 
 const setup = (context: Context) => {
   const { renderer, settings, camera } = context;
@@ -265,6 +266,11 @@ const addPiece = (context: Context) => {
   const offsets = parseShapeDefinition(shape);
   const mesh = currentPiece.renderCurrentPiece(context, offsets);
   animator.setTarget(mesh);
+
+  const currentCubes = currentPiece.getCurrentCubes(mesh);
+  if (fallenCubes.pieceCollidesWithFallenCube(context, currentCubes)) {
+    context.onGameOver();
+  }
 };
 
 const letCurrentPieceFallDown = (context: Context) => {
@@ -311,6 +317,7 @@ const main = (
   settings: Settings,
   callbacks: StateUpdateCallbacks
 ): GameController => {
+  const gameState = new GameStateManager(callbacks.updateGameState);
   const scene = new THREE.Scene();
   const animator = new GameAnimator(settings.animationDuration);
   const camera = new Camera(settings);
@@ -319,8 +326,6 @@ const main = (
   const fallingScheduler = new Scheduler(settings.fallingSpeed, () =>
     letCurrentPieceFallDown(context)
   );
-
-  if (settings.paused) fallingScheduler.stop();
 
   const context: Context = {
     scene,
@@ -333,11 +338,12 @@ const main = (
     schedulers: {
       falling: fallingScheduler,
     },
+    onGameOver: () => {
+      gameState.stop(true);
+      removeEventListener("keydown", keyPress);
+      fallingScheduler.stop();
+    },
   };
-
-  setup(context);
-
-  addPiece(context);
 
   const keyPress = (e: KeyboardEvent) => {
     const unhandled = onKeyPress(context, e.key);
@@ -345,28 +351,38 @@ const main = (
       e.preventDefault();
     }
   };
-  addEventListener("keydown", keyPress);
-
-  let stop = false;
 
   const mainLoop = () => {
     fallingScheduler.tick();
     animator.update();
     renderer.renderScene(context);
-    if (!stop) requestAnimationFrame(mainLoop);
+    if (gameState.isRunning()) requestAnimationFrame(mainLoop);
   };
 
-  mainLoop();
-
   return {
-    stop: () => {
-      stop = true;
-      removeEventListener("keydown", keyPress);
+    start: () => {
+      scene.clear();
+      setup(context);
+      addPiece(context);
+      if (!settings.paused) fallingScheduler.start();
+      addEventListener("keydown", keyPress);
+      gameState.start();
+      mainLoop();
     },
-    togglePause: () => {
-      fallingScheduler.isStopped()
-        ? fallingScheduler.start()
-        : fallingScheduler.stop();
+    stop: (isGameOver: boolean) => {
+      gameState.stop(isGameOver);
+      removeEventListener("keydown", keyPress);
+      fallingScheduler.stop();
+      scene.clear();
+    },
+    pause: () => {
+      gameState.pause();
+      fallingScheduler.stop();
+    },
+    resume: () => {
+      fallingScheduler.start();
+      gameState.start();
+      mainLoop();
     },
     updateSettings: (s: Settings) => {
       settings = s;
@@ -386,17 +402,21 @@ const App = () => {
   const [fallenCubes, setFallenCubes] = React.useState<
     [number, number, number][]
   >([]);
-  const [rendererInfo, setRendererInfo] = React.useState<{
-    geometries: number;
-  }>({ geometries: 0 });
+  const [geometries, setGeometries] = React.useState<number>(0);
   const [removedRows, setRemovedRows] = React.useState<number>(0);
   const settings = useAppStore().settings;
+
+  const [gameState, setGameState] = React.useState<{
+    state: GameState;
+    isGameOver: boolean;
+  }>({ state: "stopped", isGameOver: false });
 
   const callbacks: StateUpdateCallbacks = {
     currentPiece: () => {},
     fallenCubes: setFallenCubes,
-    rendererInfo: setRendererInfo,
+    rendererInfo: (rendererInfo) => setGeometries(rendererInfo.geometries),
     removeRow: () => setRemovedRows((prev) => prev + 1),
+    updateGameState: setGameState,
   };
 
   const gameController = useRef<GameController>();
@@ -404,7 +424,7 @@ const App = () => {
   useEffect(() => {
     const controller = main(settings, callbacks);
     gameController.current = controller;
-    return controller.stop;
+    return () => controller.stop(false);
   }, [
     settings.shaftSizeX,
     settings.shaftSizeY,
@@ -423,18 +443,27 @@ const App = () => {
     <div style={{ display: "flex", flexDirection: "row" }}>
       <div id="scene"></div>
       <div id="settings" style={{ width: SETTINGS_WIDTH }}>
+        {gameState.state === "stopped" && (
+          <button onClick={() => gameController.current?.start()}>
+            {gameState.isGameOver ? "Restart" : "Start"}
+          </button>
+        )}
+        <br />
+        {gameState.state}
+        <br />
         Removed rows: {removedRows}
         <br />
         <br />
-        Geometries: {rendererInfo.geometries}
+        Geometries: {geometries}
         <br />
         <br />
         Fallen cubes: {fallenCubes.length}
         <br />
         <br />
-        {gameController.current && (
-          <SettingsPanel gameController={gameController.current} />
-        )}
+        {["running", "paused"].includes(gameState.state) &&
+          gameController.current && (
+            <SettingsPanel gameController={gameController.current} />
+          )}
       </div>
     </div>
   );

@@ -41,7 +41,11 @@ const SettingsPanel = ({ gameController }: Props) => {
           updateSettings({
             paused: !settings.paused,
           });
-          gameController.togglePause();
+          if (settings.paused) {
+            gameController.resume();
+          } else {
+            gameController.pause();
+          }
         }}
       />{" "}
       Paused
