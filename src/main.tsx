@@ -16,7 +16,6 @@ import * as shaft from "./rendering/shaft";
 
 import GameRenderer from "./rendering/gameRenderer";
 import { getRandomShape } from "./shapeDefinitions";
-import { SETTINGS_WIDTH } from "./config";
 import GameAnimator from "./rendering/gameAnimator";
 import Scheduler from "./scheduler";
 import * as fallenCubes from "./rendering/fallenCubes";
@@ -440,9 +439,16 @@ const App = () => {
   }, [settings.fallingSpeed, settings.animationDuration, settings.blockSet]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "row" }}>
-      <div id="scene"></div>
-      <div id="settings" style={{ width: SETTINGS_WIDTH }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "stretch",
+        height: "100%",
+      }}
+    >
+      <div id="scene" style={{ flex: 1 }}></div>
+      <div id="settings" style={{ width: 300 }}>
         {gameState.state === "stopped" && (
           <button onClick={() => gameController.current?.start()}>
             {gameState.isGameOver ? "Restart" : "Start"}

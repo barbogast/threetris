@@ -1,5 +1,6 @@
 import { CameraSettings, GameSettings, Settings } from "./types";
 
+export const ASPECT_RATIO = 1.375;
 export const getGameDefaults = (): GameSettings => ({
   shaftSizeX: 5,
   shaftSizeY: 12,
@@ -28,5 +29,3 @@ export const getAllDefaults = (): Settings => {
   const cameraDefaults = getCameraDefaults(gameDefaults);
   return { ...gameDefaults, ...cameraDefaults };
 };
-
-export const SETTINGS_WIDTH = 300;

@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 import { Context, StateUpdateCallbacks } from "../types";
-import { SETTINGS_WIDTH } from "../config";
+import { ASPECT_RATIO } from "../config";
 
 class GameRenderer {
   #callbacks?: StateUpdateCallbacks;
@@ -15,12 +15,19 @@ class GameRenderer {
     const { callbacks } = context;
     this.#callbacks = callbacks;
 
-    this.#renderer.setSize(
-      window.innerWidth - SETTINGS_WIDTH,
-      window.innerHeight
-    );
+    const el = document.getElementById("scene");
 
-    document.getElementById("scene")?.appendChild(this.#renderer.domElement);
+    let height = el!.offsetHeight;
+    let width = el!.offsetHeight * ASPECT_RATIO;
+
+    if (width > el!.offsetWidth) {
+      width = el!.offsetWidth;
+      height = el!.offsetWidth / ASPECT_RATIO;
+    }
+
+    el!.appendChild(this.#renderer.domElement);
+
+    this.#renderer.setSize(width, height);
   }
 
   getDomElement() {
