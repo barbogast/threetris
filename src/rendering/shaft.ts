@@ -131,3 +131,10 @@ export const renderFloorGrid = (context: Context) => {
 
   renderShaftLines(context, "floor-lines", vectors);
 };
+
+export const renderAll = (context: Context) => {
+  renderContainer(context);
+  renderFloorGrid(context);
+  renderWallGridLongLines(context);
+  renderWallGridShortLines(context);
+};

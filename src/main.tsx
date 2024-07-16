@@ -36,11 +36,7 @@ const setup = (context: Context) => {
 
   fallenCubes.setup(context);
   shaft.setup(context);
-
-  shaft.renderContainer(context);
-  shaft.renderFloorGrid(context);
-  shaft.renderWallGridLongLines(context);
-  shaft.renderWallGridShortLines(context);
+  shaft.renderAll(context);
 };
 
 const onKeyPress = (context: Context, key: string) => {
