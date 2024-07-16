@@ -23,7 +23,7 @@ const renderShaftCube = (
   const cube = new THREE.LineSegments(edges, shaftMaterial);
   cube.position.copy(position);
   cube.name = "container";
-  scene.add(cube);
+  scene.getObjectByName(SHAFT_LINES_ID)!.add(cube);
 };
 
 const renderShaftLines = (
