@@ -68,10 +68,4 @@ export type GameController = {
   stop: (isGameOver: boolean) => void;
   pause: () => void;
   resume: () => void;
-  updateSettings: (s: Settings) => void;
-  updateCamera: {
-    fov: (fov: number) => void;
-    position: (position: THREE.Vector3) => void;
-    lookAt: (position: THREE.Vector3) => void;
-  };
 };

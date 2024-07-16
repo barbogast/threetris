@@ -3,7 +3,6 @@ import ReactDOM from "react-dom/client";
 import * as THREE from "three";
 
 import { parseShapeDefinition } from "./shape";
-import SettingsPanel from "./components/SettingsPanel";
 import {
   Axis,
   Context,
@@ -11,7 +10,6 @@ import {
   Settings,
   StateUpdateCallbacks,
 } from "./types";
-import useAppStore from "./appStore";
 import * as shaft from "./rendering/shaft";
 
 import GameRenderer from "./rendering/gameRenderer";
@@ -20,10 +18,12 @@ import GameAnimator from "./rendering/gameAnimator";
 import Scheduler from "./scheduler";
 import * as fallenCubes from "./rendering/fallenCubes";
 import * as currentPiece from "./rendering/currentPiece";
+import * as debugUI from "./debugUI";
 import { disposeObject } from "./utils";
 import Camera from "./rendering/camera";
 import AsyncFunctionQueue, { OnFinish } from "./AsyncFunctionQueue";
 import GameStateManager, { GameState } from "./gameState";
+import { loadSettings } from "./persist";
 
 const setup = (context: Context) => {
   const { renderer, settings, camera } = context;
@@ -308,7 +308,7 @@ const handlePieceReachedFloor = (
 // Needs to be a global since we can have only one THREE.WebGLRenderer()
 const renderer = new GameRenderer();
 
-const main = (
+export const main = (
   settings: Settings,
   callbacks: StateUpdateCallbacks
 ): GameController => {
@@ -355,7 +355,7 @@ const main = (
     if (gameState.isRunning()) requestAnimationFrame(mainLoop);
   };
 
-  return {
+  const controller: GameController = {
     start: () => {
       scene.clear();
       setup(context);
@@ -380,18 +380,11 @@ const main = (
       gameState.start();
       mainLoop();
     },
-    updateSettings: (s: Settings) => {
-      settings = s;
-      context.settings = s;
-      animator.duration = settings.animationDuration;
-      fallingScheduler.updateInterval(settings.fallingSpeed);
-    },
-    updateCamera: {
-      fov: (...args) => camera.updateFov(...args),
-      position: (...args) => camera.updatePosition(...args),
-      lookAt: (...args) => camera.updateLookAt(...args),
-    },
   };
+
+  debugUI.setup(context, controller);
+
+  return controller;
 };
 
 const App = () => {
@@ -399,7 +392,6 @@ const App = () => {
     [number, number, number][]
   >([]);
   const [geometries, setGeometries] = React.useState<number>(0);
-  const settings = useAppStore().settings;
 
   const [gameState, setGameState] = React.useState<GameState>({
     state: "stopped",
@@ -417,22 +409,10 @@ const App = () => {
   const gameController = useRef<GameController>();
 
   useEffect(() => {
-    const controller = main(settings, callbacks);
+    const controller = main(loadSettings(), callbacks);
     gameController.current = controller;
     return () => controller.stop(false);
-  }, [
-    settings.shaftSizeX,
-    settings.shaftSizeY,
-    settings.shaftSizeZ,
-    settings.aspect,
-    settings.zoom,
-    settings.enableOrbitalControl,
-  ]);
-
-  // Some settings can be updated while the game is running.
-  useEffect(() => {
-    gameController.current!.updateSettings(settings);
-  }, [settings.fallingSpeed, settings.animationDuration, settings.blockSet]);
+  }, []);
 
   return (
     <div
@@ -460,12 +440,6 @@ const App = () => {
         <br />
         <br />
         Fallen cubes: {fallenCubes.length}
-        <br />
-        <br />
-        {["running", "paused"].includes(gameState.state) &&
-          gameController.current && (
-            <SettingsPanel gameController={gameController.current} />
-          )}
       </div>
     </div>
   );

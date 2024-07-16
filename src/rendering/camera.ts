@@ -64,6 +64,10 @@ class Camera {
   updateLookAt(lookAt: THREE.Vector3) {
     this.#camera!.lookAt(lookAt.x, lookAt.y, lookAt.z);
   }
+
+  updateZoom(zoom: number) {
+    this.#camera!.zoom = zoom;
+  }
 }
 
 export default Camera;

@@ -41,6 +41,18 @@ class GameRenderer {
       geometries: this.#renderer.info.memory.geometries,
     });
   }
+
+  removeDOMElement(context: Context) {
+    const { gameState } = context;
+    const el = document.getElementById("scene");
+    const children = el?.children;
+    if (children) {
+      for (let i = 0; i < children.length; i++) {
+        children[i].remove();
+      }
+    }
+    gameState.stop(false);
+  }
 }
 
 export default GameRenderer;
