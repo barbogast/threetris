@@ -8,8 +8,11 @@ const elements = {
   shaftSizeY: document.getElementById("shaft-size-y") as HTMLSelectElement,
   shaftSizeZ: document.getElementById("shaft-size-z") as HTMLSelectElement,
   blockSet: document.getElementById("block-set") as HTMLSelectElement,
+  scoreScore: document.getElementById("score-score")!,
+  scoreHighScore: document.getElementById("score-high-score")!,
   scoreCubesPlayed: document.getElementById("score-cubes-played")!,
   scorePit: document.getElementById("score-pit")!,
+  scoreBlockSet: document.getElementById("score-block-set")!,
 };
 
 const getInput = (name: string) => {
@@ -30,6 +33,10 @@ export const setup = (controller: GameController) => {
       blockSet: elements.blockSet.value as BlockSet,
       ...getCameraDefaults(shaftSettings),
     };
+
+    const x = `<span class="small-x">x</span>`;
+    elements.scorePit.innerHTML = `${settings.shaftSizeX}${x}${settings.shaftSizeZ}${x}${settings.shaftSizeY}`;
+    elements.scoreBlockSet.textContent = settings.blockSet;
     controller.start(settings);
   };
 
@@ -78,6 +85,7 @@ export const setup = (controller: GameController) => {
   });
 
   controller.addEventListener("scoreUpdate", ({ score }) => {
+    elements.scoreScore.textContent = String(score.removedRows);
     elements.scoreCubesPlayed.textContent = String(score.fallenCubes);
   });
 };

@@ -87,12 +87,12 @@ body {
   padding-top: 4px;
   padding-right: 15px;
   font-size: 40px;
-  font-weight: 600;
   line-height: 30px;
 }
 
 .green-font {
   color: #04a601;
+  font-weight: 600;
   text-align: right;
 }
 
@@ -103,4 +103,14 @@ body {
 
 .flexer {
   flex: 1;
+}
+
+.value-small {
+  font-size: 25px;
+}
+
+.small-x {
+  font-size: 20px;
+  position: relative;
+  bottom: 5px;
 }
