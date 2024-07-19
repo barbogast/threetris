@@ -302,10 +302,7 @@ const handlePieceReachedFloor = (
   }
 };
 
-// Needs to be a global since we can have only one THREE.WebGLRenderer()
-const renderer = new GameRenderer();
-
-export const main = () => {
+const createContext = () => {
   const settings = loadSettings();
   const gameEvents = new EventManager(renderer.getDomElement());
   const gameState = new GameStateManager(gameEvents);
@@ -332,6 +329,15 @@ export const main = () => {
     events: gameEvents,
   };
 
+  return context;
+};
+
+// Needs to be a global since we can have only one THREE.WebGLRenderer()
+const renderer = new GameRenderer();
+
+export const main = () => {
+  const context = createContext();
+
   const keyPress = (e: KeyboardEvent) => {
     const unhandled = onKeyPress(context, e.key);
     if (!unhandled) {
@@ -339,44 +345,40 @@ export const main = () => {
     }
   };
 
-  gameEvents.addListener("gameStateChange", ({ gameState }) => {
+  context.events.addListener("gameStateChange", ({ gameState }) => {
     if (gameState.state === "stopped") {
       removeEventListener("keydown", keyPress);
-      fallingScheduler.stop();
+      context.schedulers.falling.stop();
     }
   });
 
-  const updateSettings = (newSettings: Settings) => {
-    context.settings = newSettings;
-    gameEvents.dispatch("settingsUpdate", { settings: newSettings });
-  };
-
   const mainLoop = () => {
-    fallingScheduler.tick();
-    animator.update();
+    context.schedulers.falling.tick();
+    context.animator.update();
     renderer.renderScene(context);
-    if (gameState.getState().state === "running")
+    if (context.gameState.getState().state === "running")
       requestAnimationFrame(mainLoop);
   };
 
   const controller: GameController = {
-    start: (settings_: Settings) => {
-      updateSettings(settings_);
-      scene.clear();
+    start: (newSettings: Settings) => {
+      context.settings = newSettings;
+      context.events.dispatch("settingsUpdate", { settings: newSettings });
+      context.scene.clear();
       setup(context);
       addPiece(context);
-      if (!settings.paused) fallingScheduler.start();
+      if (!context.settings.paused) context.schedulers.falling.start();
       addEventListener("keydown", keyPress);
-      gameState.start();
+      context.gameState.start();
       mainLoop();
     },
     pause: () => {
-      gameState.pause();
-      fallingScheduler.stop();
+      context.gameState.pause();
+      context.schedulers.falling.stop();
     },
     resume: () => {
-      fallingScheduler.start();
-      gameState.start();
+      context.schedulers.falling.start();
+      context.gameState.start();
       mainLoop();
     },
     addEventListener: context.events.addListener,
