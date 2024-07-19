@@ -305,7 +305,8 @@ const handlePieceReachedFloor = (
 // Needs to be a global since we can have only one THREE.WebGLRenderer()
 const renderer = new GameRenderer();
 
-export const main = (settings: Settings) => {
+export const main = () => {
+  const settings = loadSettings();
   const gameEvents = new EventManager(renderer.getDomElement());
   const gameState = new GameStateManager(gameEvents);
   const scene = new THREE.Scene();
@@ -343,6 +344,11 @@ export const main = (settings: Settings) => {
     }
   };
 
+  const updateSettings = (newSettings: Settings) => {
+    context.settings = newSettings;
+    gameEvents.dispatch("settingsUpdate", { settings: newSettings });
+  };
+
   const mainLoop = () => {
     fallingScheduler.tick();
     animator.update();
@@ -353,8 +359,7 @@ export const main = (settings: Settings) => {
 
   const controller: GameController = {
     start: (settings_: Settings) => {
-      settings = settings_;
-      context.settings = settings_;
+      updateSettings(settings_);
       scene.clear();
       setup(context);
       addPiece(context);
@@ -385,4 +390,4 @@ export const main = (settings: Settings) => {
   ui.setup(controller);
 };
 
-main(loadSettings());
+main();

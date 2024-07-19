@@ -1,6 +1,10 @@
 import { GameScore, GameState } from "./gameState";
+import { Settings } from "./types";
 
 type Events = {
+  settingsUpdate: {
+    settings: Settings;
+  };
   gameStateChange: {
     gameState: GameState;
   };

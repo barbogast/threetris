@@ -31,10 +31,15 @@ let gui: GUI;
 export const setup = (context: Context, controller: GameController) => {
   const { settings, schedulers, animator, camera, renderer } = context;
 
+  controller.addEventListener("settingsUpdate", ({ settings: newSettings }) => {
+    Object.assign(settings, newSettings);
+    gui.controllersRecursive().forEach((c) => c.updateDisplay());
+  });
+
   const reinitialize = () => {
     controller.stop(false);
     renderer.removeDOMElement(context);
-    main(settings);
+    main();
     controller.start(settings);
   };
 
