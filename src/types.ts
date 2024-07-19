@@ -47,16 +47,14 @@ export type Direction = 1 | -1;
 
 export type Context = {
   scene: THREE.Scene;
-  events: GameEvents;
+  gameEvents: GameEvents;
   gameState: GameStateManager;
   renderer: GameRenderer;
   animator: GameAnimator;
   camera: Camera;
   settings: Settings;
   eventQueue: AsyncFunctionQueue;
-  schedulers: {
-    falling: Scheduler;
-  };
+  fallingScheduler: Scheduler;
 };
 
 export type GameController = {

@@ -13,7 +13,7 @@ class GameRenderer {
   }
 
   setup(context: Context) {
-    this.#events = context.events;
+    this.#events = context.gameEvents;
 
     const el = document.getElementById("scene");
 

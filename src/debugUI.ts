@@ -29,8 +29,15 @@ const applyDefaults = <O extends Record<string, unknown>>(
 
 let gui: GUI;
 export const setup = (context: Context, controller: GameController) => {
-  const { settings, schedulers, animator, camera, renderer, scene, gameState } =
-    context;
+  const {
+    settings,
+    fallingScheduler,
+    animator,
+    camera,
+    renderer,
+    scene,
+    gameState,
+  } = context;
 
   controller.addEventListener("settingsUpdate", ({ settings: newSettings }) => {
     Object.assign(settings, newSettings);
@@ -74,7 +81,7 @@ export const setup = (context: Context, controller: GameController) => {
   gameFolder.add(settings, "shaftSizeZ", 1, 10, 1).onChange(rerenderShaft);
   gameFolder
     .add(settings, "fallingSpeed", 0, 3, 0.01)
-    .onChange((v: number) => schedulers.falling.updateInterval(v));
+    .onChange((v: number) => fallingScheduler.updateInterval(v));
   gameFolder
     .add(settings, "animationDuration", 0, 1, 0.01)
     .onChange((v: number) => {

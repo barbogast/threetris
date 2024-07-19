@@ -51,7 +51,7 @@ const onKeyPress = (context: Context, key: string) => {
 };
 
 const onSpacebar = (context: Context, done: OnFinish) => {
-  const { animator, settings, schedulers } = context;
+  const { animator, settings, fallingScheduler } = context;
   const currentObject = currentPiece.getThreeObject(context);
 
   let newPiece = currentObject.clone();
@@ -74,7 +74,7 @@ const onSpacebar = (context: Context, done: OnFinish) => {
 
   if (newPiece.position.y === currentObject.position.y) {
     handlePieceReachedFloor(context, currentPiece.getCurrentCubes(newPiece));
-    schedulers.falling.start();
+    fallingScheduler.start();
     done();
   } else {
     // Stop falling down during the animation.
@@ -83,7 +83,7 @@ const onSpacebar = (context: Context, done: OnFinish) => {
     // Also, we need to reset the timer so that the new piece gets
     // the full interval before it starts falling down (instead of the
     // remainder of the last interval of the previous piece
-    schedulers.falling.stop();
+    fallingScheduler.stop();
 
     const moveDownY = -(currentObject.position.y - newPiece.position.y);
     const animationTrack = animator.getMoveTrack(
@@ -92,7 +92,7 @@ const onSpacebar = (context: Context, done: OnFinish) => {
     animator.playAnimation(animationTrack);
     animator.onEventFinished(() => {
       handlePieceReachedFloor(context, currentPiece.getCurrentCubes(newPiece));
-      !settings.paused && schedulers.falling.start();
+      !settings.paused && fallingScheduler.start();
       disposeObject(newPiece);
       done();
     });
@@ -323,10 +323,8 @@ const createContext = () => {
     animator,
     settings,
     eventQueue,
-    schedulers: {
-      falling: fallingScheduler,
-    },
-    events: gameEvents,
+    fallingScheduler,
+    gameEvents,
   };
 
   return context;
@@ -345,15 +343,15 @@ export const main = () => {
     }
   };
 
-  context.events.addListener("gameStateChange", ({ gameState }) => {
+  context.gameEvents.addListener("gameStateChange", ({ gameState }) => {
     if (gameState.state === "stopped") {
       removeEventListener("keydown", keyPress);
-      context.schedulers.falling.stop();
+      context.fallingScheduler.stop();
     }
   });
 
   const mainLoop = () => {
-    context.schedulers.falling.tick();
+    context.fallingScheduler.tick();
     context.animator.update();
     renderer.renderScene(context);
     if (context.gameState.getState().state === "running")
@@ -363,25 +361,25 @@ export const main = () => {
   const controller: GameController = {
     start: (newSettings: Settings) => {
       context.settings = newSettings;
-      context.events.dispatch("settingsUpdate", { settings: newSettings });
+      context.gameEvents.dispatch("settingsUpdate", { settings: newSettings });
       context.scene.clear();
       setup(context);
       addPiece(context);
-      if (!context.settings.paused) context.schedulers.falling.start();
+      if (!context.settings.paused) context.fallingScheduler.start();
       addEventListener("keydown", keyPress);
       context.gameState.start();
       mainLoop();
     },
     pause: () => {
       context.gameState.pause();
-      context.schedulers.falling.stop();
+      context.fallingScheduler.stop();
     },
     resume: () => {
-      context.schedulers.falling.start();
+      context.fallingScheduler.start();
       context.gameState.start();
       mainLoop();
     },
-    addEventListener: context.events.addListener,
+    addEventListener: context.gameEvents.addListener,
   };
 
   debugUI.setup(context, controller);
