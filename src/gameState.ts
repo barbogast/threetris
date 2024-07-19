@@ -3,23 +3,23 @@ import EventManager from "./gameEvents";
 export type GameState = {
   state: "stopped" | "running" | "paused";
   isGameOver: boolean;
-  removedRows: number;
-  fallenCubes: number;
 };
+
+export type GameScore = { removedRows: number; fallenCubes: number };
 
 export type GameStateCallback = (state: GameState) => void;
 
 class GameStateManager {
   #state: GameState;
   #events: EventManager;
+  #score: GameScore;
 
   constructor(events: EventManager) {
     this.#state = {
       state: "stopped",
       isGameOver: false,
-      removedRows: 0,
-      fallenCubes: 0,
     };
+    this.#score = { removedRows: 0, fallenCubes: 0 };
     this.#events = events;
   }
 
@@ -28,8 +28,14 @@ class GameStateManager {
     this.#events.dispatch("gameStateChange", { gameState: this.#state });
   }
 
+  #changeScore(score: Partial<GameScore>) {
+    Object.assign(this.#score, score);
+    this.#events.dispatch("scoreUpdate", { score: this.#score });
+  }
+
   start() {
-    this.#changeState({ state: "running", isGameOver: false, removedRows: 0 });
+    this.#changeState({ state: "running", isGameOver: false });
+    this.#changeScore({ removedRows: 0, fallenCubes: 0 });
   }
 
   pause() {
@@ -41,31 +47,15 @@ class GameStateManager {
   }
 
   removeRow() {
-    this.#changeState({ removedRows: this.#state.removedRows + 1 });
+    this.#changeScore({ removedRows: this.#score.removedRows + 1 });
   }
 
   pieceFellDown(numberOfCubes: number) {
-    this.#changeState({ fallenCubes: this.#state.fallenCubes + numberOfCubes });
+    this.#changeScore({ fallenCubes: this.#score.fallenCubes + numberOfCubes });
   }
 
-  isRunning() {
-    return this.#state.state === "running";
-  }
-
-  isStopped() {
-    return this.#state.state === "stopped";
-  }
-
-  isPaused() {
-    return this.#state.state === "paused";
-  }
-
-  isGameOver() {
-    return this.#state.isGameOver;
-  }
-
-  removedRows() {
-    return this.#state.removedRows;
+  getState() {
+    return this.#state;
   }
 }
 

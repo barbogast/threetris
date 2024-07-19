@@ -347,7 +347,8 @@ export const main = (settings: Settings) => {
     fallingScheduler.tick();
     animator.update();
     renderer.renderScene(context);
-    if (gameState.isRunning()) requestAnimationFrame(mainLoop);
+    if (gameState.getState().state === "running")
+      requestAnimationFrame(mainLoop);
   };
 
   const controller: GameController = {

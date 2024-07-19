@@ -1,11 +1,11 @@
-import { GameState } from "./gameState";
+import { GameScore, GameState } from "./gameState";
 
 type Events = {
   gameStateChange: {
     gameState: GameState;
   };
   scoreUpdate: {
-    removedRows: number;
+    score: GameScore;
   };
   rendererUpdate: {
     geometries: number;

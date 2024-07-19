@@ -65,7 +65,6 @@ export const setup = (controller: GameController) => {
     switch (gameState.state) {
       case "running": {
         elements.overlay.classList.add("removed");
-        elements.scoreCubesPlayed.textContent = String(gameState.fallenCubes);
         break;
       }
       case "stopped": {
@@ -76,5 +75,9 @@ export const setup = (controller: GameController) => {
         break;
       }
     }
+  });
+
+  controller.addEventListener("scoreUpdate", ({ score }) => {
+    elements.scoreCubesPlayed.textContent = String(score.fallenCubes);
   });
 };

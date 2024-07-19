@@ -4,7 +4,7 @@ import GameRenderer from "./rendering/gameRenderer";
 import Scheduler from "./scheduler";
 import Camera from "./rendering/camera";
 import AsyncFunctionQueue from "./AsyncFunctionQueue";
-import GameStateManager, { GameState, GameStateCallback } from "./gameState";
+import GameStateManager from "./gameState";
 import GameEvents from "./gameEvents";
 
 export type BlockSet = "flat" | "basic" | "extended";
