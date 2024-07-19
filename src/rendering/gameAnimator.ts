@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { getAxisAndAngelFromQuaternion } from "../utils";
+import { getAxisAndAngelFromQuaternion } from "../threeUtils";
 
 const roundTo90Degrees = (q: THREE.Quaternion) => {
   const { angle, x, y, z } = getAxisAndAngelFromQuaternion(q);

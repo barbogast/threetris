@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { Context } from "../types";
-import { disposeObject } from "../utils";
+import { disposeObject } from "../threeUtils";
 
 const FALLEN_CUBES_ID = "fallen-cubes";
 

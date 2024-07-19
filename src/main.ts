@@ -13,7 +13,7 @@ import Scheduler from "./scheduler";
 import * as fallenCubes from "./rendering/fallenCubes";
 import * as currentPiece from "./rendering/currentPiece";
 import * as debugUI from "./debugUI";
-import { disposeObject } from "./utils";
+import { disposeObject } from "./threeUtils";
 import Camera from "./rendering/camera";
 import AsyncFunctionQueue, { OnFinish } from "./AsyncFunctionQueue";
 import GameStateManager from "./gameState";
