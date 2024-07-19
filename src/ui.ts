@@ -1,4 +1,5 @@
 import { getGameDefaults, getCameraDefaults, gameModes } from "./config";
+import { GameState } from "./gameState";
 import { ShaftSettings, Settings, BlockSet, GameController } from "./types";
 
 const elements = {
@@ -20,38 +21,54 @@ const getInput = (name: string) => {
   return elements as NodeListOf<HTMLInputElement>;
 };
 
+const startGame = (controller: GameController) => {
+  const shaftSettings: ShaftSettings = {
+    shaftSizeX: parseInt(elements.shaftSizeX.value!),
+    shaftSizeY: parseInt(elements.shaftSizeY.value!),
+    shaftSizeZ: parseInt(elements.shaftSizeZ.value!),
+  };
+  const settings: Settings = {
+    ...getGameDefaults(),
+    ...shaftSettings,
+    blockSet: elements.blockSet.value as BlockSet,
+    ...getCameraDefaults(shaftSettings),
+  };
+
+  const x = `<span class="small-x">x</span>`;
+  elements.scorePit.innerHTML = `${settings.shaftSizeX}${x}${settings.shaftSizeZ}${x}${settings.shaftSizeY}`;
+  elements.scoreBlockSet.textContent = settings.blockSet;
+  controller.start(settings);
+};
+
+const updateGameMode = () => {
+  const mode = (
+    document.querySelector(`input[name=game-mode]:checked`) as HTMLInputElement
+  ).value;
+  const values = gameModes[mode]!;
+  elements.shaftSizeX.value = String(values.shaftSizeX);
+  elements.shaftSizeY.value = String(values.shaftSizeY);
+  elements.shaftSizeZ.value = String(values.shaftSizeZ);
+  elements.blockSet.value = String(values.blockSet);
+};
+
+const onGameStateChange = ({ gameState }: { gameState: GameState }) => {
+  switch (gameState.state) {
+    case "running": {
+      elements.overlay.classList.add("removed");
+      break;
+    }
+    case "stopped": {
+      elements.overlay.classList.remove("removed");
+      if (gameState.isGameOver) {
+        elements.gameOver.classList.remove("hidden");
+      }
+      break;
+    }
+  }
+};
+
 export const setup = (controller: GameController) => {
-  document.getElementById("start")!.onclick = () => {
-    const shaftSettings: ShaftSettings = {
-      shaftSizeX: parseInt(elements.shaftSizeX.value!),
-      shaftSizeY: parseInt(elements.shaftSizeY.value!),
-      shaftSizeZ: parseInt(elements.shaftSizeZ.value!),
-    };
-    const settings: Settings = {
-      ...getGameDefaults(),
-      ...shaftSettings,
-      blockSet: elements.blockSet.value as BlockSet,
-      ...getCameraDefaults(shaftSettings),
-    };
-
-    const x = `<span class="small-x">x</span>`;
-    elements.scorePit.innerHTML = `${settings.shaftSizeX}${x}${settings.shaftSizeZ}${x}${settings.shaftSizeY}`;
-    elements.scoreBlockSet.textContent = settings.blockSet;
-    controller.start(settings);
-  };
-
-  const updateGameMode = () => {
-    const mode = (
-      document.querySelector(
-        `input[name=game-mode]:checked`
-      ) as HTMLInputElement
-    ).value;
-    const values = gameModes[mode]!;
-    elements.shaftSizeX.value = String(values.shaftSizeX);
-    elements.shaftSizeY.value = String(values.shaftSizeY);
-    elements.shaftSizeZ.value = String(values.shaftSizeZ);
-    elements.blockSet.value = String(values.blockSet);
-  };
+  document.getElementById("start")!.onclick = () => startGame(controller);
 
   getInput("game-mode").forEach((el) =>
     el.addEventListener("change", updateGameMode)
@@ -68,21 +85,7 @@ export const setup = (controller: GameController) => {
     }
   });
 
-  controller.addEventListener("gameStateChange", ({ gameState }) => {
-    switch (gameState.state) {
-      case "running": {
-        elements.overlay.classList.add("removed");
-        break;
-      }
-      case "stopped": {
-        elements.overlay.classList.remove("removed");
-        if (gameState.isGameOver) {
-          elements.gameOver.classList.remove("hidden");
-        }
-        break;
-      }
-    }
-  });
+  controller.addEventListener("gameStateChange", onGameStateChange);
 
   controller.addEventListener("scoreUpdate", ({ score }) => {
     elements.scoreScore.textContent = String(score.removedRows);
