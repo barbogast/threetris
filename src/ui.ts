@@ -1,0 +1,80 @@
+import { getGameDefaults, getCameraDefaults, gameModes } from "./config";
+import { ShaftSettings, Settings, BlockSet, GameController } from "./types";
+
+const elements = {
+  overlay: document.getElementById("overlay")!,
+  gameOver: document.getElementById("game-over")!,
+  shaftSizeX: document.getElementById("shaft-size-x") as HTMLSelectElement,
+  shaftSizeY: document.getElementById("shaft-size-y") as HTMLSelectElement,
+  shaftSizeZ: document.getElementById("shaft-size-z") as HTMLSelectElement,
+  blockSet: document.getElementById("block-set") as HTMLSelectElement,
+  scoreCubesPlayed: document.getElementById("score-cubes-played")!,
+  scorePit: document.getElementById("score-pit")!,
+};
+
+const getInput = (name: string) => {
+  const elements = document.querySelectorAll(`input[name=${name}]`);
+  return elements as NodeListOf<HTMLInputElement>;
+};
+
+export const setup = (controller: GameController) => {
+  document.getElementById("start")!.onclick = () => {
+    const shaftSettings: ShaftSettings = {
+      shaftSizeX: parseInt(elements.shaftSizeX.value!),
+      shaftSizeY: parseInt(elements.shaftSizeY.value!),
+      shaftSizeZ: parseInt(elements.shaftSizeZ.value!),
+    };
+    const settings: Settings = {
+      ...getGameDefaults(),
+      ...shaftSettings,
+      blockSet: elements.blockSet.value as BlockSet,
+      ...getCameraDefaults(shaftSettings),
+    };
+    controller.start(settings);
+  };
+
+  const updateGameMode = () => {
+    const mode = (
+      document.querySelector(
+        `input[name=game-mode]:checked`
+      ) as HTMLInputElement
+    ).value;
+    const values = gameModes[mode]!;
+    elements.shaftSizeX.value = String(values.shaftSizeX);
+    elements.shaftSizeY.value = String(values.shaftSizeY);
+    elements.shaftSizeZ.value = String(values.shaftSizeZ);
+    elements.blockSet.value = String(values.blockSet);
+  };
+
+  getInput("game-mode").forEach((el) =>
+    el.addEventListener("change", updateGameMode)
+  );
+
+  // Apply the values the initially selected game mode
+  updateGameMode();
+
+  getInput("custom-game")[0].addEventListener("change", (event: Event) => {
+    if ((event!.currentTarget as HTMLInputElement).checked) {
+      document.getElementById("game-settings")?.classList.remove("hidden");
+    } else {
+      document.getElementById("game-settings")?.classList.add("hidden");
+    }
+  });
+
+  controller.addEventListener("gameStateChange", ({ gameState }) => {
+    switch (gameState.state) {
+      case "running": {
+        elements.overlay.classList.add("removed");
+        elements.scoreCubesPlayed.textContent = String(gameState.fallenCubes);
+        break;
+      }
+      case "stopped": {
+        elements.overlay.classList.remove("removed");
+        if (gameState.isGameOver) {
+          elements.gameOver.classList.remove("hidden");
+        }
+        break;
+      }
+    }
+  });
+};

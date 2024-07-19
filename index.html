@@ -1,13 +1,136 @@
 <!DOCTYPE html>
-<html lang="en" style="height: 100%">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + TS</title>
   </head>
-  <body style="height: 100%">
-    <div id="app" style="height: 100%"></div>
+  <body>
+    <div id="outer-container">
+      <div id="scene-container">
+        <div id="scene"></div>
+        <div id="overlay">
+          <div>
+            <div id="game-over" class="hidden">GAME OVER</div>
+            <div class="input-group">
+              <label
+                ><input
+                  type="radio"
+                  name="game-mode"
+                  value="flat-fun"
+                  checked
+                />Flat fun</label
+              >
+              <label
+                ><input
+                  type="radio"
+                  name="game-mode"
+                  value="3d-mania"
+                />3D-Mania</label
+              >
+              <label
+                ><input
+                  type="radio"
+                  name="game-mode"
+                  value="out-of-control"
+                />Out of control</label
+              >
+              <br />
+              <label
+                ><input
+                  type="checkbox"
+                  name="game-mode"
+                  value="practice-mode"
+                />Practice mode</label
+              >
+              <br />
+              <label
+                ><input
+                  type="checkbox"
+                  name="custom-game"
+                  value="custom"
+                />Custom</label
+              >
+            </div>
+            <div id="game-settings" class="input-group hidden">
+              <h3>Pit dimensions</h3>
+              <label
+                >Length
+                <select id="shaft-size-x">
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                </select></label
+              >
+              <label
+                >Width
+                <select id="shaft-size-z">
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                </select></label
+              >
+              <label
+                >Depth
+                <select id="shaft-size-y">
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                  <option value="11">11</option>
+                  <option value="12">12</option>
+                  <option value="13">13</option>
+                  <option value="14">14</option>
+                  <option value="15">15</option>
+                  <option value="16">16</option>
+                  <option value="17">17</option>
+                  <option value="18">18</option>
+                </select></label
+              >
+              <label
+                >Block set
+                <select id="block-set">
+                  <option value="flat">Flat</option>
+                  <option value="basic">Basic</option>
+                  <option value="extended">Extended</option>
+                </select></label
+              >
+              <label
+                >Rotation speed
+                <select id="rotation-speed">
+                  <option value="slow">Slow</option>
+                  <option value="medium">Medium</option>
+                  <option value="fast">Fast</option>
+                </select></label
+              >
+            </div>
+            <button id="start">Start</button>
+          </div>
+        </div>
+      </div>
+      <div id="right-column">
+        <h1>Blockout</h1>
+        <div id="panel">
+          <h2>Score</h2>
+          <div class="value green-font">{gameState.removedRows}</div>
+          <h2>Cubes played</h2>
+          <div id="score-cubes-played" class="value green-font">000</div>
+          <div class="flexer"></div>
+          <h2>High Score</h2>
+          <div class="value green-font">000</div>
+          <h2>Pit</h2>
+          <div id="score-pit" class="value orange-font">000</div>
+          <h2>Block set</h2>
+          <div class="value orange-font">000</div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

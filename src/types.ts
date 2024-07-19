@@ -5,13 +5,17 @@ import Scheduler from "./scheduler";
 import Camera from "./rendering/camera";
 import AsyncFunctionQueue from "./AsyncFunctionQueue";
 import GameStateManager, { GameState, GameStateCallback } from "./gameState";
+import GameEvents from "./gameEvents";
 
 export type BlockSet = "flat" | "basic" | "extended";
 
-export type GameSettings = {
+export type ShaftSettings = {
   shaftSizeX: number;
   shaftSizeY: number;
   shaftSizeZ: number;
+};
+
+export type GameSettings = ShaftSettings & {
   fallingSpeed: number;
   animationDuration: number;
   paused: boolean;
@@ -41,16 +45,9 @@ export type Edge = [number, number];
 export type Axis = "x" | "y" | "z";
 export type Direction = 1 | -1;
 
-export type StateUpdateCallbacks = {
-  currentPiece: () => void;
-  fallenCubes: (fallenCubes: [number, number, number][]) => void;
-  rendererInfo: (info: { geometries: number }) => void;
-  updateGameState: GameStateCallback;
-};
-
 export type Context = {
   scene: THREE.Scene;
-  callbacks: StateUpdateCallbacks;
+  events: GameEvents;
   gameState: GameStateManager;
   renderer: GameRenderer;
   animator: GameAnimator;
@@ -64,8 +61,9 @@ export type Context = {
 };
 
 export type GameController = {
-  start: () => void;
+  start: (settings: Settings) => void;
   stop: (isGameOver: boolean) => void;
   pause: () => void;
   resume: () => void;
+  addEventListener: GameEvents["addListener"];
 };

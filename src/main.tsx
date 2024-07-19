@@ -1,15 +1,9 @@
-import React, { useEffect, useRef } from "react";
-import ReactDOM from "react-dom/client";
+import "./style.css";
+
 import * as THREE from "three";
 
 import { parseShapeDefinition } from "./shape";
-import {
-  Axis,
-  Context,
-  GameController,
-  Settings,
-  StateUpdateCallbacks,
-} from "./types";
+import { Axis, Context, GameController, Settings } from "./types";
 import * as shaft from "./rendering/shaft";
 
 import GameRenderer from "./rendering/gameRenderer";
@@ -22,8 +16,10 @@ import * as debugUI from "./debugUI";
 import { disposeObject } from "./utils";
 import Camera from "./rendering/camera";
 import AsyncFunctionQueue, { OnFinish } from "./AsyncFunctionQueue";
-import GameStateManager, { GameState } from "./gameState";
+import GameStateManager from "./gameState";
 import { loadSettings } from "./persist";
+import * as ui from "./ui";
+import EventManager from "./gameEvents";
 
 const setup = (context: Context) => {
   const { renderer, settings, camera } = context;
@@ -294,6 +290,7 @@ const handlePieceReachedFloor = (
   const { gameState } = context;
 
   fallenCubes.addPiece(context, currentCubes);
+  gameState.pieceFellDown(currentCubes.length);
 
   disposeObject(currentPiece.getThreeObject(context));
   addPiece(context);
@@ -308,11 +305,9 @@ const handlePieceReachedFloor = (
 // Needs to be a global since we can have only one THREE.WebGLRenderer()
 const renderer = new GameRenderer();
 
-export const main = (
-  settings: Settings,
-  callbacks: StateUpdateCallbacks
-): GameController => {
-  const gameState = new GameStateManager(callbacks.updateGameState);
+export const main = (settings: Settings) => {
+  const gameEvents = new EventManager(renderer.getDomElement());
+  const gameState = new GameStateManager(gameEvents);
   const scene = new THREE.Scene();
   const animator = new GameAnimator(settings.animationDuration);
   const camera = new Camera(settings);
@@ -324,7 +319,6 @@ export const main = (
 
   const context: Context = {
     scene,
-    callbacks,
     gameState,
     renderer,
     camera,
@@ -334,6 +328,7 @@ export const main = (
     schedulers: {
       falling: fallingScheduler,
     },
+    events: gameEvents,
     onGameOver: () => {
       gameState.stop(true);
       removeEventListener("keydown", keyPress);
@@ -356,7 +351,9 @@ export const main = (
   };
 
   const controller: GameController = {
-    start: () => {
+    start: (settings_: Settings) => {
+      settings = settings_;
+      context.settings = settings_;
       scene.clear();
       setup(context);
       addPiece(context);
@@ -380,73 +377,11 @@ export const main = (
       gameState.start();
       mainLoop();
     },
+    addEventListener: context.events.addListener,
   };
 
   debugUI.setup(context, controller);
-
-  return controller;
+  ui.setup(controller);
 };
 
-const App = () => {
-  const [fallenCubes, setFallenCubes] = React.useState<
-    [number, number, number][]
-  >([]);
-  const [geometries, setGeometries] = React.useState<number>(0);
-
-  const [gameState, setGameState] = React.useState<GameState>({
-    state: "stopped",
-    isGameOver: false,
-    removedRows: 0,
-  });
-
-  const callbacks: StateUpdateCallbacks = {
-    currentPiece: () => {},
-    fallenCubes: setFallenCubes,
-    rendererInfo: (rendererInfo) => setGeometries(rendererInfo.geometries),
-    updateGameState: (state) => setGameState({ ...state }),
-  };
-
-  const gameController = useRef<GameController>();
-
-  useEffect(() => {
-    const controller = main(loadSettings(), callbacks);
-    gameController.current = controller;
-    return () => controller.stop(false);
-  }, []);
-
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "stretch",
-        height: "100%",
-      }}
-    >
-      <div id="scene" style={{ flex: 1 }}></div>
-      <div id="settings" style={{ width: 300 }}>
-        {gameState.state === "stopped" && (
-          <button onClick={() => gameController.current?.start()}>
-            {gameState.isGameOver ? "Restart" : "Start"}
-          </button>
-        )}
-        <br />
-        {gameState.state}
-        <br />
-        Removed rows: {gameState.removedRows}
-        <br />
-        <br />
-        Geometries: {geometries}
-        <br />
-        <br />
-        Fallen cubes: {fallenCubes.length}
-      </div>
-    </div>
-  );
-};
-
-ReactDOM.createRoot(document.getElementById("app")!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+main(loadSettings());

@@ -2,7 +2,7 @@ import GUI from "lil-gui";
 import * as THREE from "three";
 import { Axis, Context, GameController, Settings } from "./types";
 import * as shaft from "./rendering/shaft";
-import { getAllDefaults, getCameraDefaults, getGameDefaults } from "./config";
+import { getCameraDefaults, getGameDefaults } from "./config";
 import { main } from "./main";
 import { saveSettings } from "./persist";
 
@@ -29,14 +29,13 @@ const applyDefaults = <O extends Record<string, unknown>>(
 
 let gui: GUI;
 export const setup = (context: Context, controller: GameController) => {
-  const { settings, schedulers, animator, camera, renderer, callbacks } =
-    context;
+  const { settings, schedulers, animator, camera, renderer } = context;
 
   const reinitialize = () => {
     controller.stop(false);
     renderer.removeDOMElement(context);
-    main(settings, callbacks);
-    controller.start();
+    main(settings);
+    controller.start(settings);
   };
 
   const rerenderShaft = () => {
@@ -44,12 +43,13 @@ export const setup = (context: Context, controller: GameController) => {
     controller.stop(false);
     shaft.setup(context);
     shaft.renderAll(context);
-    controller.start();
+    controller.start(settings);
   };
 
   // We'll be calling this function multiple times in case we reinitialize the game
   if (gui) gui.destroy();
   gui = new GUI();
+  gui.close();
   gui.onFinishChange(() => saveSettings(settings));
 
   const gameFolder = gui.addFolder("Game");

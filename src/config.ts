@@ -1,4 +1,4 @@
-import { CameraSettings, GameSettings, Settings } from "./types";
+import { CameraSettings, GameSettings, Settings, ShaftSettings } from "./types";
 
 export const ASPECT_RATIO = 1.375;
 export const getGameDefaults = (): GameSettings => ({
@@ -11,7 +11,7 @@ export const getGameDefaults = (): GameSettings => ({
   blockSet: "flat",
 });
 
-export const getCameraDefaults = (settings: GameSettings): CameraSettings => ({
+export const getCameraDefaults = (settings: ShaftSettings): CameraSettings => ({
   aspect: 0.8,
   fov: 50,
   zoom: 0.3,
@@ -28,4 +28,25 @@ export const getAllDefaults = (): Settings => {
   const gameDefaults = getGameDefaults();
   const cameraDefaults = getCameraDefaults(gameDefaults);
   return { ...gameDefaults, ...cameraDefaults };
+};
+
+export const gameModes: Record<string, Partial<Settings>> = {
+  "flat-fun": {
+    blockSet: "flat",
+    shaftSizeX: 5,
+    shaftSizeY: 12,
+    shaftSizeZ: 5,
+  },
+  "3d-mania": {
+    blockSet: "basic",
+    shaftSizeX: 3,
+    shaftSizeY: 10,
+    shaftSizeZ: 3,
+  },
+  "out-of-control": {
+    blockSet: "extended",
+    shaftSizeX: 5,
+    shaftSizeY: 10,
+    shaftSizeZ: 5,
+  },
 };

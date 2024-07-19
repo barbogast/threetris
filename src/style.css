@@ -1,0 +1,106 @@
+html {
+  height: 100%;
+}
+
+body {
+  font-family: "Courier New", Courier, monospace;
+  margin: 0;
+  background-color: black;
+  height: 100%;
+}
+
+.removed {
+  display: none !important;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.input-group > label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+#outer-container {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+#scene-container {
+  flex: 1;
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+}
+
+#scene {
+  height: 100%;
+  width: 600px;
+  /* margin-inline: auto;
+  margin-left: auto;
+  margin-right: auto; */
+}
+
+#overlay {
+  background-color: white;
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  opacity: 0.5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#right-column {
+  width: 250px;
+  text-align: center;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  color: white;
+}
+
+#panel {
+  color: blue;
+  display: flex;
+  flex-direction: column;
+  border: 3px solid blue;
+  padding: 15px;
+  margin: 5px;
+  flex: 1;
+}
+
+#panel h2 {
+  color: lightblue;
+  align-self: center;
+  margin-bottom: 2px;
+}
+
+.value {
+  border: 3px solid blue;
+  padding: 0px;
+  padding-top: 4px;
+  padding-right: 15px;
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 30px;
+}
+
+.green-font {
+  color: #04a601;
+  text-align: right;
+}
+
+.orange-font {
+  color: orange;
+  text-align: center;
+}
+
+.flexer {
+  flex: 1;
+}

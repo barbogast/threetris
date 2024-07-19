@@ -1,19 +1,19 @@
 import * as THREE from "three";
 
-import { Context, StateUpdateCallbacks } from "../types";
+import { Context } from "../types";
 import { ASPECT_RATIO } from "../config";
+import EventManager from "../gameEvents";
 
 class GameRenderer {
-  #callbacks?: StateUpdateCallbacks;
   #renderer: THREE.WebGLRenderer;
+  #events?: EventManager;
 
   constructor() {
     this.#renderer = new THREE.WebGLRenderer();
   }
 
   setup(context: Context) {
-    const { callbacks } = context;
-    this.#callbacks = callbacks;
+    this.#events = context.events;
 
     const el = document.getElementById("scene");
 
@@ -37,7 +37,7 @@ class GameRenderer {
   renderScene(context: Context) {
     const { scene, camera } = context;
     this.#renderer.render(scene, camera.getCamera());
-    this.#callbacks!.rendererInfo({
+    this.#events!.dispatch("rendererUpdate", {
       geometries: this.#renderer.info.memory.geometries,
     });
   }

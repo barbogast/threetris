@@ -1,23 +1,31 @@
+import EventManager from "./gameEvents";
+
 export type GameState = {
   state: "stopped" | "running" | "paused";
   isGameOver: boolean;
   removedRows: number;
+  fallenCubes: number;
 };
 
 export type GameStateCallback = (state: GameState) => void;
 
 class GameStateManager {
   #state: GameState;
-  #callback: GameStateCallback;
+  #events: EventManager;
 
-  constructor(callback: GameStateCallback) {
-    this.#state = { state: "stopped", isGameOver: false, removedRows: 0 };
-    this.#callback = callback;
+  constructor(events: EventManager) {
+    this.#state = {
+      state: "stopped",
+      isGameOver: false,
+      removedRows: 0,
+      fallenCubes: 0,
+    };
+    this.#events = events;
   }
 
   #changeState(state: Partial<GameState>) {
     Object.assign(this.#state, state);
-    this.#callback(this.#state);
+    this.#events.dispatch("gameStateChange", { gameState: this.#state });
   }
 
   start() {
@@ -34,6 +42,10 @@ class GameStateManager {
 
   removeRow() {
     this.#changeState({ removedRows: this.#state.removedRows + 1 });
+  }
+
+  pieceFellDown(numberOfCubes: number) {
+    this.#changeState({ fallenCubes: this.#state.fallenCubes + numberOfCubes });
   }
 
   isRunning() {
