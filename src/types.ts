@@ -57,12 +57,10 @@ export type Context = {
   schedulers: {
     falling: Scheduler;
   };
-  onGameOver: () => void;
 };
 
 export type GameController = {
   start: (settings: Settings) => void;
-  stop: (isGameOver: boolean) => void;
   pause: () => void;
   resume: () => void;
   addEventListener: GameEvents["addListener"];

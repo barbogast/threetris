@@ -29,7 +29,8 @@ const applyDefaults = <O extends Record<string, unknown>>(
 
 let gui: GUI;
 export const setup = (context: Context, controller: GameController) => {
-  const { settings, schedulers, animator, camera, renderer } = context;
+  const { settings, schedulers, animator, camera, renderer, scene, gameState } =
+    context;
 
   controller.addEventListener("settingsUpdate", ({ settings: newSettings }) => {
     Object.assign(settings, newSettings);
@@ -37,7 +38,8 @@ export const setup = (context: Context, controller: GameController) => {
   });
 
   const reinitialize = () => {
-    controller.stop(false);
+    gameState.stop(false);
+    scene.clear();
     renderer.removeDOMElement(context);
     main();
     controller.start(settings);
@@ -45,7 +47,8 @@ export const setup = (context: Context, controller: GameController) => {
 
   const rerenderShaft = () => {
     // Restart game to avoid having pieces outside the shaft
-    controller.stop(false);
+    gameState.stop(false);
+    scene.clear();
     shaft.setup(context);
     shaft.renderAll(context);
     controller.start(settings);

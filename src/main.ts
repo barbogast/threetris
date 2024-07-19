@@ -241,7 +241,7 @@ const handleShaftCollision = (
 };
 
 const addPiece = (context: Context) => {
-  const { settings, animator } = context;
+  const { settings, animator, gameState } = context;
 
   // Tetris pieces are constructed from cubes aligned next to or on top of each other.
   // In addition to aligning the cubes we need to remove mesh-lines between cubes where
@@ -260,7 +260,7 @@ const addPiece = (context: Context) => {
 
   const currentCubes = currentPiece.getCurrentCubes(mesh);
   if (fallenCubes.pieceCollidesWithFallenCube(context, currentCubes)) {
-    context.onGameOver();
+    gameState.stop(true);
   }
 };
 
@@ -330,11 +330,6 @@ export const main = () => {
       falling: fallingScheduler,
     },
     events: gameEvents,
-    onGameOver: () => {
-      gameState.stop(true);
-      removeEventListener("keydown", keyPress);
-      fallingScheduler.stop();
-    },
   };
 
   const keyPress = (e: KeyboardEvent) => {
@@ -343,6 +338,13 @@ export const main = () => {
       e.preventDefault();
     }
   };
+
+  gameEvents.addListener("gameStateChange", ({ gameState }) => {
+    if (gameState.state === "stopped") {
+      removeEventListener("keydown", keyPress);
+      fallingScheduler.stop();
+    }
+  });
 
   const updateSettings = (newSettings: Settings) => {
     context.settings = newSettings;
@@ -367,12 +369,6 @@ export const main = () => {
       addEventListener("keydown", keyPress);
       gameState.start();
       mainLoop();
-    },
-    stop: (isGameOver: boolean) => {
-      gameState.stop(isGameOver);
-      removeEventListener("keydown", keyPress);
-      fallingScheduler.stop();
-      scene.clear();
     },
     pause: () => {
       gameState.pause();
