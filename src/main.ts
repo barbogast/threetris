@@ -292,7 +292,7 @@ const handlePieceReachedFloor = (
   const { gameState } = context;
 
   fallenCubes.addPiece(context, currentCubes);
-  gameState.pieceFellDown(currentCubes.length);
+  gameState.pieceFellDown(currentCubes.length, fallenCubes.getHeight(context));
 
   disposeObject(currentPiece.getThreeObject(context));
   addPiece(context);
@@ -300,7 +300,7 @@ const handlePieceReachedFloor = (
   const fullLevels = fallenCubes.findFullLevels(context);
   for (const level of fullLevels) {
     fallenCubes.removeLevel(context, level);
-    gameState.removeRow();
+    gameState.removeRow(fallenCubes.getHeight(context));
   }
 };
 

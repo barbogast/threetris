@@ -9,6 +9,13 @@ body {
   height: 100%;
 }
 
+h2 {
+  color: lightblue;
+  align-self: center;
+  margin-top: 0;
+  margin-bottom: 2px;
+}
+
 .removed {
   display: none !important;
 }
@@ -56,6 +63,52 @@ body {
   align-items: center;
 }
 
+#left-column {
+  width: 75px;
+  border: 3px solid blue;
+  display: flex;
+  flex-direction: column;
+}
+
+#level-display {
+  padding: 2px;
+}
+
+#left-column-colored-blocks {
+  margin: 7px;
+}
+
+#left-column-colored-blocks > div {
+  border-left: 3px solid greenyellow;
+  border-right: 3px solid greenyellow;
+  border-top: 1px solid greenyellow;
+  padding-left: 2px;
+  padding-right: 2px;
+  padding-top: 1px;
+  height: 30px;
+  background-clip: content-box;
+  position: relative;
+}
+
+/* Put black line on top of the horizontal green borders between the colored blocks,
+ so that only so first and the last pixels of the border are visible */
+#left-column-colored-blocks > div:before {
+  content: "";
+  display: block;
+  position: absolute;
+  background-color: black;
+  z-index: 1000;
+  left: 2px;
+  top: -1px;
+  width: calc(100% - 4px);
+  height: 1px;
+}
+
+#left-column-colored-blocks > div:last-child {
+  border-bottom: 3px solid greenyellow;
+  padding-bottom: 2px;
+}
+
 #right-column {
   width: 250px;
   text-align: center;
@@ -73,19 +126,13 @@ body {
   padding: 15px;
   margin: 5px;
   flex: 1;
-}
-
-#panel h2 {
-  color: lightblue;
-  align-self: center;
-  margin-bottom: 2px;
+  gap: 20px;
 }
 
 .value {
   border: 3px solid blue;
   padding: 0px;
   padding-top: 4px;
-  padding-right: 15px;
   font-size: 40px;
   line-height: 30px;
 }
@@ -94,6 +141,7 @@ body {
   color: #04a601;
   font-weight: 600;
   text-align: right;
+  padding-right: 15px;
 }
 
 .orange-font {

@@ -1,4 +1,9 @@
-import { getGameDefaults, getCameraDefaults, gameModes } from "./config";
+import {
+  getGameDefaults,
+  getCameraDefaults,
+  gameModes,
+  COLORS,
+} from "./config";
 import { GameState } from "./gameState";
 import { ShaftSettings, Settings, BlockSet, GameController } from "./types";
 
@@ -87,8 +92,17 @@ export const setup = (controller: GameController) => {
 
   controller.addEventListener("gameStateChange", onGameStateChange);
 
-  controller.addEventListener("scoreUpdate", ({ score }) => {
+  controller.addEventListener("pieceFellDown", ({ score }) => {
     elements.scoreScore.textContent = String(score.removedRows);
     elements.scoreCubesPlayed.textContent = String(score.fallenCubes);
+
+    const coloredBlocks = Array.from<HTMLElement>(
+      document.querySelectorAll("#left-column-colored-blocks > div")
+    );
+    coloredBlocks.reverse(); // Apply color from bottom to top
+    for (let i = 0; i < coloredBlocks.length; i++) {
+      coloredBlocks[i].style.backgroundColor =
+        i < score.fallenCubesHeight ? COLORS[i] : "transparent";
+    }
   });
 };

@@ -5,9 +5,19 @@ export type GameState = {
   isGameOver: boolean;
 };
 
-export type GameScore = { removedRows: number; fallenCubes: number };
+export type GameScore = {
+  removedRows: number;
+  fallenCubes: number;
+  fallenCubesHeight: number;
+};
 
 export type GameStateCallback = (state: GameState) => void;
+
+const getInitialScore = (): GameScore => ({
+  removedRows: 0,
+  fallenCubes: 0,
+  fallenCubesHeight: 0,
+});
 
 class GameStateManager {
   #state: GameState;
@@ -19,7 +29,7 @@ class GameStateManager {
       state: "stopped",
       isGameOver: false,
     };
-    this.#score = { removedRows: 0, fallenCubes: 0 };
+    this.#score = getInitialScore();
     this.#events = events;
   }
 
@@ -30,12 +40,14 @@ class GameStateManager {
 
   #changeScore(score: Partial<GameScore>) {
     Object.assign(this.#score, score);
-    this.#events.dispatch("scoreUpdate", { score: this.#score });
+    this.#events.dispatch("pieceFellDown", {
+      score: this.#score,
+    });
   }
 
   start() {
     this.#changeState({ state: "running", isGameOver: false });
-    this.#changeScore({ removedRows: 0, fallenCubes: 0 });
+    this.#changeScore(getInitialScore());
   }
 
   pause() {
@@ -46,12 +58,18 @@ class GameStateManager {
     this.#changeState({ state: "stopped", isGameOver });
   }
 
-  removeRow() {
-    this.#changeScore({ removedRows: this.#score.removedRows + 1 });
+  removeRow(fallenCubesHeight: number) {
+    this.#changeScore({
+      removedRows: this.#score.removedRows + 1,
+      fallenCubesHeight,
+    });
   }
 
-  pieceFellDown(numberOfCubes: number) {
-    this.#changeScore({ fallenCubes: this.#score.fallenCubes + numberOfCubes });
+  pieceFellDown(numberOfCubes: number, fallenCubesHeight: number) {
+    this.#changeScore({
+      fallenCubes: this.#score.fallenCubes + numberOfCubes,
+      fallenCubesHeight,
+    });
   }
 
   getState() {

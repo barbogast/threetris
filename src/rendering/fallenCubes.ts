@@ -1,19 +1,10 @@
 import * as THREE from "three";
 import { Context } from "../types";
 import { disposeObject } from "../threeUtils";
+import { COLORS } from "../config";
 
 const FALLEN_CUBES_ID = "fallen-cubes";
 
-const COLORS = [
-  "darkblue",
-  "green",
-  "lightblue",
-  "red",
-  "pink",
-  "organe",
-  "white",
-  "darkblue",
-];
 const MATERIALS = COLORS.map((color) => new THREE.MeshBasicMaterial({ color }));
 
 const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
@@ -121,4 +112,13 @@ export const removeLevel = (context: Context, y: number) => {
 
   // Add a new layer at the top
   addLayer(context, shaftSizeY - 1);
+};
+
+export const getHeight = (context: Context) => {
+  const { settings } = context;
+  const lowestEmptyLayer = getAllLayers(context).find(
+    (layer) => layer.children.length === 0
+  );
+
+  return lowestEmptyLayer ? lowestEmptyLayer.position.y : settings.shaftSizeY;
 };

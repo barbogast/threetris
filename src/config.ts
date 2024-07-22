@@ -1,6 +1,21 @@
 import { CameraSettings, GameSettings, Settings, ShaftSettings } from "./types";
 
 export const ASPECT_RATIO = 1.375;
+
+export const COLORS = [
+  "darkblue",
+  "green",
+  "lightblue",
+  "red",
+  "pink",
+  "orange",
+  "white",
+  "darkblue",
+  "green",
+  "lightblue",
+  "red",
+];
+
 export const getGameDefaults = (): GameSettings => ({
   shaftSizeX: 5,
   shaftSizeY: 12,

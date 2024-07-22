@@ -8,7 +8,7 @@ type Events = {
   gameStateChange: {
     gameState: GameState;
   };
-  scoreUpdate: {
+  pieceFellDown: {
     score: GameScore;
   };
   rendererUpdate: {
