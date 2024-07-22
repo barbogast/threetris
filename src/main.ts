@@ -273,8 +273,8 @@ const letCurrentPieceFallDown = (context: Context) => {
   newPiece.position.y -= 1;
   const currentCubes = currentPiece.getCurrentCubes(newPiece);
   if (
-    fallenCubes.pieceCollidesWithFallenCube(context, currentCubes) ||
-    currentPiece.getShaftCollision(currentCubes, settings).isCollision
+    currentPiece.getShaftCollision(currentCubes, settings).isCollision ||
+    fallenCubes.pieceCollidesWithFallenCube(context, currentCubes)
   ) {
     handlePieceReachedFloor(
       context,
