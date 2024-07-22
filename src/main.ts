@@ -38,13 +38,15 @@ const setup = (context: Context) => {
 const onKeyPress = (context: Context, key: string) => {
   console.log(`keyPress "${key}"`);
 
-  const { eventQueue } = context;
+  const { eventQueue, gameState } = context;
   if (key === " ") {
     eventQueue.queueFunc((done) => onSpacebar(context, done));
   } else if (key.startsWith("Arrow")) {
     eventQueue.queueFunc((done) => onArrowKey(context, key, done));
   } else if (["q", "a", "w", "s", "e", "d"].includes(key)) {
     eventQueue.queueFunc((done) => onRotationKey(context, key, done));
+  } else if (key === "Escape") {
+    gameState.stop(false);
   } else {
     return true;
   }
