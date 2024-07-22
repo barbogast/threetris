@@ -67,6 +67,7 @@ class Camera {
 
   updateZoom(zoom: number) {
     this.#camera!.zoom = zoom;
+    this.#camera!.updateProjectionMatrix();
   }
 }
 
