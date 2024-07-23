@@ -1,17 +1,15 @@
 import * as THREE from "three";
 
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { Settings } from "../types";
+import { Context, Settings } from "../types";
 
 class Camera {
   #camera?: THREE.PerspectiveCamera;
-  #settings: Settings;
+  #settings?: Settings;
 
-  constructor(settings: Settings) {
+  setup(context: Context) {
+    const { settings } = context;
     this.#settings = settings;
-  }
-
-  setup() {
     this.#camera = new THREE.PerspectiveCamera(
       this.#settings.fov,
       this.#settings.aspect
@@ -46,9 +44,9 @@ class Camera {
     controls.maxPolarAngle = (0.9 * Math.PI) / 2;
     controls.enableZoom = true;
     controls.target = new THREE.Vector3(
-      this.#settings.shaftSizeX / 2,
+      this.#settings!.shaftSizeX / 2,
       1,
-      this.#settings.shaftSizeZ / 2
+      this.#settings!.shaftSizeZ / 2
     );
   }
 

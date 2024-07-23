@@ -24,7 +24,7 @@ import EventManager from "./gameEvents";
 const setup = (context: Context) => {
   const { renderer, settings, camera } = context;
 
-  camera.setup();
+  camera.setup(context);
   renderer.setup(context);
 
   if (settings.enableOrbitalControl)
@@ -310,7 +310,7 @@ const createContext = () => {
   const gameState = new GameStateManager(gameEvents);
   const scene = new THREE.Scene();
   const animator = new GameAnimator(settings.animationDuration);
-  const camera = new Camera(settings);
+  const camera = new Camera();
   const eventQueue = new AsyncFunctionQueue();
 
   const fallingScheduler = new Scheduler(settings.fallingSpeed, () =>
