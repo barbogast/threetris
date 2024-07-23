@@ -27,9 +27,9 @@ export const getGameDefaults = (): GameSettings => ({
 });
 
 export const getCameraDefaults = (settings: ShaftSettings): CameraSettings => ({
-  aspect: 0.8,
+  aspect: 1,
   fov: 50,
-  zoom: 0.3,
+  zoom: 1,
   sceneScaleY: 1,
   positionX: settings.shaftSizeX / 2,
   positionY: settings.shaftSizeY + 2.1,
