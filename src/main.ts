@@ -23,6 +23,7 @@ import EventManager from "./gameEvents";
 
 const setup = (context: Context) => {
   const { renderer, settings, camera } = context;
+  console.log("setup", settings);
 
   camera.setup(context);
   renderer.setup(context);
@@ -309,6 +310,7 @@ const createContext = () => {
   const gameEvents = new EventManager(renderer.getDomElement());
   const gameState = new GameStateManager(gameEvents);
   const scene = new THREE.Scene();
+  scene.scale.y = 0.8;
   const animator = new GameAnimator(settings.animationDuration);
   const camera = new Camera();
   const eventQueue = new AsyncFunctionQueue();

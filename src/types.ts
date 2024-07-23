@@ -26,6 +26,7 @@ export type CameraSettings = {
   aspect: number;
   fov: number;
   zoom: number;
+  sceneScaleY: number;
   positionX: number;
   positionY: number;
   positionZ: number;

@@ -108,6 +108,10 @@ export const setup = (context: Context, controller: GameController) => {
     .add(settings, "zoom", 0, 10, 0.1)
     .onChange((v: number) => camera.updateZoom(v));
 
+  cameraFolder
+    .add(settings, "sceneScaleY", 0.01, 2, 0.01)
+    .onChange((v: number) => (scene.scale.y = v));
+
   const positionFolder = cameraFolder.addFolder("Position");
   positionFolder.add(settings, "positionX", -10, 10, 0.1);
   positionFolder.add(settings, "positionY", -1, 30, 0.1);
@@ -149,6 +153,4 @@ export const setup = (context: Context, controller: GameController) => {
     },
     "reset"
   );
-
-  console.log("done");
 };
