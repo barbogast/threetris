@@ -50,6 +50,11 @@ class Camera {
     );
   }
 
+  updateAspect(aspect: number) {
+    this.#camera!.aspect = aspect;
+    this.#camera!.updateProjectionMatrix();
+  }
+
   updateFov(fov: number) {
     this.#camera!.fov = fov;
     this.#camera!.updateProjectionMatrix();

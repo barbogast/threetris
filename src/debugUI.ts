@@ -100,7 +100,9 @@ export const setup = (context: Context, controller: GameController) => {
 
   const cameraFolder = gui.addFolder("Camera");
 
-  cameraFolder.add(settings, "aspect", 0, 5, 0.1);
+  cameraFolder
+    .add(settings, "aspect", 0, 3, 0.1)
+    .onChange((v: number) => camera.updateAspect(v));
   cameraFolder
     .add(settings, "fov", 0, 180, 1)
     .onChange((v: number) => camera.updateFov(v));
