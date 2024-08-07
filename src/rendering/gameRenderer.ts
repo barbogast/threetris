@@ -4,6 +4,8 @@ import { Context } from "../types";
 import { ASPECT_RATIO } from "../config";
 import EventManager from "../gameEvents";
 
+import { removeChildElements } from "../utils";
+
 class GameRenderer {
   #renderer: THREE.WebGLRenderer;
   #events?: EventManager;
@@ -44,13 +46,7 @@ class GameRenderer {
 
   removeDOMElement(context: Context) {
     const { gameState } = context;
-    const el = document.getElementById("scene");
-    const children = el?.children;
-    if (children) {
-      for (let i = 0; i < children.length; i++) {
-        children[i].remove();
-      }
-    }
+    removeChildElements(document.getElementById("scene")!);
     gameState.stop(false);
   }
 }
