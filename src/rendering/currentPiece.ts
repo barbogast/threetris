@@ -53,7 +53,7 @@ export const renderCurrentPiece = (
     point.name = `shadow-cube|${offset.x}/${offset.y}/${offset.z}`;
 
     // Move the point to the center of the cube, so that it stays in place when the cube is rotated
-    point.position.copy(offset.clone().addScalar(0.5));
+    point.position.copy(offset).addScalar(0.5);
     lines.add(point);
   }
 
