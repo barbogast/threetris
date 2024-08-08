@@ -129,7 +129,7 @@ export const setup = (context: Context, controller: GameController) => {
     camera.updatePosition(newPos);
   });
 
-  const lookAtFolder = cameraFolder.addFolder("Position");
+  const lookAtFolder = cameraFolder.addFolder("Look At");
   lookAtFolder.add(settings, "lookAtX", -5, 5, 0.1);
   lookAtFolder.add(settings, "lookAtY", -10, 5, 0.1);
   lookAtFolder.add(settings, "lookAtZ", -10, 10, 0.1);
