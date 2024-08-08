@@ -145,6 +145,7 @@ export const setup = (context: Context, controller: GameController) => {
   });
 
   cameraFolder.add(settings, "enableOrbitalControl").onChange(reinitialize);
+  cameraFolder.add(settings, "enableDebugRenderer").onChange(reinitialize);
 
   cameraFolder.add(
     {

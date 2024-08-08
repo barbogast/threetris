@@ -38,6 +38,7 @@ export const getCameraDefaults = (settings: ShaftSettings): CameraSettings => ({
   lookAtY: 1,
   lookAtZ: settings.shaftSizeZ / 2,
   enableOrbitalControl: false,
+  enableDebugRenderer: false,
 });
 
 export const getAllDefaults = (): Settings => {

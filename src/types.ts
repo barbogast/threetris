@@ -34,6 +34,7 @@ export type CameraSettings = {
   lookAtY: number;
   lookAtZ: number;
   enableOrbitalControl: boolean;
+  enableDebugRenderer: boolean;
 };
 
 export type Settings = GameSettings & CameraSettings;
