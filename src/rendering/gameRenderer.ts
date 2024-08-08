@@ -67,11 +67,9 @@ class GameRenderer {
     });
   }
 
-  removeDOMElement(context: Context) {
-    const { gameState } = context;
+  removeDOMElement() {
     removeChildElements(document.getElementById("scene")!);
     removeChildElements(document.getElementById("scene-debug")!);
-    gameState.stop(false);
   }
 }
 

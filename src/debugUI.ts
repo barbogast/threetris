@@ -47,7 +47,7 @@ export const setup = (context: Context, controller: GameController) => {
   const reinitialize = () => {
     gameState.stop(false);
     scene.clear();
-    renderer.removeDOMElement(context);
+    renderer.removeDOMElement();
     main();
     controller.start(settings);
   };
