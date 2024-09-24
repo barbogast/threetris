@@ -359,7 +359,7 @@ const shapeDefinitions: ShapeDefinition = {
 ---------
 ▢
 ▢▢
-  ▢▢
+ ▢▢
 ---------`,
     ],
   },
