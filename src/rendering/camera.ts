@@ -39,7 +39,7 @@ class Camera {
     // position the camera on top of the scene
     this.#camera.position.set(
       this.#settings.positionX,
-      posY + 0.01, // Add a bit of distance so that the shaft border is visible
+      posY + 0.02, // Add a bit of distance so that the shaft border is visible
       this.#settings.positionZ
     );
 

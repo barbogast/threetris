@@ -19,6 +19,13 @@ class GameRenderer {
   setup(context: Context) {
     this.#events = context.gameEvents;
 
+    const elDebug = document.getElementById("scene-debug")!;
+    if (context.settings.enableDebugRenderer) {
+      // We need to enable the div-element of the debug renderer so that the
+      // width of the actual renderer gets calculated correctly
+      elDebug.style.display = "block";
+    }
+
     const el = document.getElementById("scene");
 
     let height = el!.offsetHeight;
@@ -35,8 +42,6 @@ class GameRenderer {
 
     if (context.settings.enableDebugRenderer) {
       this.#debugRenderer = new THREE.WebGLRenderer();
-
-      const elDebug = document.getElementById("scene-debug")!;
       elDebug.appendChild(this.#debugRenderer.domElement);
 
       this.#debugRenderer.setSize(500, 500);
