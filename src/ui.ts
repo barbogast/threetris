@@ -9,6 +9,7 @@ import { ShaftSettings, Settings, BlockSet, GameController } from "./types";
 
 const elements = {
   overlay: document.getElementById("overlay")!,
+  newGame: document.getElementById("new-game")!,
   gameOver: document.getElementById("game-over")!,
   shaftSizeX: document.getElementById("shaft-size-x") as HTMLSelectElement,
   shaftSizeY: document.getElementById("shaft-size-y") as HTMLSelectElement,
@@ -65,6 +66,7 @@ const onGameStateChange = ({ gameState }: { gameState: GameState }) => {
     case "stopped": {
       elements.overlay.classList.remove("removed");
       if (gameState.isGameOver) {
+        elements.newGame.classList.add("hidden");
         elements.gameOver.classList.remove("hidden");
       }
       break;
@@ -74,6 +76,10 @@ const onGameStateChange = ({ gameState }: { gameState: GameState }) => {
 
 export const setup = (controller: GameController) => {
   document.getElementById("start")!.onclick = () => startGame(controller);
+  document.getElementById("again")!.onclick = () => {
+    elements.newGame.classList.remove("hidden");
+    elements.gameOver.classList.add("hidden");
+  };
 
   getInput("game-mode").forEach((el) =>
     el.addEventListener("change", updateGameMode)

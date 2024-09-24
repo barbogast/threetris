@@ -46,6 +46,8 @@ h2 {
 #scene {
   height: 100%;
   flex: 1;
+  display: flex;
+  justify-content: center;
 }
 
 #scene-debug {
@@ -55,15 +57,17 @@ h2 {
 }
 
 #overlay {
-  background-color: white;
+  background-color: black;
+  color: white;
   position: absolute;
   top: 0;
   height: 100%;
   width: 100%;
-  opacity: 0.5;
+  opacity: 0.8;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 
 #left-column {
