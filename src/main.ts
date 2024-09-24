@@ -310,7 +310,8 @@ const createContext = () => {
   const gameEvents = new EventManager(renderer.getDomElement());
   const gameState = new GameStateManager(gameEvents);
   const scene = new THREE.Scene();
-  scene.scale.y = 0.8;
+  // scene.scale.y = 0.8;
+
   const animator = new GameAnimator(settings.animationDuration);
   const camera = new Camera();
   const eventQueue = new AsyncFunctionQueue();

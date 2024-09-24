@@ -9,7 +9,7 @@ class Camera {
   #cameraPerspectiveHelper?: THREE.CameraHelper;
 
   setup(context: Context) {
-    const { settings } = context;
+    const { settings, scene } = context;
     this.#settings = settings;
     this.#camera = new THREE.PerspectiveCamera(
       this.#settings.fov,
@@ -17,10 +17,29 @@ class Camera {
     );
     this.#camera.zoom = this.#settings.zoom;
 
+    const camera = this.#camera;
+
+    // Calculate the y position of the camera so that the shaft fits into the frustum (visible area)
+    // The camera is positioned on top of the shaft (settings.shaftSizeY). In
+    // addition we might need to move the camera further away from the shaft
+    // so that the whole shaft fits into the frustum. The offset is calculated
+    // using a funky formula I found on the interwebs...
+    // See https://discourse.threejs.org/t/is-it-possible-to-know-at-what-distance-of-the-camera-from-the-cube-the-height-of-the-perspective-projection-of-the-cube-will-be-equal-to-the-height-of-the-screen/40449/6
+    // and https://jsfiddle.net/tfoller/yt9vLo6j/
+    const box_h = settings.shaftSizeX;
+    const box_w = settings.shaftSizeZ;
+    const degToRad = Math.PI / 180;
+    // Distance for height of shaft
+    const d_h = box_h / (2 * Math.tan((degToRad * camera.fov) / 2));
+    // Distance for width of shaft
+    const d_w =
+      box_w / (camera.aspect * 2 * Math.tan((degToRad * camera.fov) / 2));
+    const posY = settings.shaftSizeY + Math.max(d_h, d_w);
+
     // position the camera on top of the scene
     this.#camera.position.set(
       this.#settings.positionX,
-      this.#settings.positionY,
+      posY + 0.01, // Add a bit of distance so that the shaft border is visible
       this.#settings.positionZ
     );
 
