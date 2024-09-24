@@ -28,13 +28,18 @@ class GameRenderer {
 
     const el = document.getElementById("scene");
 
-    let height = el!.offsetHeight;
-    let width = el!.offsetHeight * ASPECT_RATIO;
+    let height, width;
 
-    if (width > el!.offsetWidth) {
+    if (el!.offsetHeight > el!.offsetWidth) {
+      height = el!.offsetHeight;
+      width = el!.offsetHeight * ASPECT_RATIO;
+    } else {
       width = el!.offsetWidth;
       height = el!.offsetWidth / ASPECT_RATIO;
     }
+
+    width = Math.min(width, el!.offsetWidth);
+    height = Math.min(height, el!.offsetHeight);
 
     el!.appendChild(this.#renderer.domElement);
 
