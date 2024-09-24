@@ -6,6 +6,7 @@ import { Context, Settings } from "../types";
 class Camera {
   #camera?: THREE.PerspectiveCamera;
   #settings?: Settings;
+  #cameraPerspectiveHelper?: THREE.CameraHelper;
 
   setup(context: Context) {
     const { settings } = context;
@@ -31,6 +32,11 @@ class Camera {
     );
 
     this.#camera.updateProjectionMatrix();
+
+    if (settings.enableDebugRenderer) {
+      this.#cameraPerspectiveHelper = new THREE.CameraHelper(this.#camera);
+      scene.add(this.#cameraPerspectiveHelper);
+    }
   }
 
   getCamera() {
@@ -53,24 +59,29 @@ class Camera {
   updateAspect(aspect: number) {
     this.#camera!.aspect = aspect;
     this.#camera!.updateProjectionMatrix();
+    this.#cameraPerspectiveHelper?.update();
   }
 
   updateFov(fov: number) {
     this.#camera!.fov = fov;
     this.#camera!.updateProjectionMatrix();
+    this.#cameraPerspectiveHelper?.update();
   }
 
   updatePosition(position: THREE.Vector3) {
     this.#camera!.position.copy(position);
+    this.#cameraPerspectiveHelper?.update();
   }
 
   updateLookAt(lookAt: THREE.Vector3) {
     this.#camera!.lookAt(lookAt.x, lookAt.y, lookAt.z);
+    this.#cameraPerspectiveHelper?.update();
   }
 
   updateZoom(zoom: number) {
     this.#camera!.zoom = zoom;
     this.#camera!.updateProjectionMatrix();
+    this.#cameraPerspectiveHelper?.update();
   }
 }
 
