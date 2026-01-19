@@ -1,0 +1,41 @@
+#outer-container {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+#scene-container {
+  flex: 1;
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+}
+
+#scene {
+  height: 100%;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#scene-debug {
+  flex: 1;
+  height: 500px;
+  display: none;
+}
+
+#overlay {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  opacity: 0.8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}

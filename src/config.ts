@@ -66,4 +66,10 @@ export const gameModes: Record<string, Partial<Settings>> = {
     shaftSizeY: 10,
     shaftSizeZ: 5,
   },
+  custom: {
+    blockSet: "flat",
+    shaftSizeX: 5,
+    shaftSizeY: 12,
+    shaftSizeZ: 5,
+  },
 };

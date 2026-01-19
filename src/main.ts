@@ -1,4 +1,8 @@
-import "./style.css";
+import "./styles/variables.css";
+import "./styles/base.css";
+import "./styles/layout.css";
+import "./styles/sidebar.css";
+import "./styles/menu.css";
 
 import * as THREE from "three";
 

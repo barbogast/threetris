@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -39,106 +39,167 @@
           </div>
           <div id="new-game">
             <h1>THREETRIS</h1>
-            <div class="input-group">
-              <label
-                ><input
-                  type="radio"
-                  name="game-mode"
-                  value="flat-fun"
-                  checked
-                />Flat fun</label
-              >
-              <label
-                ><input
-                  type="radio"
-                  name="game-mode"
-                  value="3d-mania"
-                />3D-Mania</label
-              >
-              <label
-                ><input
-                  type="radio"
-                  name="game-mode"
-                  value="out-of-control"
-                />Out of control</label
-              >
-              <br />
-              <label
-                ><input
+
+            <div class="menu-section">
+              <h3 class="section-title">Select Mode</h3>
+              <div class="mode-cards">
+                <label class="mode-card selected">
+                  <input
+                    type="radio"
+                    name="game-mode"
+                    value="flat-fun"
+                    checked
+                  />
+                  <div class="card-preview">
+                    <div class="preview-piece flat-piece">
+                      <span></span><span></span><span></span>
+                    </div>
+                  </div>
+                  <div class="card-title">Flat Fun</div>
+                  <div class="card-dims">
+                    3<span class="x">x</span>3<span class="x">x</span>8
+                  </div>
+                </label>
+                <label class="mode-card">
+                  <input type="radio" name="game-mode" value="3d-mania" />
+                  <div class="card-preview">
+                    <div class="preview-piece mania-piece">
+                      <span></span><span></span><span></span><span></span>
+                    </div>
+                  </div>
+                  <div class="card-title">3D Mania</div>
+                  <div class="card-dims">
+                    5<span class="x">x</span>5<span class="x">x</span>12
+                  </div>
+                </label>
+                <label class="mode-card">
+                  <input type="radio" name="game-mode" value="out-of-control" />
+                  <div class="card-preview">
+                    <div class="preview-piece expert-piece">
+                      <span></span><span></span><span></span><span></span
+                      ><span></span>
+                    </div>
+                  </div>
+                  <div class="card-title">Expert</div>
+                  <div class="card-dims">
+                    7<span class="x">x</span>7<span class="x">x</span>18
+                  </div>
+                </label>
+                <label class="mode-card">
+                  <input type="radio" name="game-mode" value="custom" />
+                  <div class="card-preview">
+                    <div class="preview-piece custom-piece">
+                      <span class="gear">&#9881;</span>
+                    </div>
+                  </div>
+                  <div class="card-title">Custom</div>
+                  <div class="card-dims">you decide</div>
+                </label>
+              </div>
+              <div id="game-settings" class="custom-settings hidden">
+                <div class="settings-grid">
+                  <label class="setting-item">
+                    <span>Length</span>
+                    <select id="shaft-size-x">
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                      <option value="6">6</option>
+                      <option value="7">7</option>
+                    </select>
+                  </label>
+                  <label class="setting-item">
+                    <span>Width</span>
+                    <select id="shaft-size-z">
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                      <option value="6">6</option>
+                      <option value="7">7</option>
+                    </select>
+                  </label>
+                  <label class="setting-item">
+                    <span>Depth</span>
+                    <select id="shaft-size-y">
+                      <option value="6">6</option>
+                      <option value="7">7</option>
+                      <option value="8">8</option>
+                      <option value="9">9</option>
+                      <option value="10">10</option>
+                      <option value="11">11</option>
+                      <option value="12">12</option>
+                      <option value="13">13</option>
+                      <option value="14">14</option>
+                      <option value="15">15</option>
+                      <option value="16">16</option>
+                      <option value="17">17</option>
+                      <option value="18">18</option>
+                    </select>
+                  </label>
+                  <label class="setting-item">
+                    <span>Block set</span>
+                    <select id="block-set">
+                      <option value="flat">Flat</option>
+                      <option value="basic">Basic</option>
+                      <option value="extended">Extended</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="menu-section option-with-description">
+              <label class="custom-checkbox">
+                <input
                   type="checkbox"
-                  name="game-mode"
+                  name="practice-mode"
                   value="practice-mode"
-                />Practice mode</label
-              >
-              <br />
-              <label
-                ><input
-                  type="checkbox"
-                  name="custom-game"
-                  value="custom"
-                />Custom</label
-              >
+                />
+                <span class="checkmark"></span>
+                Practice Mode
+              </label>
+              <p class="option-description">
+                Pieces don't fall automatically. Take your time to learn the
+                controls.
+              </p>
             </div>
-            <div id="game-settings" class="input-group hidden">
-              <h3>Pit dimensions</h3>
-              <label
-                >Length
-                <select id="shaft-size-x">
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                  <option value="6">6</option>
-                  <option value="7">7</option>
-                </select></label
-              >
-              <label
-                >Width
-                <select id="shaft-size-z">
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                  <option value="6">6</option>
-                  <option value="7">7</option>
-                </select></label
-              >
-              <label
-                >Depth
-                <select id="shaft-size-y">
-                  <option value="6">6</option>
-                  <option value="7">7</option>
-                  <option value="8">8</option>
-                  <option value="9">9</option>
-                  <option value="10">10</option>
-                  <option value="11">11</option>
-                  <option value="12">12</option>
-                  <option value="13">13</option>
-                  <option value="14">14</option>
-                  <option value="15">15</option>
-                  <option value="16">16</option>
-                  <option value="17">17</option>
-                  <option value="18">18</option>
-                </select></label
-              >
-              <label
-                >Block set
-                <select id="block-set">
-                  <option value="flat">Flat</option>
-                  <option value="basic">Basic</option>
-                  <option value="extended">Extended</option>
-                </select></label
-              >
-              <label
-                >Rotation speed
-                <select id="rotation-speed">
-                  <option value="slow">Slow</option>
-                  <option value="medium">Medium</option>
-                  <option value="fast">Fast</option>
-                </select></label
-              >
+
+            <div class="menu-section">
+              <h3 class="section-title">Controls</h3>
+              <div class="controls-layout">
+                <div class="control-group">
+                  <div class="arrow-keys">
+                    <span class="key">↑</span>
+                    <div class="arrow-row">
+                      <span class="key">←</span>
+                      <span class="key">↓</span>
+                      <span class="key">→</span>
+                    </div>
+                  </div>
+                  <div class="control-label">Move</div>
+                </div>
+                <div class="control-group">
+                  <div class="rotation-keys">
+                    <div class="key-pair">
+                      <span class="key">Q</span><span class="key">A</span>
+                    </div>
+                    <div class="key-pair">
+                      <span class="key">W</span><span class="key">S</span>
+                    </div>
+                    <div class="key-pair">
+                      <span class="key">E</span><span class="key">D</span>
+                    </div>
+                  </div>
+                  <div class="control-label">Rotate X / Z / Y</div>
+                </div>
+              </div>
+              <div class="space-control">
+                <span class="key wide">SPACE</span>
+                <span class="control-label">Drop</span>
+              </div>
             </div>
-            <div>Move with arrow keys<br /><br />Roate with Q/A, W/S, E/D</div>
-            <br />
-            <button id="start">Start</button>
+
+            <button id="start">Start Game</button>
           </div>
         </div>
       </div>

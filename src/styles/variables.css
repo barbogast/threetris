@@ -1,0 +1,42 @@
+:root {
+  /* Colors */
+  --color-bg: black;
+  --color-text: white;
+  --color-primary: greenyellow;
+  /* Dim variants based on --color-primary (greenyellow = rgb(173, 255, 47)) */
+  --color-primary-dim: rgba(173, 255, 47, 0.2);
+  --color-primary-dimmer: rgba(173, 255, 47, 0.1);
+  --color-secondary: orange;
+  --color-accent: lightblue;
+  --color-score: #04a601;
+  --color-border: blue;
+  --color-border-muted: #444;
+  --color-border-muted-hover: #666;
+  --color-text-muted: #888;
+
+  /* Typography */
+  --font-family: "Courier New", Courier, monospace;
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-md: 14px;
+  --font-size-lg: 18px;
+  --font-size-xl: 25px;
+  --font-size-2xl: 36px;
+  --font-size-3xl: 40px;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 15px;
+  --spacing-xl: 20px;
+
+  /* Borders */
+  --border-width: 3px;
+  --border-width-sm: 2px;
+  --border-panel: var(--border-width) solid var(--color-border);
+  --border-muted: var(--border-width-sm) solid var(--color-border-muted);
+
+  /* Transitions */
+  --transition-fast: 0.2s;
+}

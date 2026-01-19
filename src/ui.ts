@@ -50,11 +50,20 @@ const updateGameMode = () => {
   const mode = (
     document.querySelector(`input[name=game-mode]:checked`) as HTMLInputElement
   ).value;
-  const values = gameModes[mode]!;
-  elements.shaftSizeX.value = String(values.shaftSizeX);
-  elements.shaftSizeY.value = String(values.shaftSizeY);
-  elements.shaftSizeZ.value = String(values.shaftSizeZ);
-  elements.blockSet.value = String(values.blockSet);
+
+  // Show/hide custom settings
+  const gameSettings = document.getElementById("game-settings");
+  if (mode === "custom") {
+    gameSettings?.classList.remove("hidden");
+  } else {
+    gameSettings?.classList.add("hidden");
+    // Only update values for preset modes
+    const values = gameModes[mode]!;
+    elements.shaftSizeX.value = String(values.shaftSizeX);
+    elements.shaftSizeY.value = String(values.shaftSizeY);
+    elements.shaftSizeZ.value = String(values.shaftSizeZ);
+    elements.blockSet.value = String(values.blockSet);
+  }
 };
 
 const onGameStateChange = ({ gameState }: { gameState: GameState }) => {
@@ -81,20 +90,22 @@ export const setup = (controller: GameController) => {
     elements.gameOver.classList.add("hidden");
   };
 
-  getInput("game-mode").forEach((el) =>
-    el.addEventListener("change", updateGameMode)
-  );
+  // Mode card selection handling
+  const modeCards = document.querySelectorAll(".mode-card");
+  getInput("game-mode").forEach((el) => {
+    el.addEventListener("change", () => {
+      // Update selected card styling
+      modeCards.forEach((card) => card.classList.remove("selected"));
+      const selectedCard = el.closest(".mode-card");
+      if (selectedCard) {
+        selectedCard.classList.add("selected");
+      }
+      updateGameMode();
+    });
+  });
 
   // Apply the values the initially selected game mode
   updateGameMode();
-
-  getInput("custom-game")[0].addEventListener("change", (event: Event) => {
-    if ((event!.currentTarget as HTMLInputElement).checked) {
-      document.getElementById("game-settings")?.classList.remove("hidden");
-    } else {
-      document.getElementById("game-settings")?.classList.add("hidden");
-    }
-  });
 
   controller.addEventListener("gameStateChange", onGameStateChange);
 
